@@ -1,0 +1,104 @@
+/**
+ * Unit Tests for GameSearchService, Adapters, Persistent SQLite Cache, and Empty Results Caching.
+ */
+
+import { describe, it, expect, beforeEach } from 'bun:test';
+import { Database } from 'bun:sqlite';
+import { GameSearchService } from '../src/services/game-search.service';
+import { RawgAdapter, type RawgRawGame } from '../src/providers/rawg.adapter';
+import { IgdbAdapter, type IgdbRawGame } from '../src/providers/igdb.adapter';
+import { SearchCacheService } from '../src/services/search-cache.service';
+import { initDatabase } from '../src/db/index';
+import { ENV } from '../src/config/env';
+
+describe('GameSearchService and SearchCache', () => {
+  let testDb: Database;
+
+  beforeEach(() => {
+    testDb = initDatabase(':memory:');
+    SearchCacheService.clear(true, testDb);
+  });
+
+  it('should normalize RAWG API raw game payload correctly via RawgAdapter', () => {
+    const rawGames: RawgRawGame[] = [
+      {
+        id: 3498,
+        name: 'Grand Theft Auto V',
+        background_image: 'https://media.rawg.io/media/games/20a/20aa03a10e7c5236ba150d03c973fc3b.jpg',
+        released: '2013-09-17',
+        rating: 4.47,
+        genres: [
+          { id: 4, name: 'Action' },
+          { id: 3, name: 'Adventure' },
+        ],
+        platforms: [
+          { platform: { id: 4, name: 'PC' } },
+          { platform: { id: 187, name: 'PlayStation 5' } },
+        ],
+        tags: [
+          { id: 31, name: 'Singleplayer', slug: 'singleplayer' },
+          { id: 7, name: 'Multiplayer', slug: 'multiplayer' },
+        ],
+      },
+    ];
+
+    const adapter = new RawgAdapter();
+    // Use type assertion to access private normalizeGames for testing
+    const normalized = (adapter as any).normalizeGames(rawGames);
+
+    expect(normalized).toHaveLength(1);
+    expect(normalized[0]).toEqual({
+      id: 3498,
+      title: 'Grand Theft Auto V',
+      cover_url: 'https://media.rawg.io/media/games/20a/20aa03a10e7c5236ba150d03c973fc3b.jpg',
+      release_year: 2013,
+      summary: null,
+      genres: ['Action', 'Adventure'],
+      platforms: ['PC', 'PlayStation 5'],
+      rating: 4.5,
+      game_modes: ['Singleplayer', 'Multiplayer'],
+    });
+  });
+
+  it('should persist search results in SQLite search_cache table', async () => {
+    // 1. Initially cache is empty
+    expect(SearchCacheService.getSqlite('witcher', testDb)).toBeNull();
+
+    // 2. Perform search on local database / seed in offline mode
+    const originalKey = ENV.RAWG_API_KEY;
+    ENV.RAWG_API_KEY = '';
+    const results = await GameSearchService.searchGames('witcher', 10, testDb);
+    ENV.RAWG_API_KEY = originalKey;
+
+    expect(results.length).toBeGreaterThanOrEqual(1);
+
+    // 3. SQLite search_cache table should now have the entry
+    const cached = SearchCacheService.getSqlite('witcher', testDb);
+    expect(cached).not.toBeNull();
+    expect(cached?.length).toBe(results.length);
+    expect(cached?.[0].title.toLowerCase()).toContain('witcher');
+  });
+
+  it('should cache empty results [] in SQLite to prevent external quota exhaustion', () => {
+    // Store empty results for a non-existent game title
+    const nonExistentQuery = 'nonexistentgamexyz12345';
+    SearchCacheService.setSqlite(nonExistentQuery, [], testDb);
+
+    const cached = SearchCacheService.getSqlite(nonExistentQuery, testDb);
+    expect(cached).not.toBeNull();
+    expect(cached).toEqual([]);
+  });
+
+  it('should fallback to local curated seed database when offline', async () => {
+    const originalKey = ENV.RAWG_API_KEY;
+    ENV.RAWG_API_KEY = '';
+    const results = await GameSearchService.searchGames('zelda', 10, testDb);
+    ENV.RAWG_API_KEY = originalKey;
+
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    const botw = results.find((g) => g.title.includes('Breath of the Wild'));
+    expect(botw).toBeDefined();
+    expect(botw?.genres).toContain('Adventure');
+  });
+});
+
