@@ -7,8 +7,7 @@
  * 3. Storing empty results `[]` so non-existent game queries do not re-drain quotas
  */
 
-import { Database } from 'bun:sqlite';
-import { getDatabase } from '../db/index';
+import { getDatabase, type SqlClient } from '../db/index';
 import { CONSTANTS } from '../config/constants';
 import type { NormalizedGame } from '../types/games';
 
@@ -72,19 +71,19 @@ export class SearchCacheService {
   }
 
   /**
-   * Retrieves cached search results from the persistent SQLite `search_cache` table.
-   * Enforces a 45-day TTL (within the 30-60 day safe window for game data).
+   * Retrieves cached search results from the persistent PostgreSQL `search_cache` table.
+   * Enforces a 45-day TTL.
    */
-  public static getSqlite(query: string, customDb?: Database): NormalizedGame[] | null {
-    const db = customDb || getDatabase();
+  public static async getDb(query: string, customSql?: SqlClient): Promise<NormalizedGame[] | null> {
+    const sql = customSql || getDatabase();
     const queryText = query.trim().toLowerCase();
 
     try {
-      const row = db
-        .query<{ json_response: string; timestamp: string }, [string]>(
-          'SELECT json_response, timestamp FROM search_cache WHERE query_text = ?;'
-        )
-        .get(queryText);
+      const [row] = await sql<[{ json_response: any; timestamp: Date | string }?]>`
+        SELECT json_response, timestamp 
+        FROM search_cache 
+        WHERE query_text = ${queryText};
+      `;
 
       if (!row) return null;
 
@@ -94,52 +93,49 @@ export class SearchCacheService {
 
       if (!isNaN(recordTime) && now - recordTime > CONSTANTS.SEARCH_CACHE_TTL_MS) {
         // Expired - clean up row
-        db.run('DELETE FROM search_cache WHERE query_text = ?;', [queryText]);
+        await sql`DELETE FROM search_cache WHERE query_text = ${queryText};`;
         return null;
       }
 
-      const parsed = JSON.parse(row.json_response);
+      const parsed = typeof row.json_response === 'string' ? JSON.parse(row.json_response) : row.json_response;
       return Array.isArray(parsed) ? parsed : [];
     } catch (err) {
-      console.warn('[SearchCache] Error reading from SQLite search_cache:', err);
+      console.warn('[SearchCache] Error reading from PostgreSQL search_cache:', err);
       return null;
     }
   }
 
   /**
-   * Stores search results in the persistent SQLite `search_cache` table.
+   * Stores search results in the persistent PostgreSQL `search_cache` table.
    * Explicitly caches empty results `[]` to prevent quota exhaustion on non-existent titles.
    */
-  public static setSqlite(query: string, data: NormalizedGame[], customDb?: Database): void {
-    const db = customDb || getDatabase();
+  public static async setDb(query: string, data: NormalizedGame[], customSql?: SqlClient): Promise<void> {
+    const sql = customSql || getDatabase();
     const queryText = query.trim().toLowerCase();
 
     try {
       const jsonResponse = JSON.stringify(data);
-      db.run(
-        `
+      await sql`
         INSERT INTO search_cache (query_text, json_response, timestamp)
-        VALUES (?, ?, CURRENT_TIMESTAMP)
+        VALUES (${queryText}, ${jsonResponse}::jsonb, CURRENT_TIMESTAMP)
         ON CONFLICT(query_text) DO UPDATE SET
-          json_response = excluded.json_response,
+          json_response = EXCLUDED.json_response,
           timestamp = CURRENT_TIMESTAMP;
-      `,
-        [queryText, jsonResponse]
-      );
+      `;
     } catch (err) {
-      console.warn('[SearchCache] Error saving to SQLite search_cache:', err);
+      console.warn('[SearchCache] Error saving to PostgreSQL search_cache:', err);
     }
   }
 
   /**
-   * Clears the entire search cache in memory and optionally in SQLite.
+   * Clears the search cache in memory and optionally in PostgreSQL.
    */
-  public static clear(clearSqlite: boolean = false, customDb?: Database): void {
+  public static async clear(clearDb: boolean = false, customSql?: SqlClient): Promise<void> {
     this.cache.clear();
-    if (clearSqlite) {
-      const db = customDb || getDatabase();
+    if (clearDb) {
+      const sql = customSql || getDatabase();
       try {
-        db.run('DELETE FROM search_cache;');
+        await sql`DELETE FROM search_cache;`;
       } catch {}
     }
   }

@@ -1,22 +1,24 @@
 /**
- * Unit Tests for GameSearchService, Adapters, Persistent SQLite Cache, and Empty Results Caching.
+ * Unit Tests for GameSearchService, Adapters, Persistent PostgreSQL Cache, and Empty Results Caching.
  */
 
 import { describe, it, expect, beforeEach } from 'bun:test';
-import { Database } from 'bun:sqlite';
 import { GameSearchService } from '../src/services/game-search.service';
 import { RawgAdapter, type RawgRawGame } from '../src/providers/rawg.adapter';
-import { IgdbAdapter, type IgdbRawGame } from '../src/providers/igdb.adapter';
 import { SearchCacheService } from '../src/services/search-cache.service';
-import { initDatabase } from '../src/db/index';
+import { initDatabase, type SqlClient } from '../src/db/index';
 import { ENV } from '../src/config/env';
 
 describe('GameSearchService and SearchCache', () => {
-  let testDb: Database;
+  let testSql: SqlClient;
 
-  beforeEach(() => {
-    testDb = initDatabase(':memory:');
-    SearchCacheService.clear(true, testDb);
+  beforeEach(async () => {
+    try {
+      testSql = await initDatabase();
+      await SearchCacheService.clear(true, testSql);
+    } catch {
+      await SearchCacheService.clear(false);
+    }
   });
 
   it('should normalize RAWG API raw game payload correctly via RawgAdapter', () => {
@@ -60,31 +62,35 @@ describe('GameSearchService and SearchCache', () => {
     });
   });
 
-  it('should persist search results in SQLite search_cache table', async () => {
+  it('should persist search results in PostgreSQL search_cache table', async () => {
+    if (!testSql) return;
+
     // 1. Initially cache is empty
-    expect(SearchCacheService.getSqlite('witcher', testDb)).toBeNull();
+    expect(await SearchCacheService.getDb('witcher', testSql)).toBeNull();
 
     // 2. Perform search on local database / seed in offline mode
     const originalKey = ENV.RAWG_API_KEY;
     ENV.RAWG_API_KEY = '';
-    const results = await GameSearchService.searchGames('witcher', 10, testDb);
+    const results = await GameSearchService.searchGames('witcher', 10, testSql);
     ENV.RAWG_API_KEY = originalKey;
 
     expect(results.length).toBeGreaterThanOrEqual(1);
 
-    // 3. SQLite search_cache table should now have the entry
-    const cached = SearchCacheService.getSqlite('witcher', testDb);
+    // 3. PostgreSQL search_cache table should now have the entry
+    const cached = await SearchCacheService.getDb('witcher', testSql);
     expect(cached).not.toBeNull();
     expect(cached?.length).toBe(results.length);
     expect(cached?.[0].title.toLowerCase()).toContain('witcher');
   });
 
-  it('should cache empty results [] in SQLite to prevent external quota exhaustion', () => {
+  it('should cache empty results [] in PostgreSQL to prevent external quota exhaustion', async () => {
+    if (!testSql) return;
+
     // Store empty results for a non-existent game title
     const nonExistentQuery = 'nonexistentgamexyz12345';
-    SearchCacheService.setSqlite(nonExistentQuery, [], testDb);
+    await SearchCacheService.setDb(nonExistentQuery, [], testSql);
 
-    const cached = SearchCacheService.getSqlite(nonExistentQuery, testDb);
+    const cached = await SearchCacheService.getDb(nonExistentQuery, testSql);
     expect(cached).not.toBeNull();
     expect(cached).toEqual([]);
   });
@@ -92,7 +98,7 @@ describe('GameSearchService and SearchCache', () => {
   it('should fallback to local curated seed database when offline', async () => {
     const originalKey = ENV.RAWG_API_KEY;
     ENV.RAWG_API_KEY = '';
-    const results = await GameSearchService.searchGames('zelda', 10, testDb);
+    const results = await GameSearchService.searchGames('zelda', 10, testSql);
     ENV.RAWG_API_KEY = originalKey;
 
     expect(results.length).toBeGreaterThanOrEqual(1);

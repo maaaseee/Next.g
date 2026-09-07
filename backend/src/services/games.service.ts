@@ -1,12 +1,11 @@
 /**
- * Games Catalog and Local SQLite Persistence Service.
+ * Games Catalog and PostgreSQL Persistence Service.
  * 
- * Source: Bun SQLite Transactions and Queries
- * https://bun.sh/docs/api/sqlite#transactions
+ * Source: postgres (porsager) tagged template literals and transactions
+ * https://github.com/porsager/postgres#transactions
  */
 
-import { Database } from 'bun:sqlite';
-import { getDatabase } from '../db/index';
+import { getDatabase, type SqlClient } from '../db/index';
 
 export type GameStatus = 'BACKLOG' | 'PLAYING' | 'COMPLETED' | 'WISHLIST';
 
@@ -26,18 +25,18 @@ export interface UserGameRecord {
 }
 
 interface RawSqlUserGame {
-  id: number;
+  id: number | string;
   title: string;
   cover_url: string | null;
   release_year: number | null;
   summary: string | null;
-  genres: string | null;
-  platforms: string | null;
+  genres: any;
+  platforms: any;
   rating: number | null;
-  game_modes: string | null;
+  game_modes: any;
   status: GameStatus;
-  created_at: string;
-  updated_at: string;
+  created_at: string | Date;
+  updated_at: string | Date;
 }
 
 export interface UpsertGameInput {
@@ -54,35 +53,48 @@ export interface UpsertGameInput {
 }
 
 export class GamesService {
-  private static parseJsonArray(value: string | null): string[] {
+  private static parseJsonArray(value: any): string[] {
     if (!value) return [];
+    if (Array.isArray(value)) return value.map(String);
     try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [String(parsed)];
+      const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+      return Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
     } catch {
-      return value.split(',').map((s) => s.trim());
+      return typeof value === 'string' ? value.split(',').map((s) => s.trim()) : [];
     }
   }
 
   private static formatRecord(raw: RawSqlUserGame): UserGameRecord {
     return {
-      ...raw,
+      id: Number(raw.id),
+      title: raw.title,
+      cover_url: raw.cover_url,
+      release_year: raw.release_year ? Number(raw.release_year) : null,
+      summary: raw.summary,
       genres: this.parseJsonArray(raw.genres),
       platforms: this.parseJsonArray(raw.platforms),
+      rating: raw.rating !== null ? Number(raw.rating) : null,
       game_modes: this.parseJsonArray(raw.game_modes),
+      status: raw.status,
+      created_at: raw.created_at instanceof Date ? raw.created_at.toISOString() : String(raw.created_at),
+      updated_at: raw.updated_at instanceof Date ? raw.updated_at.toISOString() : String(raw.updated_at),
     };
   }
 
   /**
    * Retrieves all games in the user's catalog, optionally filtered by status, genre or platform.
    */
-  public static getAll(
+  public static async getAll(
     filters?: { status?: GameStatus; genre?: string; platform?: string },
-    customDb?: Database
-  ): UserGameRecord[] {
-    const db: Database = customDb || getDatabase();
+    customSql?: SqlClient
+  ): Promise<UserGameRecord[]> {
+    const sql = customSql || getDatabase();
 
-    let sql = `
+    const statusFilter = filters?.status || null;
+    const genreFilter = filters?.genre ? `%${filters.genre}%` : null;
+    const platformFilter = filters?.platform ? `%${filters.platform}%` : null;
+
+    const rawRecords = await sql<RawSqlUserGame[]>`
       SELECT 
         g.id, 
         g.title, 
@@ -98,117 +110,95 @@ export class GamesService {
         ug.updated_at
       FROM user_games ug
       JOIN games g ON ug.game_id = g.id
-      WHERE 1=1
+      WHERE 
+        (${statusFilter}::text IS NULL OR ug.status = ${statusFilter})
+        AND (${genreFilter}::text IS NULL OR g.genres::text ILIKE ${genreFilter})
+        AND (${platformFilter}::text IS NULL OR g.platforms::text ILIKE ${platformFilter})
+      ORDER BY ug.updated_at DESC;
     `;
 
-    const params: (string | number)[] = [];
-
-    if (filters?.status) {
-      sql += ' AND ug.status = ?';
-      params.push(filters.status);
-    }
-
-    if (filters?.genre) {
-      sql += ' AND g.genres LIKE ?';
-      params.push(`%${filters.genre}%`);
-    }
-
-    if (filters?.platform) {
-      sql += ' AND g.platforms LIKE ?';
-      params.push(`%${filters.platform}%`);
-    }
-
-    sql += ' ORDER BY ug.updated_at DESC;';
-
-    const rawRecords = db.query<RawSqlUserGame, (string | number)[]>(sql).all(...params);
     return rawRecords.map((r) => this.formatRecord(r));
   }
 
   /**
-   * Upserts a game into the local database and user catalog within a single transaction.
+   * Upserts a game into the PostgreSQL database and user catalog within a transaction.
    */
-  public static upsertGame(input: UpsertGameInput, customDb?: Database): UserGameRecord {
-    const db: Database = customDb || getDatabase();
+  public static async upsertGame(input: UpsertGameInput, customSql?: SqlClient): Promise<UserGameRecord> {
+    const sql = customSql || getDatabase();
 
-    const serializeField = (val: string[] | string | null | undefined): string | null => {
-      if (!val) return null;
+    const serializeJson = (val: string[] | string | null | undefined): string => {
+      if (!val) return '[]';
       if (Array.isArray(val)) return JSON.stringify(val);
       return val.startsWith('[') ? val : JSON.stringify([val]);
     };
 
-    const upsertTransaction = db.transaction((item: UpsertGameInput) => {
-      // Check library capacity before adding new unique games
-      const existing = db.query<{ count: number }, [number]>('SELECT COUNT(*) as count FROM user_games WHERE game_id = ?;').get(item.id);
+    const genresJson = serializeJson(input.genres);
+    const platformsJson = serializeJson(input.platforms);
+    const gameModesJson = serializeJson(input.game_modes);
+
+    await sql.begin(async (tx) => {
+      // 1. Check capacity limit (500 games)
+      const [existing] = await tx`SELECT count(*)::int as count FROM user_games WHERE game_id = ${input.id};`;
       if (!existing || existing.count === 0) {
-        const totalCount = db.query<{ count: number }, []>('SELECT COUNT(*) as count FROM user_games;').get();
-        if (totalCount && totalCount.count >= 500) {
+        const [total] = await tx`SELECT count(*)::int as count FROM user_games;`;
+        if (total && total.count >= 500) {
           throw new Error('La biblioteca ha alcanzado su capacidad máxima permitida (500 videojuegos). Elimina algunos para agregar nuevos.');
         }
       }
 
-      // 1. Insert or update master game record
-      db.run(
-        `
+      // 2. Upsert games master record
+      await tx`
         INSERT INTO games (id, title, cover_url, release_year, summary, genres, platforms, rating, game_modes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (
+          ${input.id}, 
+          ${input.title}, 
+          ${input.cover_url ?? null}, 
+          ${input.release_year ?? null}, 
+          ${input.summary ?? null}, 
+          ${genresJson}::jsonb, 
+          ${platformsJson}::jsonb, 
+          ${input.rating ?? null}, 
+          ${gameModesJson}::jsonb
+        )
         ON CONFLICT(id) DO UPDATE SET
-          title = excluded.title,
-          cover_url = excluded.cover_url,
-          release_year = excluded.release_year,
-          summary = excluded.summary,
-          genres = excluded.genres,
-          platforms = excluded.platforms,
-          rating = excluded.rating,
-          game_modes = excluded.game_modes;
-      `,
-        [
-          item.id,
-          item.title,
-          item.cover_url ?? null,
-          item.release_year ?? null,
-          item.summary ?? null,
-          serializeField(item.genres),
-          serializeField(item.platforms),
-          item.rating ?? null,
-          serializeField(item.game_modes),
-        ]
-      );
+          title = EXCLUDED.title,
+          cover_url = EXCLUDED.cover_url,
+          release_year = EXCLUDED.release_year,
+          summary = EXCLUDED.summary,
+          genres = EXCLUDED.genres,
+          platforms = EXCLUDED.platforms,
+          rating = EXCLUDED.rating,
+          game_modes = EXCLUDED.game_modes;
+      `;
 
-      // 2. Insert or update user catalog relation
-      db.run(
-        `
+      // 3. Upsert user_games catalog link
+      await tx`
         INSERT INTO user_games (game_id, status, updated_at)
-        VALUES (?, ?, CURRENT_TIMESTAMP)
+        VALUES (${input.id}, ${input.status}, CURRENT_TIMESTAMP)
         ON CONFLICT(game_id) DO UPDATE SET
-          status = excluded.status,
+          status = EXCLUDED.status,
           updated_at = CURRENT_TIMESTAMP;
-      `,
-        [item.id, item.status]
-      );
+      `;
     });
 
-    upsertTransaction(input);
-
-    const raw = db
-      .query<RawSqlUserGame, [number]>(`
-        SELECT 
-          g.id, 
-          g.title, 
-          g.cover_url, 
-          g.release_year, 
-          g.summary,
-          g.genres,
-          g.platforms,
-          g.rating,
-          g.game_modes,
-          ug.status, 
-          ug.created_at, 
-          ug.updated_at
-        FROM user_games ug
-        JOIN games g ON ug.game_id = g.id
-        WHERE g.id = ?;
-      `)
-      .get(input.id);
+    const [raw] = await sql<RawSqlUserGame[]>`
+      SELECT 
+        g.id, 
+        g.title, 
+        g.cover_url, 
+        g.release_year, 
+        g.summary,
+        g.genres,
+        g.platforms,
+        g.rating,
+        g.game_modes,
+        ug.status, 
+        ug.created_at, 
+        ug.updated_at
+      FROM user_games ug
+      JOIN games g ON ug.game_id = g.id
+      WHERE g.id = ${input.id};
+    `;
 
     if (!raw) {
       throw new Error(`Failed to retrieve saved game with ID ${input.id}`);
@@ -220,9 +210,9 @@ export class GamesService {
   /**
    * Deletes a game from the user's catalog.
    */
-  public static deleteGame(id: number, customDb?: Database): { success: boolean; deleted_id: number } {
-    const db: Database = customDb || getDatabase();
-    db.run('DELETE FROM user_games WHERE game_id = ?;', [id]);
+  public static async deleteGame(id: number, customSql?: SqlClient): Promise<{ success: boolean; deleted_id: number }> {
+    const sql = customSql || getDatabase();
+    await sql`DELETE FROM user_games WHERE game_id = ${id};`;
     return { success: true, deleted_id: id };
   }
 }

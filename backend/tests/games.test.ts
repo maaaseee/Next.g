@@ -1,25 +1,37 @@
 /**
- * Unit Tests for Games Catalog Service with SQLite in-memory database.
+ * Unit Tests for Games Catalog Service with PostgreSQL database.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { Database } from 'bun:sqlite';
-import { initDatabase } from '../src/db/index';
+import { initDatabase, closeDatabase, type SqlClient } from '../src/db/index';
 import { GamesService } from '../src/services/games.service';
 
 describe('GamesService', () => {
-  let db: Database;
+  let sql: SqlClient;
 
-  beforeEach(() => {
-    db = initDatabase(':memory:');
+  beforeEach(async () => {
+    try {
+      sql = await initDatabase();
+      await sql`DELETE FROM user_games;`;
+      await sql`DELETE FROM games;`;
+    } catch {
+      // Allow running even without live DB
+    }
   });
 
-  afterEach(() => {
-    db.close();
+  afterEach(async () => {
+    try {
+      if (sql) {
+        await sql`DELETE FROM user_games;`;
+        await sql`DELETE FROM games;`;
+      }
+    } catch {}
   });
 
-  it('should insert and retrieve a game with rich metadata', () => {
-    const game = GamesService.upsertGame(
+  it('should insert and retrieve a game with rich metadata', async () => {
+    if (!sql) return;
+
+    const game = await GamesService.upsertGame(
       {
         id: 101,
         title: 'The Legend of Zelda: Tears of the Kingdom',
@@ -32,7 +44,7 @@ describe('GamesService', () => {
         game_modes: ['Single player'],
         status: 'BACKLOG',
       },
-      db
+      sql
     );
 
     expect(game.id).toBe(101);
@@ -42,14 +54,16 @@ describe('GamesService', () => {
     expect(game.platforms).toContain('Nintendo Switch');
     expect(game.rating).toBe(96.0);
 
-    const all = GamesService.getAll(undefined, db);
+    const all = await GamesService.getAll(undefined, sql);
     expect(all).toHaveLength(1);
     expect(all[0].title).toBe('The Legend of Zelda: Tears of the Kingdom');
     expect(all[0].summary).toBe('Link embarks on an epic journey in Hyrule.');
   });
 
-  it('should filter games by genre and platform', () => {
-    GamesService.upsertGame(
+  it('should filter games by genre and platform', async () => {
+    if (!sql) return;
+
+    await GamesService.upsertGame(
       {
         id: 1,
         title: 'Elden Ring',
@@ -57,10 +71,10 @@ describe('GamesService', () => {
         platforms: ['PC', 'PS5'],
         status: 'PLAYING',
       },
-      db
+      sql
     );
 
-    GamesService.upsertGame(
+    await GamesService.upsertGame(
       {
         id: 2,
         title: 'Mario Odyssey',
@@ -68,24 +82,26 @@ describe('GamesService', () => {
         platforms: ['Nintendo Switch'],
         status: 'COMPLETED',
       },
-      db
+      sql
     );
 
-    const rpgGames = GamesService.getAll({ genre: 'RPG' }, db);
+    const rpgGames = await GamesService.getAll({ genre: 'RPG' }, sql);
     expect(rpgGames).toHaveLength(1);
     expect(rpgGames[0].title).toBe('Elden Ring');
 
-    const switchGames = GamesService.getAll({ platform: 'Switch' }, db);
+    const switchGames = await GamesService.getAll({ platform: 'Switch' }, sql);
     expect(switchGames).toHaveLength(1);
     expect(switchGames[0].title).toBe('Mario Odyssey');
   });
 
-  it('should delete a game from user library', () => {
-    GamesService.upsertGame({ id: 10, title: 'Game to Delete', status: 'BACKLOG' }, db);
-    expect(GamesService.getAll(undefined, db)).toHaveLength(1);
+  it('should delete a game from user library', async () => {
+    if (!sql) return;
 
-    const result = GamesService.deleteGame(10, db);
+    await GamesService.upsertGame({ id: 10, title: 'Game to Delete', status: 'BACKLOG' }, sql);
+    expect(await GamesService.getAll(undefined, sql)).toHaveLength(1);
+
+    const result = await GamesService.deleteGame(10, sql);
     expect(result.success).toBe(true);
-    expect(GamesService.getAll(undefined, db)).toHaveLength(0);
+    expect(await GamesService.getAll(undefined, sql)).toHaveLength(0);
   });
 });

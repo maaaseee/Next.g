@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
-import packageJson from './package.json'
+import packageJson from './package.json' with { type: 'json' }
 
 // https://vite.dev/config/
 export default defineConfig({

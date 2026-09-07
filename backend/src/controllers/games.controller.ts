@@ -18,8 +18,8 @@ export const gamesController = new Elysia({ prefix: '/api/games' })
   // GET /api/games (?status=BACKLOG&genre=RPG&platform=Switch)
   .get(
     '/',
-    ({ query }) => {
-      return GamesService.getAll({
+    async ({ query }) => {
+      return await GamesService.getAll({
         status: query.status,
         genre: query.genre,
         platform: query.platform,
@@ -46,8 +46,8 @@ export const gamesController = new Elysia({ prefix: '/api/games' })
         // POST /api/games
         .post(
           '/',
-          ({ body, set }) => {
-            const savedGame = GamesService.upsertGame({
+          async ({ body, set }) => {
+            const savedGame = await GamesService.upsertGame({
               id: Number(body.id),
               title: body.title,
               cover_url: body.cover_url,
@@ -69,8 +69,8 @@ export const gamesController = new Elysia({ prefix: '/api/games' })
         // DELETE /api/games/:id
         .delete(
           '/:id',
-          ({ params: { id } }) => {
-            return GamesService.deleteGame(Number(id));
+          async ({ params: { id } }) => {
+            return await GamesService.deleteGame(Number(id));
           },
           {
             params: GameIdParamSchema,

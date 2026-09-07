@@ -11,10 +11,12 @@
   "dependencies": {
     "@elysiajs/cors": "^1.4.2",
     "elysia": "latest",
+    "postgres": "^3.4.9",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.23.1",
     "bun-types": "latest",
     "typescript": "^5.7.3"
   },

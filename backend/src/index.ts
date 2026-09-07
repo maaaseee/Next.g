@@ -17,18 +17,19 @@ import { gamesController } from './controllers/games.controller';
 import { securityHeaders } from './middleware/security-headers';
 import { rateLimiter, rateLimiterHook } from './middleware/rate-limiter';
 
-// Initialize SQLite database
-const db = initDatabase();
-
-// Auto-seed initial catalog if library is empty
+// Initialize PostgreSQL database
 try {
-  const count = db.query<{ count: number }, []>('SELECT COUNT(*) as count FROM games;').get();
-  if (!count || count.count === 0) {
-    console.log('📦 Empty database detected. Auto-seeding 50 starter games...');
-    runSeed(db, true);
+  const sql = await initDatabase();
+  // Auto-seed initial catalog only if explicitly enabled via AUTO_SEED=true
+  if (ENV.AUTO_SEED) {
+    const [count] = await sql`SELECT count(*)::int as count FROM games;`;
+    if (!count || count.count === 0) {
+      console.log('📦 AUTO_SEED enabled and empty database detected. Seeding games...');
+      await runSeed(sql, false);
+    }
   }
 } catch (err) {
-  console.warn('⚠️ Auto-seed check skipped:', err);
+  console.warn('⚠️ Database connection or startup error:', err instanceof Error ? err.message : err);
 }
 
 export const app = new Elysia()
@@ -91,8 +92,8 @@ export const app = new Elysia()
   // Manual seed endpoint (Strictly rate-limited to 2 per 10 minutes)
   .post(
     '/api/seed',
-    () => {
-      const result = runSeed(getDatabase(), true);
+    async () => {
+      const result = await runSeed(getDatabase(), false);
       return { message: 'Database successfully seeded', ...result };
     },
     {
