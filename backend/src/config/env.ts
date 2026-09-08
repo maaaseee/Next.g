@@ -17,14 +17,18 @@ export interface EnvConfig {
 }
 
 export function loadEnv(): EnvConfig {
-  const PORT = Number(process.env.PORT || Bun.env.PORT || 3000);
-  const DATABASE_URL = process.env.DATABASE_URL || Bun.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/nextg_db';
-  const RAWG_API_KEY = process.env.RAWG_API_KEY || Bun.env.RAWG_API_KEY || '';
-  const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID || Bun.env.TWITCH_CLIENT_ID || '';
-  const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || Bun.env.TWITCH_CLIENT_SECRET || '';
-  const CORS_ORIGIN = process.env.CORS_ORIGIN || Bun.env.CORS_ORIGIN || 'http://localhost:5173';
-  const NODE_ENV = process.env.NODE_ENV || Bun.env.NODE_ENV || 'development';
-  const AUTO_SEED = (process.env.AUTO_SEED ?? Bun.env.AUTO_SEED ?? 'false').toLowerCase() === 'true';
+  const getEnv = (key: string): string | undefined => {
+    return process.env[key] ?? (typeof globalThis !== 'undefined' && (globalThis as any).Bun?.env?.[key]);
+  };
+
+  const PORT = Number(getEnv('PORT') || 3000);
+  const DATABASE_URL = getEnv('DATABASE_URL') || 'postgres://postgres:postgres@localhost:5432/nextg_db';
+  const RAWG_API_KEY = getEnv('RAWG_API_KEY') || '';
+  const TWITCH_CLIENT_ID = getEnv('TWITCH_CLIENT_ID') || '';
+  const TWITCH_CLIENT_SECRET = getEnv('TWITCH_CLIENT_SECRET') || '';
+  const CORS_ORIGIN = getEnv('CORS_ORIGIN') || 'http://localhost:5173';
+  const NODE_ENV = getEnv('NODE_ENV') || 'development';
+  const AUTO_SEED = (getEnv('AUTO_SEED') ?? 'false').toLowerCase() === 'true';
 
   if (!RAWG_API_KEY && !TWITCH_CLIENT_ID) {
     if (NODE_ENV !== 'test') {

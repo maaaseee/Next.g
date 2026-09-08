@@ -17,20 +17,25 @@ import { gamesController } from './controllers/games.controller';
 import { securityHeaders } from './middleware/security-headers';
 import { rateLimiter, rateLimiterHook } from './middleware/rate-limiter';
 
-// Initialize PostgreSQL database
-try {
-  const sql = await initDatabase();
-  // Auto-seed initial catalog only if explicitly enabled via AUTO_SEED=true
-  if (ENV.AUTO_SEED) {
-    const [count] = await sql`SELECT count(*)::int as count FROM games;`;
-    if (!count || count.count === 0) {
-      console.log('📦 AUTO_SEED enabled and empty database detected. Seeding games...');
-      await runSeed(sql, false);
+// Async database startup initializer
+export async function setupDatabase() {
+  try {
+    const sql = await initDatabase();
+    // Auto-seed initial catalog only if explicitly enabled via AUTO_SEED=true
+    if (ENV.AUTO_SEED) {
+      const [count] = await sql`SELECT count(*)::int as count FROM games;`;
+      if (!count || count.count === 0) {
+        console.log('📦 AUTO_SEED enabled and empty database detected. Seeding games...');
+        await runSeed(sql, false);
+      }
     }
+  } catch (err) {
+    console.warn('⚠️ Database connection or startup error:', err instanceof Error ? err.message : err);
   }
-} catch (err) {
-  console.warn('⚠️ Database connection or startup error:', err instanceof Error ? err.message : err);
 }
+
+// Ensure database schema is initialized on startup
+setupDatabase();
 
 export const app = new Elysia()
   // 1. Injects OWASP defense-in-depth security headers
@@ -107,10 +112,13 @@ export const app = new Elysia()
   )
   // Route controllers
   .use(searchController)
-  .use(gamesController)
-  .listen(ENV.PORT);
+  .use(gamesController);
 
-console.log(`🎮 NEXT.g Backend is running at http://localhost:${ENV.PORT}`);
+// Only listen on port when running standalone (Docker or local Bun), not in Vercel Serverless
+if (!process.env.VERCEL) {
+  app.listen(ENV.PORT);
+  console.log(`🎮 NEXT.g Backend is running at http://localhost:${ENV.PORT}`);
+}
 
 // Export App type for full End-to-End TypeScript safety with Eden Treaty in Vue 3
 export type App = typeof app;

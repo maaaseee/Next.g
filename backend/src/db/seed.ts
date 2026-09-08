@@ -96,8 +96,10 @@ export async function runSeed(
 }
 
 // If executed directly: bun run src/db/seed.ts
-if (import.meta.main) {
-  await initDatabase();
-  await runSeed();
-  process.exit(0);
+const isMain = typeof (import.meta as any)?.main === 'boolean' ? (import.meta as any).main : false;
+if (isMain) {
+  initDatabase().then(() => runSeed()).then(() => process.exit(0)).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
