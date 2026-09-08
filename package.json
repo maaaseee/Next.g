@@ -16,12 +16,17 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.2",
     "@tailwindcss/vite": "^4.3.3",
+    "elysia": "^1.4.30",
     "lucide-vue-next": "^1.0.0",
     "pinia": "^4.0.2",
+    "postgres": "^3.4.9",
     "tailwindcss": "^4.3.3",
     "vue": "rc",
-    "vue-router": "^5.2.0"
+    "vue-router": "^5.2.0",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
