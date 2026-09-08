@@ -114,3 +114,4 @@ console.log(`🎮 NEXT.g Backend is running at http://localhost:${ENV.PORT}`);
 
 // Export App type for full End-to-End TypeScript safety with Eden Treaty in Vue 3
 export type App = typeof app;
+export default app;
