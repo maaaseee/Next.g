@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: nextg-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    region: ohio
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: RAWG_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: AUTO_SEED
+        value: "false"

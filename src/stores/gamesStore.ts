@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import type { Game, UserGame, GameStatus } from '@/types/game';
 
 export const useGamesStore = defineStore('games', () => {
+  const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
   const games = ref<UserGame[]>([]);
   const activeTab = ref<GameStatus>('BACKLOG');
   const selectedGenre = ref<string | null>(null);
@@ -53,7 +54,7 @@ export const useGamesStore = defineStore('games', () => {
     loading.value = true;
     error.value = null;
     try {
-      const res = await fetch('/api/games');
+      const res = await fetch(`${API_BASE}/api/games`);
       if (!res.ok) throw new Error(`Error al obtener juegos: ${res.status}`);
       const data = await res.json();
       games.value = data;
@@ -73,7 +74,7 @@ export const useGamesStore = defineStore('games', () => {
     game.status = newStatus; // Optimistic update
 
     try {
-      const res = await fetch('/api/games', {
+      const res = await fetch(`${API_BASE}/api/games`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...game, status: newStatus }),
@@ -110,7 +111,7 @@ export const useGamesStore = defineStore('games', () => {
     }
 
     try {
-      const res = await fetch('/api/games', {
+      const res = await fetch(`${API_BASE}/api/games`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...optimistic, status }),
@@ -127,7 +128,7 @@ export const useGamesStore = defineStore('games', () => {
     games.value = games.value.filter((g) => g.id !== id);
 
     try {
-      const res = await fetch(`/api/games/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/api/games/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Error al eliminar: ${res.status}`);
     } catch (err) {
       games.value = prev; // Rollback
@@ -153,7 +154,7 @@ export const useGamesStore = defineStore('games', () => {
     }
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(clean)}`);
+      const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(clean)}`);
       if (res.ok) {
         const data: Game[] = await res.json();
         searchSessionCache.set(normalizedKey, data);
