@@ -220,10 +220,10 @@ onUnmounted(() => {
             type="button"
             @click="handlePlayNow"
             :disabled="isStartingPlay || playStarted"
-            class="w-full sm:w-auto px-5 py-2 rounded-md text-xs font-bold flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-95 disabled:opacity-50"
+            class="w-full sm:w-auto px-5 py-2 rounded-md text-xs font-bold flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-95 disabled:opacity-50 text-white"
+            :class="playStarted ? 'bg-emerald-500' : ''"
             :style="{
-              backgroundColor: playStarted ? '#10b981' : 'var(--app-primary)',
-              color: '#ffffff',
+              backgroundColor: playStarted ? undefined : 'var(--app-primary)',
             }"
           >
             <Check v-if="playStarted" class="w-3.5 h-3.5" />

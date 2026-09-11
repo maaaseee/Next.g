@@ -254,9 +254,8 @@ onUnmounted(() => {
 
         <!-- Live Visual Preview: Authentic Rotating Dial Wheel (Auto-Spinning) -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer"
+          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
-            backgroundColor: '#090d16',
             borderColor: 'var(--app-border)',
           }"
           @click="$emit('select-mode', 'classic')"
@@ -297,10 +296,11 @@ onUnmounted(() => {
           <div class="absolute bottom-2 inset-x-2 flex items-center justify-center pointer-events-none z-10">
             <div
               class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold truncate max-w-[90%] border transition-all duration-300"
+              :class="isDialSpinning ? '' : 'text-slate-200'"
               :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 borderColor: isDialSpinning ? 'var(--app-primary)' : 'rgba(255, 255, 255, 0.1)',
-                color: isDialSpinning ? 'var(--app-primary)' : '#e2e8f0',
+                color: isDialSpinning ? 'var(--app-primary)' : undefined,
               }"
             >
               <span v-if="isDialSpinning" class="animate-pulse">GIRANDO DIAL...</span>
@@ -341,9 +341,8 @@ onUnmounted(() => {
 
         <!-- Live Visual Preview: Authentic Vertical Slot Reel Visor -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer"
+          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
-            backgroundColor: '#090d16',
             borderColor: 'var(--app-border)',
           }"
           @click="$emit('select-mode', 'slot')"
@@ -370,72 +369,79 @@ onUnmounted(() => {
           </div>
 
           <!-- Top & Bottom Gradient Shadows for Visor Depth -->
-          <div class="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-[#090d16] via-[#090d16]/80 to-transparent z-10 pointer-events-none" />
-          <div class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#090d16] via-[#090d16]/80 to-transparent z-10 pointer-events-none" />
+          <div class="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
+          <div class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
 
           <!-- Continuous Vertical Sliding Strip (100% Seamless Infinite CSS Loop) -->
           <div class="slot-infinite-track w-full flex flex-col">
             <div
               v-for="(item, idx) in previewLoopGames"
               :key="`preview-loop-${idx}-${item.id}`"
-              class="h-[64px] px-3 flex items-center gap-2.5 border-b border-white/5 shrink-0"
+              class="h-[64px] flex items-center gap-3 px-4 border-b border-white/5 shrink-0"
             >
-              <!-- Mini Game Cover -->
-              <div class="w-9 h-12 rounded overflow-hidden bg-black/60 shrink-0 border border-white/10 shadow-xs">
-                <img
-                  v-if="item.cover"
-                  :src="item.cover"
-                  :alt="item.title"
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
-                  <Gamepad2 class="w-4 h-4" />
-                </div>
-              </div>
-
-              <!-- Mini Game Info -->
-              <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                <span class="text-xs font-bold text-white truncate leading-tight">
-                  {{ item.title }}
-                </span>
-                <div class="flex items-center gap-1.5 text-[9px] font-mono text-gray-400">
-                  <span>{{ item.year }}</span>
-                  <span class="px-1.5 py-0.2 rounded bg-white/10 text-gray-300 truncate max-w-[80px]">
-                    {{ item.genre }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Rating Badge -->
-              <div class="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-black/80 text-amber-300 text-[10px] font-bold shrink-0 border border-amber-500/30">
-                <Star class="w-2.5 h-2.5 fill-amber-300" />
-                <span>{{ Number(item.rating).toFixed(1) }}</span>
+              <img
+                :src="item.cover"
+                :alt="item.title"
+                class="w-10 h-12 object-cover rounded shadow-xs shrink-0"
+              />
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold truncate text-slate-200">{{ item.title }}</p>
+                <p class="text-[10px] text-slate-400 truncate">{{ item.genre }}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MODE 3: Selección Directa -->
+      <!-- Mode 3: Instant Quick Pick Card -->
       <div
-        class="group relative rounded-xl border p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        class="border rounded-xl p-5 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden shadow-lg"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'instant' ? 'var(--app-primary)' : 'var(--app-border)',
-          boxShadow: hoveredCard === 'instant' ? '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px var(--app-primary)' : 'none',
         }"
         @mouseenter="hoveredCard = 'instant'"
         @mouseleave="hoveredCard = null"
       >
-        <!-- Top Action Button Only -->
+        <!-- Header -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200"
+              :style="{
+                backgroundColor: 'var(--app-surface-hover)',
+                color: 'var(--app-primary)',
+              }"
+            >
+              <Zap class="w-5 h-5" />
+            </div>
+            <span
+              class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+              :style="{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                color: 'var(--app-text-muted)',
+              }"
+            >
+              Express
+            </span>
+          </div>
+
+          <h3 class="text-base font-black text-white flex items-center gap-2">
+            Selección Directa
+          </h3>
+
+          <p class="text-xs leading-relaxed" :style="{ color: 'var(--app-text-muted)' }">
+            Tirada rápida sin animaciones. Perfecto si tienes poco tiempo y solo quieres que el sistema elija por ti de inmediato.
+          </p>
+        </div>
+
+        <!-- Launch Button -->
         <button
           type="button"
           @click="$emit('select-mode', 'instant')"
-          class="w-full flex items-center justify-between px-4 py-3.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
+          class="w-full mt-4 py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-between transition-all duration-200 cursor-pointer text-white shadow-md active:scale-98"
           :style="{
             backgroundColor: 'var(--app-primary)',
-            borderColor: 'var(--app-border)',
           }"
         >
           <div class="flex items-center gap-2.5">
@@ -447,9 +453,8 @@ onUnmounted(() => {
 
         <!-- Live Visual Preview -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center min-h-[220px] rounded-lg overflow-hidden relative cursor-pointer"
+          class="mt-5 pt-3 border-t flex flex-col items-center justify-center min-h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
-            backgroundColor: '#090d16',
             borderColor: 'var(--app-border)',
           }"
           @click="$emit('select-mode', 'instant')"

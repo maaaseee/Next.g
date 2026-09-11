@@ -46,9 +46,9 @@ const MODES: { id: RouletteMode; label: string; icon: any; desc: string }[] = [
       type="button"
       @click="emit('update:modelValue', mode.id)"
       class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-xs font-bold transition-all duration-150 cursor-pointer select-none"
+      :class="modelValue === mode.id ? 'text-white' : 'text-app-text-muted hover:text-app-text'"
       :style="{
         backgroundColor: modelValue === mode.id ? 'var(--app-primary)' : 'transparent',
-        color: modelValue === mode.id ? '#ffffff' : 'var(--app-text-muted)',
       }"
     >
       <component :is="mode.icon" class="w-3.5 h-3.5 shrink-0" />

@@ -21,45 +21,36 @@ const imageError = ref(false);
 const hoveredActionStatus = ref<GameStatus | null>(null);
 const showDeleteConfirm = ref(false);
 
-const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: any; colorClass: string; hoverClass: string }[] = [
+const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: any; bgClass: string }[] = [
   {
     id: 'BACKLOG',
     label: 'Backlog',
     actionLabel: 'Mover a Backlog',
     icon: Clock,
-    colorClass: 'text-white/70',
-    hoverClass: 'hover:bg-amber-500/20 hover:text-amber-400 hover:scale-110',
-  },
-  {
-    id: 'COMPLETED',
-    label: 'Completado',
-    actionLabel: 'Mover a Completado',
-    icon: CheckCircle2,
-    colorClass: 'text-white/70',
-    hoverClass: 'hover:bg-sky-500/20 hover:text-sky-400 hover:scale-110',
+    bgClass: 'bg-amber-500',
   },
   {
     id: 'PLAYING',
     label: 'Jugando',
     actionLabel: 'Mover a Jugando',
     icon: Play,
-    colorClass: 'text-white/70',
-    hoverClass: 'hover:bg-emerald-500/20 hover:text-emerald-400 hover:scale-110',
+    bgClass: 'bg-emerald-500',
+  },
+  {
+    id: 'COMPLETED',
+    label: 'Completado',
+    actionLabel: 'Mover a Completado',
+    icon: CheckCircle2,
+    bgClass: 'bg-sky-500',
   },
   {
     id: 'WISHLIST',
     label: 'Deseados',
     actionLabel: 'Mover a Deseados',
     icon: Sparkles,
-    colorClass: 'text-white/70',
-    hoverClass: 'hover:bg-purple-500/20 hover:text-purple-400 hover:scale-110',
+    bgClass: 'bg-purple-500',
   },
 ];
-
-// 3 target statuses to switch to (excluding current game status)
-const otherStatuses = computed(() => {
-  return ALL_STATUSES.filter((s) => s.id !== props.game.status);
-});
 
 function handleImageError() {
   imageError.value = true;
@@ -143,9 +134,9 @@ function confirmDelete() {
         {{ game.title }}
       </h3>
 
-      <!-- Status Action Bar: Icon-only buttons -->
+      <!-- Segmented Pill Action Bar: 4 statuses continuous slider + delete -->
       <div
-        class="relative mt-2 p-1.5 rounded-lg bg-black/70 flex items-center justify-between gap-1 backdrop-blur-sm"
+        class="relative mt-2 p-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/15 flex items-center justify-between gap-1 shadow-lg"
         @click.stop
       >
         <!-- Floating Tooltip showing category name on button hover -->
@@ -156,10 +147,10 @@ function confirmDelete() {
           {{ ALL_STATUSES.find(s => s.id === hoveredActionStatus)?.actionLabel }}
         </div>
 
-        <!-- 3 Icon-Only Category Switch Buttons -->
-        <div class="flex items-center gap-1.5 flex-1">
+        <!-- 4-State Segmented Slider -->
+        <div class="flex items-center gap-0.5 flex-1 bg-white/5 p-0.5 rounded-md">
           <button
-            v-for="target in otherStatuses"
+            v-for="target in ALL_STATUSES"
             :key="target.id"
             type="button"
             @click.stop="handleStatusChange(target.id)"
@@ -167,8 +158,12 @@ function confirmDelete() {
             @mouseleave="hoveredActionStatus = null"
             :aria-label="target.actionLabel"
             :title="target.actionLabel"
-            class="flex-1 flex items-center justify-center p-1.5 rounded-md transition-all duration-150 cursor-pointer active:scale-90"
-            :class="[target.colorClass, target.hoverClass]"
+            class="flex-1 flex items-center justify-center py-1 rounded transition-all duration-150 cursor-pointer active:scale-95"
+            :class="[
+              game.status === target.id
+                ? [target.bgClass, 'text-white shadow-xs font-bold']
+                : 'text-white/40 hover:text-white hover:bg-white/10',
+            ]"
           >
             <component :is="target.icon" class="w-3.5 h-3.5 shrink-0" />
           </button>
@@ -180,7 +175,7 @@ function confirmDelete() {
           @click.stop="handleDelete"
           title="Eliminar de la biblioteca"
           aria-label="Eliminar de la biblioteca"
-          class="p-1.5 rounded-md text-white/50 hover:text-red-400 hover:bg-red-500/20 transition-all cursor-pointer shrink-0 hover:scale-110 active:scale-90"
+          class="p-1 rounded-md text-white/40 hover:text-red-400 hover:bg-red-500/20 transition-all cursor-pointer shrink-0 hover:scale-110 active:scale-90"
         >
           <Trash2 class="w-3.5 h-3.5" />
         </button>

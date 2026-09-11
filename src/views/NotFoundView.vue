@@ -1,5 +1,5 @@
-﻿<template>
-  <div class="h-[580px] flex flex-col items-center justify-center text-center px-4 py-6 select-none">
+<template>
+  <div class="h-145 flex flex-col items-center justify-center text-center px-4 py-6 select-none">
     <!-- Clean Badge -->
     <div
       class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2 border"
@@ -48,10 +48,9 @@
       <button
         type="button"
         @click="handleGoHome"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 shadow-sm cursor-pointer"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 shadow-sm cursor-pointer text-white"
         :style="{
           backgroundColor: 'var(--app-primary)',
-          color: '#ffffff',
         }"
       >
         <Home class="w-4 h-4" />
@@ -85,7 +84,7 @@ function handleGoHome() {
   background: linear-gradient(
     135deg,
     var(--app-primary) 0%,
-    color-mix(in srgb, var(--app-primary) 40%, #ffffff) 50%,
+    color-mix(in srgb, var(--app-primary) 40%, white) 50%,
     color-mix(in srgb, var(--app-primary) 70%, var(--app-text)) 100%
   );
   -webkit-background-clip: text;

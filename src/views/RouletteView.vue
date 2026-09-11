@@ -92,7 +92,7 @@ const resetFilters = () => {
   <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
     <!-- VIEW 1: Initial 3-Mode Selection Hub with Previews -->
     <Transition name="fade" mode="out-in">
-      <div v-if="!selectedMode" key="mode-hub" class="min-h-[692px] flex flex-col justify-between">
+      <div v-if="!selectedMode" key="mode-hub" class="min-h-173 flex flex-col justify-between">
         <RouletteModeHub @select-mode="handleSelectMode" />
       </div>
 
@@ -128,9 +128,9 @@ const resetFilters = () => {
               type="button"
               @click="selectedMode = (modeKey as RouletteMode)"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold transition-all cursor-pointer"
+              :class="selectedMode === modeKey ? 'text-white' : 'text-app-text-muted hover:text-app-text'"
               :style="{
                 backgroundColor: selectedMode === modeKey ? 'var(--app-primary)' : 'transparent',
-                color: selectedMode === modeKey ? '#ffffff' : 'var(--app-text-muted)',
               }"
             >
               <component :is="info.icon" class="w-3.5 h-3.5" />
@@ -141,7 +141,7 @@ const resetFilters = () => {
 
         <!-- Unified Roulette Card (Containing embedded filters + roulette mechanism) -->
         <div
-          class="rounded-xl border p-5 sm:p-7 flex flex-col items-center justify-between gap-6 shadow-xl transition-all duration-200 min-h-[640px]"
+          class="rounded-xl border p-5 sm:p-7 flex flex-col items-center justify-between gap-6 shadow-xl transition-all duration-200 min-h-160"
           :style="{
             backgroundColor: 'var(--app-surface)',
             borderColor: 'var(--app-border)',
@@ -182,7 +182,7 @@ const resetFilters = () => {
           </div>
 
           <!-- ROULETTE STAGE CONTENT -->
-          <div class="w-full flex flex-col items-center justify-center min-h-[400px]">
+          <div class="w-full flex flex-col items-center justify-center min-h-100">
             <!-- Mode 1: Classic Wheel -->
             <Transition name="fade" mode="out-in">
               <ClassicWheel

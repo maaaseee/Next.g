@@ -60,15 +60,14 @@ function onDrop(tabId: GameStatus) {
         class="relative flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer select-none"
         :class="[
           gamesStore.activeTab === tab.id
-            ? 'shadow-md scale-100'
-            : 'opacity-70 hover:opacity-100 hover:bg-white/5',
+            ? 'shadow-md scale-100 text-white'
+            : 'text-app-text opacity-70 hover:opacity-100 hover:bg-white/5',
           isDragging && hoveredTab === tab.id
             ? 'ring-2 ring-[var(--app-primary)] scale-105 bg-[var(--app-primary)]/20'
             : '',
         ]"
         :style="{
           backgroundColor: gamesStore.activeTab === tab.id ? 'var(--app-primary)' : 'transparent',
-          color: gamesStore.activeTab === tab.id ? '#ffffff' : 'var(--app-text)',
         }"
       >
         <component :is="tab.icon" class="w-4 h-4 shrink-0" />
@@ -76,9 +75,9 @@ function onDrop(tabId: GameStatus) {
         <!-- Counter Badge -->
         <span
           class="px-2 py-0.5 rounded text-[11px] font-black"
+          :class="gamesStore.activeTab === tab.id ? 'text-white' : 'text-app-text-muted'"
           :style="{
             backgroundColor: gamesStore.activeTab === tab.id ? 'rgba(0,0,0,0.25)' : 'var(--app-surface-hover)',
-            color: gamesStore.activeTab === tab.id ? '#ffffff' : 'var(--app-text-muted)',
           }"
         >
           {{ getCount(tab.id) }}

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <Teleport to="body">
     <Transition name="fade">
       <div
@@ -106,8 +106,8 @@
             <button
               type="button"
               @click="close"
-              class="px-5 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors shadow-xs"
-              :style="{ backgroundColor: 'var(--app-primary)', color: '#ffffff' }"
+              class="px-5 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors shadow-xs text-white"
+              :style="{ backgroundColor: 'var(--app-primary)' }"
             >
               Cerrar
             </button>

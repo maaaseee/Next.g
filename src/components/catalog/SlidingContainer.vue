@@ -77,18 +77,15 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
         }"
       >
         <div
-          class="w-10 h-10 rounded-md flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform"
-          :style="{
-            backgroundColor: GAME_STATUS_CONFIG[previousTab].color,
-            color: '#ffffff',
-          }"
+          class="w-10 h-10 rounded-md flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform text-white"
+          :class="GAME_STATUS_CONFIG[previousTab].bgClass"
         >
           <ChevronLeft class="w-6 h-6 animate-pulse" />
         </div>
         <component
           :is="getIconForStatus(previousTab)"
           class="w-4 h-4 mb-1"
-          :style="{ color: GAME_STATUS_CONFIG[previousTab].color }"
+          :class="GAME_STATUS_CONFIG[previousTab].textClass"
         />
         <span class="text-xs font-black uppercase tracking-wider text-white">
           {{ GAME_STATUS_CONFIG[previousTab].label }}
@@ -115,18 +112,15 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
         }"
       >
         <div
-          class="w-10 h-10 rounded-md flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform"
-          :style="{
-            backgroundColor: GAME_STATUS_CONFIG[nextTab].color,
-            color: '#ffffff',
-          }"
+          class="w-10 h-10 rounded-md flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform text-white"
+          :class="GAME_STATUS_CONFIG[nextTab].bgClass"
         >
           <ChevronRight class="w-6 h-6 animate-pulse" />
         </div>
         <component
           :is="getIconForStatus(nextTab)"
           class="w-4 h-4 mb-1"
-          :style="{ color: GAME_STATUS_CONFIG[nextTab].color }"
+          :class="GAME_STATUS_CONFIG[nextTab].textClass"
         />
         <span class="text-xs font-black uppercase tracking-wider text-white">
           {{ GAME_STATUS_CONFIG[nextTab].label }}
@@ -155,7 +149,7 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
           <TransitionGroup
             name="game-grid"
             tag="div"
-            class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
           >
             <GameCard
               v-for="game in getGamesForTab(tab)"

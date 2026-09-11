@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { X, Star, Calendar, Monitor, Tag, Users, Trash2, Play, CheckCircle2, Clock, Sparkles, ExternalLink } from 'lucide-vue-next';
+import { X, Star, Calendar, Monitor, Tag, Users, Trash2, Play, CheckCircle2, Clock, Sparkles, ExternalLink, Check } from 'lucide-vue-next';
 import type { UserGame, GameStatus } from '@/types/game';
 import { GAME_STATUS_CONFIG, formatGameRating, getRawgGameUrl } from '@/types/game';
 import { useGamesStore } from '@/stores/gamesStore';
@@ -16,6 +16,53 @@ const emit = defineEmits<{
 
 const gamesStore = useGamesStore();
 const showDeleteConfirm = ref(false);
+
+const modalStatuses: {
+  id: GameStatus;
+  label: string;
+  icon: any;
+  activeBg: string;
+  activeBorder: string;
+  activeText: string;
+  badgeBg: string;
+}[] = [
+  {
+    id: 'BACKLOG',
+    label: 'Backlog',
+    icon: Clock,
+    activeBg: 'bg-amber-500/15',
+    activeBorder: 'border-amber-500/60',
+    activeText: 'text-amber-400',
+    badgeBg: 'bg-amber-500/25',
+  },
+  {
+    id: 'PLAYING',
+    label: 'Jugando',
+    icon: Play,
+    activeBg: 'bg-emerald-500/15',
+    activeBorder: 'border-emerald-500/60',
+    activeText: 'text-emerald-400',
+    badgeBg: 'bg-emerald-500/25',
+  },
+  {
+    id: 'COMPLETED',
+    label: 'Completado',
+    icon: CheckCircle2,
+    activeBg: 'bg-sky-500/15',
+    activeBorder: 'border-sky-500/60',
+    activeText: 'text-sky-400',
+    badgeBg: 'bg-sky-500/25',
+  },
+  {
+    id: 'WISHLIST',
+    label: 'Deseado',
+    icon: Sparkles,
+    activeBg: 'bg-purple-500/15',
+    activeBorder: 'border-purple-500/60',
+    activeText: 'text-purple-400',
+    badgeBg: 'bg-purple-500/25',
+  },
+];
 
 const rawgUrl = computed(() => {
   return props.game ? getRawgGameUrl(props.game.title) : 'https://rawg.io';
@@ -209,40 +256,48 @@ onUnmounted(() => {
           <div class="pt-5 border-t space-y-4" :style="{ borderColor: 'var(--app-border)' }">
             <div>
               <p class="text-xs font-bold uppercase tracking-wider mb-2.5" :style="{ color: 'var(--app-text-muted)' }">
-                Cambiar Estado:
+                Cambiar Categoría:
               </p>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div class="grid grid-cols-2 gap-2.5">
                 <button
+                  v-for="statusItem in modalStatuses"
+                  :key="statusItem.id"
                   type="button"
-                  @click="handleStatusChange('BACKLOG')"
-                  class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-bold border transition cursor-pointer"
-                  :class="game.status === 'BACKLOG' ? 'bg-amber-500/20 text-amber-300 border-amber-500' : 'hover:bg-white/5 border-transparent text-amber-400/70'"
+                  @click="handleStatusChange(statusItem.id)"
+                  class="p-3 rounded-xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between h-20 active:scale-[0.98]"
+                  :class="[
+                    game.status === statusItem.id
+                      ? [statusItem.activeBg, statusItem.activeBorder]
+                      : 'hover:bg-white/5',
+                  ]"
+                  :style="{
+                    backgroundColor: game.status === statusItem.id ? undefined : 'var(--app-surface)',
+                    borderColor: game.status === statusItem.id ? undefined : 'var(--app-border)',
+                  }"
                 >
-                  <Clock class="w-4 h-4" /> Backlog
-                </button>
-                <button
-                  type="button"
-                  @click="handleStatusChange('COMPLETED')"
-                  class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-bold border transition cursor-pointer"
-                  :class="game.status === 'COMPLETED' ? 'bg-sky-500/20 text-sky-300 border-sky-500' : 'hover:bg-white/5 border-transparent text-sky-400/70'"
-                >
-                  <CheckCircle2 class="w-4 h-4" /> Completado
-                </button>
-                <button
-                  type="button"
-                  @click="handleStatusChange('PLAYING')"
-                  class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-bold border transition cursor-pointer"
-                  :class="game.status === 'PLAYING' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500' : 'hover:bg-white/5 border-transparent text-emerald-400/70'"
-                >
-                  <Play class="w-4 h-4" /> Jugando
-                </button>
-                <button
-                  type="button"
-                  @click="handleStatusChange('WISHLIST')"
-                  class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-bold border transition cursor-pointer"
-                  :class="game.status === 'WISHLIST' ? 'bg-purple-500/20 text-purple-300 border-purple-500' : 'hover:bg-white/5 border-transparent text-purple-400/70'"
-                >
-                  <Sparkles class="w-4 h-4" /> Deseado
+                  <div class="flex items-center justify-between">
+                    <component
+                      :is="statusItem.icon"
+                      class="w-4 h-4"
+                      :class="game.status === statusItem.id ? statusItem.activeText : 'text-app-text-muted'"
+                    />
+                    <span
+                      v-if="game.status === statusItem.id"
+                      class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs"
+                      :class="[statusItem.badgeBg, statusItem.activeText]"
+                    >
+                      <Check class="w-3 h-3" />
+                      Activo
+                    </span>
+                  </div>
+                  <div>
+                    <div
+                      class="text-xs font-bold tracking-tight"
+                      :class="game.status === statusItem.id ? statusItem.activeText : 'text-app-text'"
+                    >
+                      {{ statusItem.label }}
+                    </div>
+                  </div>
                 </button>
               </div>
             </div>

@@ -124,9 +124,8 @@ defineExpose({ spin });
 
       <!-- Visor Box with Center HUD Indicator -->
       <div
-        class="relative w-full h-[380px] rounded-md overflow-hidden border shadow-inner"
+        class="relative w-full h-[380px] rounded-md overflow-hidden border shadow-inner bg-slate-950"
         :style="{
-          backgroundColor: '#090d16',
           borderColor: 'var(--app-border)',
         }"
       >
@@ -152,8 +151,8 @@ defineExpose({ spin });
         </div>
 
         <!-- Top & Bottom Gradient Shadows for depth -->
-        <div class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#090d16] via-[#090d16]/70 to-transparent z-10 pointer-events-none" />
-        <div class="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#090d16] via-[#090d16]/70 to-transparent z-10 pointer-events-none" />
+        <div class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
+        <div class="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
 
         <!-- Vertical Sliding Strip -->
         <div
