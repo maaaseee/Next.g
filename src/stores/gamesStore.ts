@@ -5,7 +5,19 @@ import { GAME_STATUS_CONFIG } from '@/types/game';
 import { useToastStore } from './toastStore';
 
 export const useGamesStore = defineStore('games', () => {
-  const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+  const API_BASE = (() => {
+    if (!rawApiUrl) return '';
+    try {
+      if (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://')) {
+        const parsed = new URL(rawApiUrl);
+        return parsed.origin;
+      }
+    } catch {
+      // fallback to basic trailing slash removal
+    }
+    return rawApiUrl.replace(/\/$/, '');
+  })();
   const games = ref<UserGame[]>([]);
   const activeTab = ref<GameStatus>('BACKLOG');
   const selectedGenre = ref<string | null>(null);
