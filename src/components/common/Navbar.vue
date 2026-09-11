@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Gamepad2, Dices, Search } from 'lucide-vue-next';
+import { Gamepad2, Dices, Search, HelpCircle } from 'lucide-vue-next';
 import { RouterLink, useRoute } from 'vue-router';
 import ThemeSelector from './ThemeSelector.vue';
 
 defineEmits<{
   (e: 'open-search'): void;
+  (e: 'open-faq'): void;
 }>();
 
 const route = useRoute();
@@ -96,6 +97,22 @@ const route = useRoute();
           >
             Ctrl K
           </kbd>
+        </button>
+
+        <!-- FAQ / Help Trigger Button -->
+        <button
+          type="button"
+          @click="$emit('open-faq')"
+          class="flex items-center justify-center w-8 h-8 rounded-md text-xs border transition-all duration-200 hover:opacity-90 cursor-pointer"
+          :style="{
+            backgroundColor: 'var(--app-surface)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text-muted)',
+          }"
+          aria-label="Ayuda y preguntas frecuentes"
+          title="Ayuda y preguntas frecuentes"
+        >
+          <HelpCircle class="w-4 h-4" />
         </button>
 
         <!-- Theme Selector -->

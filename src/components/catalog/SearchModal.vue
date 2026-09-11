@@ -1,9 +1,22 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
-import { Search, X, Star, Plus, Check, Loader2, Sparkles } from 'lucide-vue-next';
+import {
+  Search,
+  X,
+  Star,
+  Plus,
+  Check,
+  Loader2,
+  Sparkles,
+  ChevronDown,
+  Clock,
+  Play,
+  CheckCircle2,
+  Trash2,
+} from 'lucide-vue-next';
 import { useGamesStore } from '@/stores/gamesStore';
 import type { Game, GameStatus } from '@/types/game';
-import { GAME_STATUS_CONFIG } from '@/types/game';
+import { GAME_STATUS_CONFIG, formatGameRating } from '@/types/game';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -19,6 +32,14 @@ const searchQuery = ref('');
 const searchResults = ref<Game[]>([]);
 const isLoading = ref(false);
 const inputRef = ref<HTMLInputElement | null>(null);
+const activeMenuGameId = ref<number | null>(null);
+
+const STATUS_OPTIONS: { status: GameStatus; label: string; icon: any; color: string }[] = [
+  { status: 'BACKLOG', label: 'Backlog', icon: Clock, color: 'text-amber-400' },
+  { status: 'PLAYING', label: 'Jugando', icon: Play, color: 'text-emerald-400' },
+  { status: 'COMPLETED', label: 'Completado', icon: CheckCircle2, color: 'text-sky-400' },
+  { status: 'WISHLIST', label: 'Deseado', icon: Sparkles, color: 'text-purple-400' },
+];
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -55,12 +76,33 @@ function getExistingGameStatus(id: number): GameStatus | null {
   return existing ? existing.status : null;
 }
 
-async function handleAddGame(game: Game, status: GameStatus = 'BACKLOG') {
+function toggleStatusMenu(gameId: number) {
+  activeMenuGameId.value = activeMenuGameId.value === gameId ? null : gameId;
+}
+
+async function handleSelectCategory(game: Game, status: GameStatus) {
+  activeMenuGameId.value = null;
   await gamesStore.addGame(game, status);
+}
+
+async function handleRemoveGame(gameId: number) {
+  activeMenuGameId.value = null;
+  await gamesStore.deleteGame(gameId);
+}
+
+function handleClickOutside(e: MouseEvent) {
+  if (activeMenuGameId.value !== null) {
+    activeMenuGameId.value = null;
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape' && props.isOpen) {
+    if (activeMenuGameId.value !== null) {
+      activeMenuGameId.value = null;
+      e.stopPropagation();
+      return;
+    }
     emit('close');
   }
 }
@@ -71,19 +113,24 @@ watch(
     if (val) {
       searchQuery.value = '';
       searchResults.value = [];
+      activeMenuGameId.value = null;
       nextTick(() => {
         inputRef.value?.focus();
       });
+    } else {
+      activeMenuGameId.value = null;
     }
   }
 );
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
+  document.addEventListener('click', handleClickOutside);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown);
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -120,7 +167,7 @@ onUnmounted(() => {
             v-model="searchQuery"
             @input="handleSearchInput"
             placeholder="Buscar títulos, sagas, géneros..."
-            class="flex-1 bg-transparent border-none text-sm sm:text-base font-medium focus:outline-hidden placeholder:text-[var(--app-text-muted)]"
+            class="flex-1 bg-transparent border-none text-sm sm:text-base font-medium focus:outline-hidden placeholder:text-(--app-text-muted)"
             :style="{ color: 'var(--app-text)' }"
           />
           <button
@@ -146,7 +193,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Search Results List -->
-        <div class="p-4 max-h-[60vh] overflow-y-auto space-y-2.5">
+        <div class="p-4 max-h-[60vh] overflow-y-auto space-y-2.5 pb-20">
           <!-- Loading Skeletons -->
           <div v-if="isLoading" class="space-y-2.5">
             <div
@@ -166,9 +213,10 @@ onUnmounted(() => {
           <!-- Results -->
           <div v-else-if="searchResults.length > 0" class="space-y-2">
             <div
-              v-for="game in searchResults"
+              v-for="(game, index) in searchResults"
               :key="game.id"
               class="flex items-center justify-between gap-3 p-3 rounded-lg border transition-all hover:border-[var(--app-primary)]"
+              :class="{ 'relative z-30': activeMenuGameId === game.id }"
               :style="{ backgroundColor: 'var(--app-surface-hover)', borderColor: 'var(--app-border)' }"
             >
               <!-- Game Info Preview -->
@@ -191,9 +239,9 @@ onUnmounted(() => {
                   </h4>
                   <div class="flex items-center gap-2 mt-1 text-xs" :style="{ color: 'var(--app-text-muted)' }">
                     <span v-if="game.release_year">{{ game.release_year }}</span>
-                    <span v-if="game.rating" class="inline-flex items-center gap-0.5 text-amber-300 font-semibold">
+                    <span v-if="formatGameRating(game.rating)" class="inline-flex items-center gap-0.5 text-amber-300 font-semibold">
                       <Star class="w-3 h-3 fill-amber-300" />
-                      {{ game.rating.toFixed(1) }}
+                      {{ formatGameRating(game.rating) }}
                     </span>
                     <span v-if="game.genres?.length" class="truncate hidden sm:inline">
                       • {{ game.genres.slice(0, 2).join(', ') }}
@@ -202,29 +250,115 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <!-- Add to Catalog Buttons -->
-              <div class="shrink-0 flex items-center gap-1.5">
-                <!-- If already in library -->
-                <span
+              <!-- Add to Catalog / Category Dropdown -->
+              <div class="shrink-0 relative" :class="{ 'z-40': activeMenuGameId === game.id }">
+                <!-- If already in library: Interactive badge to view/change status -->
+                <button
                   v-if="getExistingGameStatus(game.id)"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold border"
+                  type="button"
+                  @click.stop="toggleStatusMenu(game.id)"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
                   :class="GAME_STATUS_CONFIG[getExistingGameStatus(game.id)!].badgeClass"
+                  title="Cambiar categoría o estado"
+                  aria-haspopup="true"
+                  :aria-expanded="activeMenuGameId === game.id"
                 >
                   <Check class="w-3.5 h-3.5" />
-                  {{ GAME_STATUS_CONFIG[getExistingGameStatus(game.id)!].label }}
-                </span>
+                  <span>{{ GAME_STATUS_CONFIG[getExistingGameStatus(game.id)!].label }}</span>
+                  <ChevronDown
+                    class="w-3 h-3 opacity-70 transition-transform duration-150"
+                    :class="{ 'rotate-180': activeMenuGameId === game.id }"
+                  />
+                </button>
 
-                <!-- Quick Add to Backlog -->
+                <!-- If not in library: Add to category button with dropdown -->
                 <button
                   v-else
                   type="button"
-                  @click="handleAddGame(game, 'BACKLOG')"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-white transition-transform hover:scale-105 cursor-pointer shadow-md"
+                  @click.stop="toggleStatusMenu(game.id)"
+                  class="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md hover:shadow-lg"
                   :style="{ backgroundColor: 'var(--app-primary)' }"
+                  title="Agregar a una categoría"
+                  aria-haspopup="true"
+                  :aria-expanded="activeMenuGameId === game.id"
                 >
-                  <Plus class="w-3.5 h-3.5" />
-                  <span>+ Backlog</span>
+                  <Plus class="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Agregar</span>
+                  <ChevronDown
+                    class="w-3 h-3 opacity-80 transition-transform duration-150"
+                    :class="{ 'rotate-180': activeMenuGameId === game.id }"
+                  />
                 </button>
+
+                <!-- Category Popover Dropdown -->
+                <transition
+                  enter-active-class="transition duration-150 ease-out"
+                  enter-from-class="transform scale-95 opacity-0"
+                  enter-to-class="transform scale-100 opacity-100"
+                  leave-active-class="transition duration-100 ease-in"
+                  leave-from-class="transform scale-100 opacity-100"
+                  leave-to-class="transform scale-95 opacity-0"
+                >
+                  <div
+                    v-if="activeMenuGameId === game.id"
+                    class="absolute right-0 w-48 p-1.5 rounded-lg border shadow-2xl z-50 backdrop-blur-md"
+                    :class="[
+                      index >= searchResults.length - 2 && searchResults.length > 2
+                        ? 'bottom-full mb-1.5 origin-bottom-right'
+                        : 'top-full mt-1.5 origin-top-right'
+                    ]"
+                    :style="{
+                      backgroundColor: 'var(--app-surface)',
+                      borderColor: 'var(--app-border)',
+                    }"
+                    role="menu"
+                  >
+                    <div class="px-2 py-1 mb-1 border-b" :style="{ borderColor: 'var(--app-border)' }">
+                      <p class="text-[10px] font-bold uppercase tracking-wider" :style="{ color: 'var(--app-text-muted)' }">
+                        {{ getExistingGameStatus(game.id) ? 'Mover a categoría:' : 'Agregar a categoría:' }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-0.5">
+                      <button
+                        v-for="opt in STATUS_OPTIONS"
+                        :key="opt.status"
+                        type="button"
+                        @click.stop="handleSelectCategory(game, opt.status)"
+                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all hover:bg-white/10 cursor-pointer"
+                        :class="{ 'bg-white/5 font-bold': getExistingGameStatus(game.id) === opt.status }"
+                        role="menuitem"
+                      >
+                        <div class="flex items-center gap-2">
+                          <component :is="opt.icon" class="w-3.5 h-3.5" :class="opt.color" />
+                          <span :style="{ color: 'var(--app-text)' }">{{ opt.label }}</span>
+                        </div>
+                        <Check
+                          v-if="getExistingGameStatus(game.id) === opt.status"
+                          class="w-3.5 h-3.5"
+                          :style="{ color: 'var(--app-primary)' }"
+                        />
+                      </button>
+                    </div>
+
+                    <!-- Option to remove from library if already added -->
+                    <div
+                      v-if="getExistingGameStatus(game.id)"
+                      class="pt-1 mt-1 border-t"
+                      :style="{ borderColor: 'var(--app-border)' }"
+                    >
+                      <button
+                        type="button"
+                        @click.stop="handleRemoveGame(game.id)"
+                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-semibold text-rose-400 hover:bg-rose-500/15 transition-colors cursor-pointer"
+                        role="menuitem"
+                      >
+                        <Trash2 class="w-3.5 h-3.5" />
+                        <span>Quitar de biblioteca</span>
+                      </button>
+                    </div>
+                  </div>
+                </transition>
               </div>
             </div>
           </div>

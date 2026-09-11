@@ -89,10 +89,10 @@ const resetFilters = () => {
 </script>
 
 <template>
-  <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
     <!-- VIEW 1: Initial 3-Mode Selection Hub with Previews -->
     <Transition name="fade" mode="out-in">
-      <div v-if="!selectedMode" key="mode-hub">
+      <div v-if="!selectedMode" key="mode-hub" class="min-h-[692px] flex flex-col justify-between">
         <RouletteModeHub @select-mode="handleSelectMode" />
       </div>
 
@@ -141,7 +141,7 @@ const resetFilters = () => {
 
         <!-- Unified Roulette Card (Containing embedded filters + roulette mechanism) -->
         <div
-          class="rounded-xl border p-5 sm:p-7 flex flex-col items-center gap-6 shadow-xl transition-all duration-200"
+          class="rounded-xl border p-5 sm:p-7 flex flex-col items-center justify-between gap-6 shadow-xl transition-all duration-200 min-h-[640px]"
           :style="{
             backgroundColor: 'var(--app-surface)',
             borderColor: 'var(--app-border)',

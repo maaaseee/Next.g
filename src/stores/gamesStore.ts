@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Game, UserGame, GameStatus } from '@/types/game';
+import { GAME_STATUS_CONFIG } from '@/types/game';
+import { useToastStore } from './toastStore';
 
 export const useGamesStore = defineStore('games', () => {
   const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
@@ -67,6 +69,7 @@ export const useGamesStore = defineStore('games', () => {
   }
 
   async function updateGameStatus(id: number, newStatus: GameStatus) {
+    const toast = useToastStore();
     const game = games.value.find((g) => g.id === id);
     if (!game) return;
 
@@ -80,14 +83,17 @@ export const useGamesStore = defineStore('games', () => {
         body: JSON.stringify({ ...game, status: newStatus }),
       });
       if (!res.ok) throw new Error(`Error en el servidor: ${res.status}`);
+      toast.info(`"${game.title}" movido a ${GAME_STATUS_CONFIG[newStatus].label}`);
     } catch (err) {
       game.status = previousStatus; // Rollback
+      toast.error('No se pudo actualizar el estado del juego');
       console.error('[GamesStore] Update status error:', err);
       throw err;
     }
   }
 
   async function addGame(gameData: Partial<UserGame>, status: GameStatus = 'BACKLOG') {
+    const toast = useToastStore();
     const optimistic: UserGame = {
       id: gameData.id!,
       title: gameData.title!,
@@ -117,21 +123,28 @@ export const useGamesStore = defineStore('games', () => {
         body: JSON.stringify({ ...optimistic, status }),
       });
       if (!res.ok) throw new Error(`Error al guardar: ${res.status}`);
+      toast.success(`"${optimistic.title}" añadido a ${GAME_STATUS_CONFIG[status].label}`);
     } catch (err) {
+      toast.error(`Error al guardar "${optimistic.title}"`);
       await fetchGames(); // Refresh on error
       throw err;
     }
   }
 
   async function deleteGame(id: number) {
+    const toast = useToastStore();
+    const target = games.value.find((g) => g.id === id);
+    const targetTitle = target ? `"${target.title}"` : 'Juego';
     const prev = [...games.value];
     games.value = games.value.filter((g) => g.id !== id);
 
     try {
       const res = await fetch(`${API_BASE}/api/games/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Error al eliminar: ${res.status}`);
+      toast.info(`${targetTitle} eliminado de la biblioteca`);
     } catch (err) {
       games.value = prev; // Rollback
+      toast.error(`Error al eliminar ${targetTitle}`);
       throw err;
     }
   }

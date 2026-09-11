@@ -52,3 +52,26 @@ export const GAME_STATUS_CONFIG: Record<
     color: '#a855f7',
   },
 };
+
+/**
+ * Normalizes game rating to a 5-star scale (0.0 to 5.0).
+ * Handles legacy IGDB ratings (0-100) by dividing by 20.
+ */
+export function formatGameRating(rating: number | null | undefined): string | null {
+  if (rating === null || rating === undefined || isNaN(rating)) return null;
+  const normalized = rating > 5 ? rating / 20 : rating;
+  return normalized.toFixed(1);
+}
+
+/**
+ * Generates official RAWG.io game page URL from title.
+ */
+export function getRawgGameUrl(title: string): string {
+  const slug = title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `https://rawg.io/games/${slug}`;
+}

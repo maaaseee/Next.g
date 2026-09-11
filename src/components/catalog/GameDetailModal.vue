@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
-import { X, Star, Calendar, Monitor, Tag, Users, Trash2, Play, CheckCircle2, Clock, Sparkles } from 'lucide-vue-next';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { X, Star, Calendar, Monitor, Tag, Users, Trash2, Play, CheckCircle2, Clock, Sparkles, ExternalLink } from 'lucide-vue-next';
 import type { UserGame, GameStatus } from '@/types/game';
-import { GAME_STATUS_CONFIG } from '@/types/game';
+import { GAME_STATUS_CONFIG, formatGameRating, getRawgGameUrl } from '@/types/game';
 import { useGamesStore } from '@/stores/gamesStore';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 
 const props = defineProps<{
   game: UserGame | null;
@@ -14,6 +15,11 @@ const emit = defineEmits<{
 }>();
 
 const gamesStore = useGamesStore();
+const showDeleteConfirm = ref(false);
+
+const rawgUrl = computed(() => {
+  return props.game ? getRawgGameUrl(props.game.title) : 'https://rawg.io';
+});
 
 function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
@@ -26,8 +32,13 @@ async function handleStatusChange(newStatus: GameStatus) {
   await gamesStore.updateGameStatus(props.game.id, newStatus);
 }
 
-async function handleDelete() {
+function handleDelete() {
+  showDeleteConfirm.value = true;
+}
+
+async function confirmDelete() {
   if (!props.game) return;
+  showDeleteConfirm.value = false;
   await gamesStore.deleteGame(props.game.id);
   emit('close');
 }
@@ -92,22 +103,15 @@ onUnmounted(() => {
         <!-- Right Column: Info & Actions -->
         <div class="flex-1 p-6 md:p-8 flex flex-col justify-between overflow-y-auto max-h-[85vh]">
           <div>
-            <!-- Top Badges -->
+            <!-- Top Badges & RAWG Link -->
             <div class="flex items-center gap-2.5 flex-wrap mb-3">
               <span
-                v-if="game.rating"
+                v-if="formatGameRating(game.rating)"
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                title="Puntuación en RAWG (sobre 5 estrellas)"
               >
-                <Star class="w-4 h-4 fill-amber-300" />
-                {{ game.rating.toFixed(1) }} / 100
-              </span>
-
-              <span
-                v-if="game.release_year"
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-semibold bg-white/10 text-white/90"
-              >
-                <Calendar class="w-4 h-4" />
-                {{ game.release_year }}
+                <Star class="w-4 h-4 fill-amber-300 text-amber-300" />
+                {{ formatGameRating(game.rating) }} / 5
               </span>
 
               <span
@@ -116,12 +120,37 @@ onUnmounted(() => {
               >
                 {{ GAME_STATUS_CONFIG[game.status].label }}
               </span>
+
+              <a
+                :href="rawgUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border transition-all duration-150 hover:bg-white/10 hover:border-white/30 cursor-pointer sm:ml-auto"
+                :style="{
+                  backgroundColor: 'var(--app-surface-hover)',
+                  borderColor: 'var(--app-border)',
+                  color: 'var(--app-text-muted)',
+                }"
+                title="Abrir página oficial del juego en RAWG.io"
+              >
+                <span>Ver en RAWG</span>
+                <ExternalLink class="w-3.5 h-3.5" />
+              </a>
             </div>
 
-            <!-- Title -->
-            <h2 class="text-3xl md:text-4xl font-display font-extrabold leading-tight mb-4 tracking-tight" :style="{ color: 'var(--app-text)' }">
-              {{ game.title }}
-            </h2>
+            <!-- Title & Release Year side by side -->
+            <div class="flex items-baseline gap-2.5 flex-wrap mb-4">
+              <h2 class="text-3xl md:text-4xl font-display font-extrabold leading-tight tracking-tight" :style="{ color: 'var(--app-text)' }">
+                {{ game.title }}
+              </h2>
+              <span
+                v-if="game.release_year"
+                class="text-xl md:text-2xl font-bold font-mono text-app-text-muted select-none"
+                title="Año de lanzamiento"
+              >
+                ({{ game.release_year }})
+              </span>
+            </div>
 
             <!-- Metadata List -->
             <div class="space-y-3 mb-6 text-sm">
@@ -229,6 +258,17 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Delete Confirmation Modal -->
+      <ConfirmModal
+        :is-open="showDeleteConfirm"
+        :title="`¿Eliminar ${game.title}?`"
+        message="¿Seguro que deseas eliminar este juego del backlog compartido? Se quitará de la lista para todos los usuarios."
+        confirm-text="Sí, eliminar"
+        cancel-text="Cancelar"
+        @confirm="confirmDelete"
+        @cancel="showDeleteConfirm = false"
+      />
     </div>
   </transition>
 </template>

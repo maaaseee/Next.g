@@ -60,7 +60,7 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
 </script>
 
 <template>
-  <div class="relative w-full overflow-hidden min-h-[60vh] py-2">
+  <div class="relative w-full overflow-hidden h-145 py-1">
     <!-- Left Lateral Drop Zone (Previous Category) -->
     <Transition name="fade">
       <div
@@ -139,54 +139,54 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
 
     <!-- Horizontal Sliding Track (400% width) -->
     <div
-      class="flex w-[400%] transition-transform duration-300 ease-out"
+      class="flex w-[400%] h-full transition-transform duration-300 ease-out"
       :style="{ transform: `translateX(${translateOffset})` }"
     >
       <!-- Individual Tab Pages (25% width each) -->
       <div
         v-for="tab in TABS"
         :key="tab"
-        class="w-1/4 px-1"
+        class="w-1/4 h-full px-1 flex flex-col"
         @dragover.prevent
         @drop="handleDropOnTab(tab)"
       >
-        <!-- Games Grid with smooth move transitions -->
-        <TransitionGroup
-          v-if="getGamesForTab(tab).length > 0"
-          name="game-grid"
-          tag="div"
-          class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 pb-4"
-        >
-          <GameCard
-            v-for="game in getGamesForTab(tab)"
-            :key="game.id"
-            :game="game"
-            @click="$emit('select-game', game)"
-          />
-        </TransitionGroup>
+        <!-- Games Grid with smooth scroll inside fixed container -->
+        <div v-if="getGamesForTab(tab).length > 0" class="flex-1 overflow-y-auto pr-1 pb-4">
+          <TransitionGroup
+            name="game-grid"
+            tag="div"
+            class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3"
+          >
+            <GameCard
+              v-for="game in getGamesForTab(tab)"
+              :key="game.id"
+              :game="game"
+              @click="$emit('select-game', game)"
+            />
+          </TransitionGroup>
+        </div>
 
-        <!-- Empty State -->
+        <!-- Empty State centered in full height (seamless transparent background without borders) -->
         <div
           v-else
-          class="flex flex-col items-center justify-center py-20 px-4 text-center rounded-lg border my-4"
-          :style="{ backgroundColor: 'var(--app-surface)', borderColor: 'var(--app-border)' }"
+          class="h-full flex flex-col items-center justify-center p-8 text-center"
         >
           <div
-            class="w-14 h-14 rounded-lg flex items-center justify-center mb-4"
-            :style="{ backgroundColor: 'var(--app-surface-hover)', color: 'var(--app-primary)' }"
+            class="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+            :style="{ backgroundColor: 'var(--app-surface)', color: 'var(--app-primary)' }"
           >
-            <Inbox class="w-7 h-7" />
+            <Inbox class="w-6 h-6" />
           </div>
           <h3 class="text-lg font-bold font-display" :style="{ color: 'var(--app-text)' }">
             No hay juegos en {{ GAME_STATUS_CONFIG[tab].label }}
           </h3>
           <p class="text-xs max-w-sm mt-1 mb-6" :style="{ color: 'var(--app-text-muted)' }">
-            Arrastra un juego a los laterales o busca nuevos títulos en RAWG para agregarlos.
+            Arrastra un juego a los laterales o busca nuevos títulos para agregarlos.
           </p>
           <button
             type="button"
             @click="$emit('open-search')"
-            class="px-4 py-2 mt-6 rounded-md text-xs font-bold text-white transition-transform hover:scale-105 cursor-pointer shadow-md"
+            class="px-4 py-2 rounded-md text-xs font-bold text-white transition-transform hover:scale-105 cursor-pointer shadow-md"
             :style="{ backgroundColor: 'var(--app-primary)' }"
           >
             + Buscar y Agregar Juegos

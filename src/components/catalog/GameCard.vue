@@ -4,6 +4,7 @@ import { Trash2, CheckCircle2, Play, Clock, Sparkles } from 'lucide-vue-next';
 import type { UserGame, GameStatus } from '@/types/game';
 import { useGamesStore } from '@/stores/gamesStore';
 import { useDragAndDrop } from '@/composables/useDragAndDrop';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 
 const props = defineProps<{
   game: UserGame;
@@ -18,6 +19,7 @@ const { onDragStart, onDragEnd, draggedGame } = useDragAndDrop();
 
 const imageError = ref(false);
 const hoveredActionStatus = ref<GameStatus | null>(null);
+const showDeleteConfirm = ref(false);
 
 const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: any; colorClass: string; hoverClass: string }[] = [
   {
@@ -68,6 +70,11 @@ function handleStatusChange(newStatus: GameStatus) {
 }
 
 function handleDelete() {
+  showDeleteConfirm.value = true;
+}
+
+function confirmDelete() {
+  showDeleteConfirm.value = false;
   gamesStore.deleteGame(props.game.id);
 }
 </script>
@@ -179,6 +186,17 @@ function handleDelete() {
         </button>
       </div>
     </div>
+
+    <!-- Confirm Deletion Modal -->
+    <ConfirmModal
+      :is-open="showDeleteConfirm"
+      :title="`¿Eliminar ${game.title}?`"
+      message="¿Seguro que deseas eliminar este juego del backlog compartido? Esta acción lo removerá para todos los usuarios."
+      confirm-text="Sí, eliminar"
+      cancel-text="Cancelar"
+      @confirm="confirmDelete"
+      @cancel="showDeleteConfirm = false"
+    />
   </div>
 </template>
 

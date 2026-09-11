@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import type { UserGame } from '@/types/game';
+import { formatGameRating } from '@/types/game';
 import { useGamesStore } from '@/stores/gamesStore';
 import { Star, Calendar, Gamepad2, RotateCcw, X, Check, Target, Layers } from 'lucide-vue-next';
 
@@ -127,11 +128,11 @@ onUnmounted(() => {
 
             <!-- Rating badge -->
             <div
-              v-if="game.rating"
+              v-if="formatGameRating(game.rating)"
               class="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/85 border border-amber-500/30 text-amber-300 font-bold text-[11px] flex items-center gap-1 shadow-sm"
             >
               <Star class="w-3 h-3 fill-amber-300 text-amber-300" />
-              <span>{{ game.rating.toFixed(1) }}</span>
+              <span>{{ formatGameRating(game.rating) }}</span>
             </div>
           </div>
 

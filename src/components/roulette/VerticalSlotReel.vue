@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import type { UserGame } from '@/types/game';
+import { formatGameRating } from '@/types/game';
 import { Star, Gamepad2, SlidersVertical, Target } from 'lucide-vue-next';
 
 const props = defineProps<{
@@ -207,11 +208,11 @@ defineExpose({ spin });
 
             <!-- Rating badge -->
             <div
-              v-if="item.game.rating"
+              v-if="formatGameRating(item.game.rating)"
               class="flex items-center gap-1.5 px-3 py-1 rounded bg-black/80 text-amber-300 text-xs sm:text-sm font-bold shrink-0 border border-amber-500/30 shadow-sm"
             >
               <Star class="w-3.5 h-3.5 fill-amber-300" />
-              <span>{{ item.game.rating.toFixed(1) }}</span>
+              <span>{{ formatGameRating(item.game.rating) }}</span>
             </div>
           </div>
         </div>

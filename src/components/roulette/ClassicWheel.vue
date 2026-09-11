@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import type { UserGame } from '@/types/game';
+import { formatGameRating } from '@/types/game';
 import { useTheme } from '@/composables/useTheme';
 import { Compass, Gamepad2, Star } from 'lucide-vue-next';
 
@@ -371,11 +372,11 @@ defineExpose({ spin });
               </span>
             </div>
             <div
-              v-if="hoveredGame.rating"
+              v-if="formatGameRating(hoveredGame.rating)"
               class="flex items-center gap-1 text-[10px] text-amber-300 font-bold"
             >
               <Star class="w-3 h-3 fill-amber-300" />
-              <span>{{ hoveredGame.rating.toFixed(1) }}</span>
+              <span>{{ formatGameRating(hoveredGame.rating) }}</span>
             </div>
           </div>
         </div>
