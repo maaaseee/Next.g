@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import CatalogView from '@/views/CatalogView.vue';
 import RouletteView from '@/views/RouletteView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
-import DesignShowcaseView from '@/views/DesignShowcaseView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,11 +15,6 @@ const router = createRouter({
       path: '/roulette',
       name: 'roulette',
       component: RouletteView,
-    },
-    {
-      path: '/design-lab',
-      name: 'design-lab',
-      component: DesignShowcaseView,
     },
     {
       path: '/:pathMatch(.*)*',

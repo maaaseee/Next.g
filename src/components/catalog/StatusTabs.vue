@@ -63,7 +63,7 @@ function onDrop(tabId: GameStatus) {
             ? 'shadow-md scale-100 text-white'
             : 'text-app-text opacity-70 hover:opacity-100 hover:bg-white/5',
           isDragging && hoveredTab === tab.id
-            ? 'ring-2 ring-[var(--app-primary)] scale-105 bg-[var(--app-primary)]/20'
+            ? 'ring-2 ring-(--app-primary) scale-105 bg-(--app-primary)/20'
             : '',
         ]"
         :style="{

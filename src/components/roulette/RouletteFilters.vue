@@ -56,7 +56,7 @@ const gamesStore = useGamesStore();
         <select
           :value="selectedGenre || ''"
           @change="emit('update:selectedGenre', ($event.target as HTMLSelectElement).value || null)"
-          class="bg-transparent text-xs font-semibold py-1.5 px-2.5 rounded-md border focus:outline-hidden cursor-pointer max-w-[150px] truncate"
+          class="bg-transparent text-xs font-semibold py-1.5 px-2.5 rounded-md border focus:outline-hidden cursor-pointer max-w-37.5 truncate"
           :style="{
             backgroundColor: 'var(--app-surface-hover)',
             borderColor: 'var(--app-border)',
@@ -81,7 +81,7 @@ const gamesStore = useGamesStore();
         <select
           :value="selectedPlatform || ''"
           @change="emit('update:selectedPlatform', ($event.target as HTMLSelectElement).value || null)"
-          class="bg-transparent text-xs font-semibold py-1.5 px-2.5 rounded-md border focus:outline-hidden cursor-pointer max-w-[150px] truncate"
+          class="bg-transparent text-xs font-semibold py-1.5 px-2.5 rounded-md border focus:outline-hidden cursor-pointer max-w-37.5 truncate"
           :style="{
             backgroundColor: 'var(--app-surface-hover)',
             borderColor: 'var(--app-border)',

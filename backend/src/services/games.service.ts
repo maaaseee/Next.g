@@ -12,6 +12,7 @@ export type GameStatus = 'BACKLOG' | 'PLAYING' | 'COMPLETED' | 'WISHLIST';
 export interface UserGameRecord {
   id: number;
   title: string;
+  slug: string | null;
   cover_url: string | null;
   release_year: number | null;
   summary: string | null;
@@ -27,6 +28,7 @@ export interface UserGameRecord {
 interface RawSqlUserGame {
   id: number | string;
   title: string;
+  slug?: string | null;
   cover_url: string | null;
   release_year: number | null;
   summary: string | null;
@@ -42,6 +44,7 @@ interface RawSqlUserGame {
 export interface UpsertGameInput {
   id: number;
   title: string;
+  slug?: string | null;
   cover_url?: string | null;
   release_year?: number | null;
   summary?: string | null;
@@ -68,6 +71,7 @@ export class GamesService {
     return {
       id: Number(raw.id),
       title: raw.title,
+      slug: raw.slug ?? null,
       cover_url: raw.cover_url,
       release_year: raw.release_year ? Number(raw.release_year) : null,
       summary: raw.summary,
@@ -98,6 +102,7 @@ export class GamesService {
       SELECT 
         g.id, 
         g.title, 
+        g.slug,
         g.cover_url, 
         g.release_year, 
         g.summary,
@@ -148,10 +153,11 @@ export class GamesService {
 
       // 2. Upsert games master record
       await tx`
-        INSERT INTO games (id, title, cover_url, release_year, summary, genres, platforms, rating, game_modes)
+        INSERT INTO games (id, title, slug, cover_url, release_year, summary, genres, platforms, rating, game_modes)
         VALUES (
           ${input.id}, 
           ${input.title}, 
+          ${input.slug ?? null},
           ${input.cover_url ?? null}, 
           ${input.release_year ?? null}, 
           ${input.summary ?? null}, 
@@ -162,6 +168,7 @@ export class GamesService {
         )
         ON CONFLICT(id) DO UPDATE SET
           title = EXCLUDED.title,
+          slug = COALESCE(EXCLUDED.slug, games.slug),
           cover_url = EXCLUDED.cover_url,
           release_year = EXCLUDED.release_year,
           summary = EXCLUDED.summary,
@@ -185,6 +192,7 @@ export class GamesService {
       SELECT 
         g.id, 
         g.title, 
+        g.slug,
         g.cover_url, 
         g.release_year, 
         g.summary,

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { Code2, ExternalLink, Github, Sparkles, Terminal } from 'lucide-vue-next';
+import { Code2, ExternalLink, Github, Sparkles } from 'lucide-vue-next';
 
 const APP_VERSION = __APP_VERSION__;
 const CURRENT_YEAR = new Date().getFullYear();
@@ -95,13 +94,6 @@ const CURRENT_YEAR = new Date().getFullYear();
           <span>•</span>
           <span>Todos los datos e imágenes provienen de RAWG.</span>
         </div>
-
-        <RouterLink
-          to="/design-lab"
-          class="hover:underline hover:text-app-text transition-colors cursor-pointer text-app-text-muted"
-        >
-          ⚙️ Lab de Diseño (4 versiones)
-        </RouterLink>
       </div>
     </div>
   </footer>

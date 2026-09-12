@@ -13,9 +13,9 @@ const emit = defineEmits<{
 }>();
 
 const isSpinning = ref(false);
-const ITEM_HEIGHT = 110; // px
-const VISOR_HEIGHT = 380; // px (allows seeing multiple games before and after the reticle)
-const centerOffset = (VISOR_HEIGHT - ITEM_HEIGHT) / 2;
+const ITEM_HEIGHT = 80; // px
+const VISOR_HEIGHT = 260; // px (allows seeing items before and after without dominating viewport)
+const centerOffset = (VISOR_HEIGHT - ITEM_HEIGHT) / 2; // 90px
 
 // 250-item continuous virtual strip
 const BUFFER_SIZE = 250;
@@ -62,7 +62,7 @@ onMounted(() => {
 });
 
 const spin = () => {
-  if (isSpinning.value || props.candidates.length === 0) return;
+  if (isSpinning.value || props.candidates.length < 2) return;
 
   const total = props.candidates.length;
   const winnerIndex = Math.floor(Math.random() * total);
@@ -99,60 +99,46 @@ defineExpose({ spin });
 </script>
 
 <template>
-  <div class="w-full flex flex-col items-center justify-center gap-8 py-3">
-    <!-- Scanner HUD Housing Frame - 75% container width -->
+  <div class="w-full flex flex-col items-center justify-center gap-5 py-2">
+    <!-- Scanner Housing Frame -->
     <div
-      class="relative w-full md:w-3/4 max-w-5xl p-5 sm:p-6 rounded-lg border shadow-2xl flex flex-col items-center"
+      class="relative w-full md:w-3/4 max-w-4xl p-4 sm:p-5 rounded-lg border shadow-xl flex flex-col items-center"
       :style="{
         backgroundColor: 'var(--app-surface)',
         borderColor: 'var(--app-border)',
       }"
     >
-      <!-- Telemetry Header -->
-      <div class="w-full flex items-center justify-between pb-3 mb-3 border-b text-xs" :style="{ borderColor: 'var(--app-border)' }">
-        <div class="flex items-center gap-2.5">
-          <div class="w-2.5 h-2.5 rounded-xs" :style="{ backgroundColor: 'var(--app-primary)' }" />
-          <span class="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider" :style="{ color: 'var(--app-text)' }">
-            ESCÁNER SECUENCIAL DE PRECISIÓN
-          </span>
-        </div>
-        <div class="flex items-center gap-1.5 font-mono text-xs" :style="{ color: 'var(--app-text-muted)' }">
-          <Target class="w-4 h-4" />
-          <span>{{ candidates.length }} OBJETIVOS</span>
-        </div>
-      </div>
-
-      <!-- Visor Box with Center HUD Indicator -->
+      <!-- Visor Box with Center Indicator -->
       <div
-        class="relative w-full h-[380px] rounded-md overflow-hidden border shadow-inner bg-slate-950"
+        class="relative w-full h-65 rounded-md overflow-hidden border shadow-inner bg-slate-950"
         :style="{
           borderColor: 'var(--app-border)',
         }"
       >
-        <!-- Center Target Laser Reticle Line -->
+        <!-- Center Target Indicator Reticle Line -->
         <div
-          class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[110px] border-y-2 pointer-events-none z-20 flex items-center justify-between px-3"
+          class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-20 border-y-2 pointer-events-none z-20 flex items-center justify-between px-3"
           :style="{
             borderColor: 'var(--app-primary)',
             backgroundColor: 'rgba(255, 255, 255, 0.02)',
-            boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)',
+            boxShadow: 'inset 0 0 16px rgba(0, 0, 0, 0.5)',
           }"
         >
           <!-- Left Chevron Target -->
           <div
-            class="w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-[10px]"
+            class="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent border-l-8"
             :style="{ borderLeftColor: 'var(--app-primary)' }"
           />
           <!-- Right Chevron Target -->
           <div
-            class="w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-[10px]"
+            class="w-0 h-0 border-t-6 border-t-transparent border-b-6 border-b-transparent border-r-8"
             :style="{ borderRightColor: 'var(--app-primary)' }"
           />
         </div>
 
         <!-- Top & Bottom Gradient Shadows for depth -->
-        <div class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
-        <div class="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
+        <div class="absolute top-0 inset-x-0 h-12 bg-linear-to-b from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
+        <div class="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
 
         <!-- Vertical Sliding Strip -->
         <div
@@ -166,10 +152,10 @@ defineExpose({ spin });
           <div
             v-for="item in reelItems"
             :key="item.key"
-            class="h-[110px] px-4 sm:px-6 flex items-center gap-4 sm:gap-6 border-b border-white/5 shrink-0"
+            class="h-20 px-3 sm:px-5 flex items-center gap-3 sm:gap-4 border-b border-white/5 shrink-0"
           >
             <!-- Game Thumb -->
-            <div class="w-16 h-22 rounded-md overflow-hidden bg-black/60 shrink-0 border border-white/15 shadow-md">
+            <div class="w-11 h-15 rounded overflow-hidden bg-black/60 shrink-0 border border-white/15 shadow-sm">
               <img
                 v-if="item.game.cover_url"
                 :src="item.game.cover_url"
@@ -179,26 +165,26 @@ defineExpose({ spin });
                 decoding="async"
               />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
-                <Gamepad2 class="w-6 h-6" />
+                <Gamepad2 class="w-5 h-5" />
               </div>
             </div>
 
             <!-- Game Info -->
-            <div class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
-              <span class="text-base sm:text-lg font-black text-white tracking-tight truncate">
+            <div class="flex-1 min-w-0 flex flex-col justify-center gap-1">
+              <span class="text-sm sm:text-base font-bold text-white tracking-tight truncate">
                 {{ item.game.title }}
               </span>
               <div class="flex flex-wrap items-center gap-2">
                 <span
                   v-if="item.game.release_year"
-                  class="text-xs font-mono text-gray-300 font-semibold px-2 py-0.5 rounded bg-white/5"
+                  class="text-[11px] font-mono text-gray-300 px-1.5 py-0.2 rounded bg-white/5"
                 >
                   {{ item.game.release_year }}
                 </span>
                 <span
                   v-for="genre in (item.game.genres || []).slice(0, 2)"
                   :key="genre"
-                  class="text-[11px] px-2.5 py-0.5 rounded bg-white/10 text-gray-200 font-medium truncate max-w-[140px]"
+                  class="text-[10px] px-2 py-0.2 rounded bg-white/10 text-gray-200 truncate max-w-30"
                 >
                   {{ genre }}
                 </span>
@@ -208,9 +194,9 @@ defineExpose({ spin });
             <!-- Rating badge -->
             <div
               v-if="formatGameRating(item.game.rating)"
-              class="flex items-center gap-1.5 px-3 py-1 rounded bg-black/80 text-amber-300 text-xs sm:text-sm font-bold shrink-0 border border-amber-500/30 shadow-sm"
+              class="flex items-center gap-1 px-2.5 py-1 rounded bg-black/80 text-amber-300 text-xs font-bold shrink-0 border border-amber-500/30 shadow-xs"
             >
-              <Star class="w-3.5 h-3.5 fill-amber-300" />
+              <Star class="w-3 h-3 fill-amber-300" />
               <span>{{ formatGameRating(item.game.rating) }}</span>
             </div>
           </div>
@@ -219,26 +205,26 @@ defineExpose({ spin });
         <!-- Empty State -->
         <div v-else class="h-full flex items-center justify-center text-center p-4">
           <p class="text-xs text-gray-400 font-medium">
-            No hay objetivos para los filtros activos.
+            No hay juegos para los filtros activos.
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Action Button -->
-    <div class="flex flex-col items-center gap-2">
+    <!-- Action Button & Status -->
+    <div class="flex flex-col items-center gap-1.5">
       <button
         type="button"
         @click="spin"
-        :disabled="isSpinning || candidates.length === 0"
-        class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border"
+        :disabled="isSpinning || candidates.length < 2"
+        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border"
         :style="{
           backgroundColor: 'var(--app-primary)',
           borderColor: 'var(--app-border)',
         }"
       >
-        <SlidersVertical class="w-4 h-4" :class="{ 'animate-pulse': isSpinning }" />
-        <span>{{ isSpinning ? 'Escaneando Secuencia...' : 'Ejecutar Escáner' }}</span>
+        <SlidersVertical class="w-3.5 h-3.5" :class="{ 'animate-pulse': isSpinning }" />
+        <span>{{ isSpinning ? 'Seleccionando...' : 'Sortear Juego' }}</span>
       </button>
 
       <span
@@ -248,11 +234,10 @@ defineExpose({ spin });
         No hay candidatos disponibles con los filtros actuales.
       </span>
       <span
-        v-else
-        class="text-[11px] font-mono"
-        :style="{ color: 'var(--app-text-muted)' }"
+        v-else-if="candidates.length === 1"
+        class="text-xs font-medium text-amber-300"
       >
-        El visor se detendrá automáticamente en el objetivo seleccionado
+        Se necesitan al menos 2 juegos para realizar el sorteo.
       </span>
     </div>
   </div>

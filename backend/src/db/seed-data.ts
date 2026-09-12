@@ -8,6 +8,7 @@
 export interface SeedGame {
   id: number;
   title: string;
+  slug?: string | null;
   cover_url: string;
   release_year: number;
   summary: string;

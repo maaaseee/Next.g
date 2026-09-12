@@ -114,9 +114,10 @@ export class GameSearchService {
           platforms: any;
           rating: number | null;
           game_modes: any;
+          slug: string | null;
         }[]
       >`
-        SELECT id, title, cover_url, release_year, summary, genres, platforms, rating, game_modes
+        SELECT id, title, cover_url, release_year, summary, genres, platforms, rating, game_modes, slug
         FROM games
         WHERE title ILIKE ${term} OR genres::text ILIKE ${term} OR platforms::text ILIKE ${term}
         LIMIT ${limit};
@@ -143,6 +144,7 @@ export class GameSearchService {
         platforms: parseJsonArray(r.platforms),
         rating: r.rating !== null ? Number(r.rating) : null,
         game_modes: parseJsonArray(r.game_modes),
+        slug: r.slug ?? null,
       }));
     } catch {
       return [];
@@ -175,6 +177,7 @@ export class GameSearchService {
       platforms: g.platforms,
       rating: g.rating,
       game_modes: g.game_modes,
+      slug: g.slug ?? null,
     }));
 
     // Merge with any unique games from local database

@@ -65,7 +65,7 @@ const modalStatuses: {
 ];
 
 const rawgUrl = computed(() => {
-  return props.game ? getRawgGameUrl(props.game.title) : 'https://rawg.io';
+  return props.game ? getRawgGameUrl(props.game) : 'https://rawg.io';
 });
 
 function handleKeydown(e: KeyboardEvent) {
@@ -134,7 +134,7 @@ onUnmounted(() => {
         </button>
 
         <!-- Left Column: Cover Image -->
-        <div class="w-full md:w-5/12 relative aspect-[3/4] md:aspect-auto shrink-0 bg-black/60 overflow-hidden min-h-[350px] md:min-h-[520px]">
+        <div class="w-full md:w-5/12 relative aspect-3/4 md:aspect-auto shrink-0 bg-black/60 overflow-hidden min-h-87.5 md:min-h-130">
           <img
             v-if="game.cover_url"
             :src="game.cover_url"

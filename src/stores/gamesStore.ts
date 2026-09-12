@@ -80,28 +80,83 @@ export const useGamesStore = defineStore('games', () => {
     }
   }
 
-  async function updateGameStatus(id: number, newStatus: GameStatus) {
+  // Debounce and abort controllers map for status updates per game ID
+  const statusUpdateTimers = new Map<number, any>();
+  const statusUpdateAbortControllers = new Map<number, AbortController>();
+  const statusInitialState = new Map<number, GameStatus>();
+
+  async function updateGameStatus(id: number, newStatus: GameStatus, debounceMs: number = 400) {
     const toast = useToastStore();
     const game = games.value.find((g) => g.id === id);
     if (!game) return;
 
-    const previousStatus = game.status;
-    game.status = newStatus; // Optimistic update
-
-    try {
-      const res = await fetch(`${API_BASE}/api/games`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...game, status: newStatus }),
-      });
-      if (!res.ok) throw new Error(`Error en el servidor: ${res.status}`);
-      toast.info(`"${game.title}" movido a ${GAME_STATUS_CONFIG[newStatus].label}`);
-    } catch (err) {
-      game.status = previousStatus; // Rollback
-      toast.error('No se pudo actualizar el estado del juego');
-      console.error('[GamesStore] Update status error:', err);
-      throw err;
+    // Track the initial status before rapid changes if not already tracked
+    if (!statusInitialState.has(id)) {
+      statusInitialState.set(id, game.status);
     }
+
+    // 1. Instant optimistic UI update so the user feels immediate reactivity
+    game.status = newStatus;
+
+    // 2. Clear previous pending timer for this game if user clicks rapidly
+    if (statusUpdateTimers.has(id)) {
+      clearTimeout(statusUpdateTimers.get(id));
+      statusUpdateTimers.delete(id);
+    }
+
+    // 3. Abort any in-flight fetch request for this same game
+    if (statusUpdateAbortControllers.has(id)) {
+      statusUpdateAbortControllers.get(id)!.abort();
+      statusUpdateAbortControllers.delete(id);
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(async () => {
+        statusUpdateTimers.delete(id);
+
+        const initialStatus = statusInitialState.get(id) ?? newStatus;
+        statusInitialState.delete(id);
+
+        // If after rapid clicks the status is back to what it originally was in DB, no need to call API
+        if (game.status === initialStatus) {
+          resolve();
+          return;
+        }
+
+        const controller = new AbortController();
+        statusUpdateAbortControllers.set(id, controller);
+
+        try {
+          const res = await fetch(`${API_BASE}/api/games`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...game, status: game.status }),
+            signal: controller.signal,
+          });
+
+          if (!res.ok) throw new Error(`Error en el servidor: ${res.status}`);
+          toast.info(`"${game.title}" movido a ${GAME_STATUS_CONFIG[game.status].label}`);
+          resolve();
+        } catch (err: any) {
+          if (err?.name === 'AbortError') {
+            // Cancelled because another newer action superseded this one
+            resolve();
+            return;
+          }
+          // Rollback to original status before the rapid changes
+          game.status = initialStatus;
+          toast.error('No se pudo actualizar el estado del juego');
+          console.error('[GamesStore] Update status error:', err);
+          reject(err);
+        } finally {
+          if (statusUpdateAbortControllers.get(id) === controller) {
+            statusUpdateAbortControllers.delete(id);
+          }
+        }
+      }, debounceMs);
+
+      statusUpdateTimers.set(id, timer);
+    });
   }
 
   async function addGame(gameData: Partial<UserGame>, status: GameStatus = 'BACKLOG') {
@@ -116,6 +171,7 @@ export const useGamesStore = defineStore('games', () => {
       platforms: gameData.platforms || [],
       rating: gameData.rating || null,
       game_modes: gameData.game_modes || [],
+      slug: gameData.slug || null,
       status,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -148,6 +204,18 @@ export const useGamesStore = defineStore('games', () => {
     const target = games.value.find((g) => g.id === id);
     const targetTitle = target ? `"${target.title}"` : 'Juego';
     const prev = [...games.value];
+
+    // Clear any pending debounced status updates for this game
+    if (statusUpdateTimers.has(id)) {
+      clearTimeout(statusUpdateTimers.get(id));
+      statusUpdateTimers.delete(id);
+    }
+    if (statusUpdateAbortControllers.has(id)) {
+      statusUpdateAbortControllers.get(id)!.abort();
+      statusUpdateAbortControllers.delete(id);
+    }
+    statusInitialState.delete(id);
+
     games.value = games.value.filter((g) => g.id !== id);
 
     try {

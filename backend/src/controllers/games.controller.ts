@@ -50,6 +50,7 @@ export const gamesController = new Elysia({ prefix: '/api/games' })
             const savedGame = await GamesService.upsertGame({
               id: Number(body.id),
               title: body.title,
+              slug: body.slug ?? null,
               cover_url: body.cover_url,
               release_year: body.release_year ? Number(body.release_year) : null,
               summary: body.summary,

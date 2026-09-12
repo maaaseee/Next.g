@@ -7,6 +7,7 @@ import { logger } from '../utils/logger';
 export interface RawgRawGame {
   id: number;
   name: string;
+  slug?: string | null;
   background_image?: string | null;
   released?: string | null;
   description_raw?: string | null;
@@ -125,6 +126,7 @@ export class RawgAdapter implements GameProvider {
       return {
         id: game.id,
         title: game.name,
+        slug: game.slug || null,
         cover_url,
         release_year,
         summary: game.description_raw || null,

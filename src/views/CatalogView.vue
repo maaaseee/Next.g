@@ -21,9 +21,9 @@ function handleCloseDetail() {
 </script>
 
 <template>
-  <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 w-full flex-1 flex flex-col">
     <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
       <div>
         <h1 class="text-3xl font-display font-black tracking-tight" :style="{ color: 'var(--app-text)' }">
           Mi Biblioteca
@@ -48,7 +48,7 @@ function handleCloseDetail() {
     </div>
 
     <!-- Status Tabs Component -->
-    <StatusTabs />
+    <StatusTabs class="shrink-0" />
 
     <!-- Sliding Container with Drag & Drop Viewports -->
     <SlidingContainer

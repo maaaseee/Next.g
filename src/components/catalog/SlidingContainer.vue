@@ -60,7 +60,7 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
 </script>
 
 <template>
-  <div class="relative w-full overflow-hidden h-145 py-1">
+  <div class="relative w-full overflow-hidden flex-1 min-h-145 py-1">
     <!-- Left Lateral Drop Zone (Previous Category) -->
     <Transition name="fade">
       <div
@@ -145,7 +145,7 @@ function getGamesForTab(tab: GameStatus): UserGame[] {
         @drop="handleDropOnTab(tab)"
       >
         <!-- Games Grid with smooth scroll inside fixed container -->
-        <div v-if="getGamesForTab(tab).length > 0" class="flex-1 overflow-y-auto pr-1 pb-4">
+        <div v-if="getGamesForTab(tab).length > 0" class="flex-1 overflow-y-auto pr-1 pb-2">
           <TransitionGroup
             name="game-grid"
             tag="div"

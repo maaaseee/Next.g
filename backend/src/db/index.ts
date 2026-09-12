@@ -17,6 +17,7 @@ const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS games (
   id BIGINT PRIMARY KEY,
   title TEXT NOT NULL,
+  slug TEXT,
   cover_url TEXT,
   release_year INTEGER,
   summary TEXT,
@@ -63,6 +64,9 @@ export async function initDatabase(customUrl?: string): Promise<SqlClient> {
 
   // Run schema creation
   await sql.unsafe(SCHEMA_SQL);
+
+  // Ensure slug column exists for existing tables created before this update
+  await sql.unsafe(`ALTER TABLE games ADD COLUMN IF NOT EXISTS slug TEXT;`);
 
   if (!customUrl) {
     sqlInstance = sql;

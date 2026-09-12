@@ -79,100 +79,161 @@ const drawWheel = () => {
 
   const arc = (2 * Math.PI) / total;
   const shades = wheelShades.value;
+  const hubRadius = 36;
 
-  // Draw Slices
+  // 1. Draw Slices
   for (let i = 0; i < total; i++) {
-    const angle = i * arc;
+    const startAngle = i * arc;
+    const endAngle = startAngle + arc;
     const game = activeSlices.value[i];
     if (!game) continue;
 
-    // Sector body with alternating theme tones
+    // Slice Body
     ctx.beginPath();
     ctx.fillStyle = shades[i % shades.length] || '#131a27';
     ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, radius, angle, angle + arc);
-    ctx.lineTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.closePath();
     ctx.fill();
 
-    // Sector border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 2;
+    // Clean subtle divider between slices
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Sector number & Title
+    // Special case 1: Single element (full circle) -> clean horizontal centered text
+    if (total === 1) {
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 18px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+
+      const maxTextWidth = radius * 1.5;
+      let title = game.title;
+      if (ctx.measureText(title).width > maxTextWidth) {
+        while (title.length > 3 && ctx.measureText(title + '…').width > maxTextWidth) {
+          title = title.slice(0, -1);
+        }
+        title += '…';
+      }
+      ctx.fillText(title, centerX, centerY + radius * 0.4);
+      ctx.restore();
+      continue;
+    }
+
+    // Special case 2: Exactly two elements (sectors are bottom [0, PI] and top [PI, 2PI])
+    // The bisectors are at midAngle = PI/2 (90°, bottom) and 3PI/2 (270°, top).
+    // Both sectors are horizontal, so we draw their text horizontally centered in each half!
+    if (total === 2) {
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      // Slices: i=0 is bottom half [0 to PI], i=1 is top half [PI to 2*PI].
+      // Both sectors are separated by the X axis (y=0).
+      // Placing text at y = +radius*0.48 (bottom half) and y = -radius*0.48 (top half)
+      // puts them right in the middle of each compartment, perfectly horizontal and upright!
+      const textY = i === 0 ? radius * 0.48 : -radius * 0.48;
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 24px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+
+      const maxTextWidth = radius * 1.4;
+      let title = game.title;
+      if (ctx.measureText(title).width > maxTextWidth) {
+        while (title.length > 3 && ctx.measureText(title + '…').width > maxTextWidth) {
+          title = title.slice(0, -1);
+        }
+        title += '…';
+      }
+      ctx.fillText(title, 0, textY);
+      ctx.restore();
+      continue;
+    }
+
+    // General case: 3 or more elements
+    // We calculate the bisector angle of the slice (startAngle + arc / 2)
+    const midAngle = startAngle + arc / 2;
+    // Normalize midAngle to [0, 2*PI)
+    const normalizedAngle = ((midAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    const isLeftHalf = normalizedAngle > Math.PI / 2 && normalizedAngle < (3 * Math.PI) / 2;
+
     ctx.save();
     ctx.translate(centerX, centerY);
-    ctx.rotate(angle + arc / 2);
-    ctx.textAlign = 'right';
+    ctx.rotate(midAngle);
 
-    // Sector index tag
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-    ctx.font = 'bold 11px monospace';
-    ctx.fillText(`[#0${i + 1}]`, radius - 240, 4);
+    // If the sector points to the left half, a normal radial rotation would orient text upside down.
+    // We flip by 180 degrees (Math.PI) so it is always read naturally left-to-right!
+    if (isLeftHalf) {
+      ctx.rotate(Math.PI);
+      ctx.textAlign = 'left';
+    } else {
+      ctx.textAlign = 'right';
+    }
 
-    // Game Title text with contrast shadow
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-    ctx.shadowBlur = 5;
+    ctx.textBaseline = 'middle';
+
+    // Clear readable font
+    const fontSize = total > 12 ? 12 : total > 8 ? 14 : 16;
+    ctx.font = `600 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 4;
     ctx.shadowOffsetX = 1;
     ctx.shadowOffsetY = 1;
     ctx.fillStyle = '#ffffff';
 
-    const fontSize = total > 12 ? 12 : total > 8 ? 13 : 15;
-    ctx.font = `bold ${fontSize}px system-ui, -apple-system, sans-serif`;
+    const maxTextWidth = radius - hubRadius - 30;
+    let title = game.title;
 
-    const maxLen = total > 12 ? 22 : total > 8 ? 26 : 32;
-    const text = game.title.length > maxLen ? game.title.substring(0, maxLen - 2) + '...' : game.title;
-    ctx.fillText(text, radius - 24, 4);
+    if (ctx.measureText(title).width > maxTextWidth) {
+      while (title.length > 3 && ctx.measureText(title + '…').width > maxTextWidth) {
+        title = title.slice(0, -1);
+      }
+      title += '…';
+    }
 
+    // Centered radially along the bisector:
+    // When textAlign is 'right', position near outer edge (radius - 18)
+    // When textAlign is 'left', position near outer edge (-radius + 18)
+    const textOffset = isLeftHalf ? -radius + 18 : radius - 18;
+    ctx.fillText(title, textOffset, 0);
     ctx.restore();
   }
 
-  // Outer Precision Ring & Ticks
+  // 2. Clean Outer Border (No noisy ticks, no fake dial gauges)
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#334155';
-  ctx.lineWidth = 5;
-  ctx.stroke();
-
-  // Draw 48 Precision Ticks on Outer Bezel
-  for (let i = 0; i < 48; i++) {
-    const tickAngle = (i * 2 * Math.PI) / 48;
-    const isMajor = i % 12 === 0;
-    const isMedium = i % 4 === 0;
-    const tickLength = isMajor ? 14 : isMedium ? 9 : 5;
-    const outerX = centerX + radius * Math.cos(tickAngle);
-    const outerY = centerY + radius * Math.sin(tickAngle);
-    const innerX = centerX + (radius - tickLength) * Math.cos(tickAngle);
-    const innerY = centerY + (radius - tickLength) * Math.sin(tickAngle);
-
-    ctx.beginPath();
-    ctx.moveTo(outerX, outerY);
-    ctx.lineTo(innerX, innerY);
-    ctx.strokeStyle = isMajor
-      ? (currentThemeOption.value?.primaryColor || 'rgba(255, 255, 255, 0.9)')
-      : isMedium
-      ? 'rgba(255, 255, 255, 0.5)'
-      : 'rgba(255, 255, 255, 0.2)';
-    ctx.lineWidth = isMajor ? 2.5 : isMedium ? 1.5 : 1;
-    ctx.stroke();
-  }
-
-  // Center Precision Hub
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 52, 0, 2 * Math.PI);
-  ctx.fillStyle = currentThemeOption.value?.surfaceColor || '#090d16';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 50, 0, 2 * Math.PI);
-  ctx.strokeStyle = currentThemeOption.value?.primaryColor || '#334155';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Center Reticle
+  // 3. Simple Elegant Center Cap
   ctx.beginPath();
-  ctx.arc(centerX, centerY, 12, 0, 2 * Math.PI);
-  ctx.fillStyle = currentThemeOption.value?.primaryColor || 'rgba(255, 255, 255, 0.9)';
+  ctx.arc(centerX, centerY, hubRadius, 0, 2 * Math.PI);
+  ctx.fillStyle = currentThemeOption.value?.surfaceColor || '#0f172a';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, hubRadius, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Small inner center accent
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+  ctx.fillStyle = currentThemeOption.value?.primaryColor || '#6366f1';
   ctx.fill();
 };
 
@@ -207,7 +268,7 @@ const handleMouseMove = (event: MouseEvent) => {
   const dist = Math.sqrt(dx * dx + dy * dy);
 
   const visualRadius = rect.width / 2;
-  const visualInnerHub = 52 * (rect.width / canvas.width);
+  const visualInnerHub = 36 * (rect.width / canvas.width);
 
   if (dist < visualInnerHub || dist > visualRadius) {
     hoveredGame.value = null;
@@ -241,7 +302,7 @@ const handleMouseLeave = () => {
 };
 
 const spin = () => {
-  if (isSpinning.value || activeSlices.value.length === 0) return;
+  if (isSpinning.value || activeSlices.value.length < 2) return;
 
   hoveredGame.value = null;
   isSpinning.value = true;
@@ -286,7 +347,7 @@ defineExpose({ spin });
 </script>
 
 <template>
-  <div class="w-full flex flex-col items-center justify-center gap-8 py-4">
+  <div class="w-full flex flex-col items-center justify-center gap-5 py-2">
     <!-- Dial Stage Container -->
     <div
       ref="dialStageRef"
@@ -294,19 +355,12 @@ defineExpose({ spin });
       @mousemove="handleMouseMove"
       @mouseleave="handleMouseLeave"
     >
-      <!-- Precision Laser Reticle at 12 o'clock -->
+      <!-- Clean Minimal Pointer Needle at 12 o'clock -->
       <div
-        class="absolute -top-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
+        class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none drop-shadow-md"
       >
         <div
-          class="w-2 h-4 rounded-xs"
-          :style="{
-            backgroundColor: 'var(--app-primary)',
-            boxShadow: '0 0 12px var(--app-primary)',
-          }"
-        />
-        <div
-          class="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px]"
+          class="w-0 h-0 border-l-10 border-l-transparent border-r-10 border-r-transparent border-t-16"
           :style="{
             borderTopColor: 'var(--app-primary)',
           }"
@@ -315,7 +369,8 @@ defineExpose({ spin });
 
       <!-- Rotating Dial Canvas -->
       <div
-        class="relative z-10 w-[340px] h-[340px] sm:w-[500px] sm:h-[500px] md:w-[560px] md:h-[560px] lg:w-[620px] lg:h-[620px] rounded-full shadow-2xl overflow-hidden cursor-pointer border border-white/10"
+        class="relative z-10 w-65 h-65 sm:w-75 sm:h-75 md:w-85 md:h-85 lg:w-95 lg:h-95 rounded-full shadow-2xl overflow-hidden border border-white/10"
+        :class="candidates.length < 2 ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'"
         :style="{
           transform: `rotate(${rotationAngle}deg)`,
           transition: isSpinning ? 'transform 4.4s cubic-bezier(0.15, 0.9, 0.2, 1)' : 'none',
@@ -334,18 +389,18 @@ defineExpose({ spin });
       <Transition name="tooltip-fade">
         <div
           v-if="hoveredGame && !isSpinning"
-          class="absolute pointer-events-none z-30 px-3.5 py-2.5 rounded-md border shadow-2xl backdrop-blur-md flex items-center gap-3 min-w-[220px] max-w-sm"
+          class="absolute pointer-events-none z-30 px-3 py-2 rounded-md border shadow-2xl backdrop-blur-md flex items-center gap-2.5 min-w-50 max-w-xs"
           :style="{
             left: `${tooltipX}px`,
             top: `${tooltipY}px`,
-            backgroundColor: 'rgba(12, 16, 26, 0.94)',
+            backgroundColor: 'rgba(12, 16, 26, 0.95)',
             borderColor: 'var(--app-primary)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7), 0 0 12px var(--app-primary)',
-            transform: tooltipX > 300 ? 'translate(-105%, -115%)' : 'translate(5%, -115%)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.7), 0 0 10px var(--app-primary)',
+            transform: tooltipX > 200 ? 'translate(-105%, -110%)' : 'translate(5%, -110%)',
           }"
         >
           <!-- Thumbnail -->
-          <div class="w-11 h-15 rounded-xs overflow-hidden shrink-0 bg-black/80 border border-white/10 shadow-sm">
+          <div class="w-9 h-12 rounded-xs overflow-hidden shrink-0 bg-black/80 border border-white/10 shadow-sm">
             <img
               v-if="hoveredGame.cover_url"
               :src="hoveredGame.cover_url"
@@ -353,20 +408,20 @@ defineExpose({ spin });
               class="w-full h-full object-cover"
             />
             <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
-              <Gamepad2 class="w-5 h-5" />
+              <Gamepad2 class="w-4 h-4" />
             </div>
           </div>
 
           <!-- Info -->
           <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-            <span class="text-xs sm:text-sm font-bold text-white leading-tight truncate">
+            <span class="text-xs font-bold text-white leading-tight truncate">
               {{ hoveredGame.title }}
             </span>
             <div class="flex items-center gap-2 text-[10px] font-mono text-gray-300">
               <span v-if="hoveredGame.release_year">{{ hoveredGame.release_year }}</span>
               <span
                 v-if="hoveredGame.genres && hoveredGame.genres.length > 0"
-                class="truncate max-w-[110px]"
+                class="truncate max-w-25"
               >
                 • {{ hoveredGame.genres[0] }}
               </span>
@@ -383,34 +438,33 @@ defineExpose({ spin });
       </Transition>
     </div>
 
-    <!-- Action Button -->
-    <div class="flex flex-col items-center gap-2">
+    <!-- Action Button & Status -->
+    <div class="flex flex-col items-center gap-1.5">
       <button
         type="button"
         @click="spin"
-        :disabled="isSpinning || candidates.length === 0"
-        class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border"
+        :disabled="isSpinning || candidates.length < 2"
+        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border"
         :style="{
           backgroundColor: 'var(--app-primary)',
           borderColor: 'var(--app-border)',
         }"
       >
-        <Compass class="w-4 h-4" :class="{ 'animate-spin': isSpinning }" />
-        <span>{{ isSpinning ? 'Calculando Trayectoria...' : 'Iniciar Dial de Decisión' }}</span>
+        <Compass class="w-3.5 h-3.5" :class="{ 'animate-spin': isSpinning }" />
+        <span>{{ isSpinning ? 'Girando...' : 'Girar Ruleta' }}</span>
       </button>
 
       <span
         v-if="candidates.length === 0"
         class="text-xs font-semibold text-rose-400"
       >
-        No hay objetivos disponibles para los filtros activos.
+        No hay juegos disponibles con los filtros actuales.
       </span>
       <span
-        v-else
-        class="text-[11px] font-mono"
-        :style="{ color: 'var(--app-text-muted)' }"
+        v-else-if="candidates.length === 1"
+        class="text-xs font-medium text-amber-300"
       >
-        Pasa el cursor para ver el título • Haz clic en el dial o en el botón para ejecutar
+        Se necesitan al menos 2 juegos para girar la ruleta.
       </span>
     </div>
   </div>

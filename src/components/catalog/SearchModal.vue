@@ -210,7 +210,7 @@ onUnmounted(() => {
             <div
               v-for="(game, index) in searchResults"
               :key="game.id"
-              class="flex items-center justify-between gap-3 p-3 rounded-lg border transition-all hover:border-[var(--app-primary)]"
+              class="flex items-center justify-between gap-3 p-3 rounded-lg border transition-all hover:border-(--app-primary)"
               :style="{ backgroundColor: 'var(--app-surface-hover)', borderColor: 'var(--app-border)' }"
             >
               <!-- Game Info Preview -->

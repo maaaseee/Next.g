@@ -18,6 +18,7 @@ export const GameStatusSchema = t.Union([
 export const UpsertGameSchema = t.Object({
   id: t.Numeric({ minimum: 1, maximum: 2147483647, error: 'Valid game ID is required' }),
   title: t.String({ minLength: 1, maxLength: 150, error: 'Game title must be between 1 and 150 characters' }),
+  slug: t.Optional(t.Nullable(t.String({ maxLength: 200 }))),
   cover_url: t.Optional(t.Nullable(t.String({ maxLength: 500 }))),
   release_year: t.Optional(t.Nullable(t.Numeric({ minimum: 1950, maximum: 2100 }))),
   summary: t.Optional(t.Nullable(t.String({ maxLength: 3000 }))),

@@ -99,38 +99,39 @@ const drawDialPreviewWheel = () => {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Text label
+    // Text label - Clean and readable
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(angle + arc / 2);
     ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 9px monospace';
-    const shortTitle = game.title.length > 10 ? game.title.slice(0, 9) + '…' : game.title;
-    ctx.fillText(shortTitle, radius - 10, 3);
+    ctx.font = '600 9px system-ui, -apple-system, sans-serif';
+    const shortTitle = game.title.length > 12 ? game.title.slice(0, 11) + '…' : game.title;
+    ctx.fillText(shortTitle, radius - 8, 0);
     ctx.restore();
   }
 
   // Outer ring
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   // Center Hub
   ctx.beginPath();
-  ctx.arc(centerX, centerY, 18, 0, 2 * Math.PI);
-  ctx.fillStyle = '#0a0f1d';
+  ctx.arc(centerX, centerY, 16, 0, 2 * Math.PI);
+  ctx.fillStyle = currentThemeOption.value?.surfaceColor || '#0f172a';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Center Pip
   ctx.beginPath();
-  ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
-  ctx.fillStyle = '#38bdf8';
+  ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+  ctx.fillStyle = currentThemeOption.value?.primaryColor || '#6366f1';
   ctx.fill();
 };
 
@@ -201,32 +202,21 @@ onUnmounted(() => {
 
 <template>
   <div class="w-full max-w-6xl mx-auto space-y-6">
-    <!-- Header banner -->
-    <div class="text-center max-w-2xl mx-auto space-y-2 mb-8">
-      <div
-        class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase border shadow-sm"
-        :style="{
-          backgroundColor: 'var(--app-surface)',
-          borderColor: 'var(--app-border)',
-          color: 'var(--app-primary)',
-        }"
-      >
-        <Sparkles class="w-3.5 h-3.5" />
-        <span>SISTEMAS DE ELECCIÓN ALEATORIA</span>
-      </div>
-      <h2 class="text-2xl sm:text-3xl font-display font-extrabold tracking-tight" :style="{ color: 'var(--app-text)' }">
-        Selecciona tu Experiencia de Ruleta
+    <!-- Hub Header Banner (Concise and serious) -->
+    <div class="text-center max-w-2xl mx-auto mb-5 space-y-1.5">
+      <h2 class="text-xl sm:text-2xl font-display font-extrabold tracking-tight" :style="{ color: 'var(--app-text)' }">
+        Selecciona el Tipo de Ruleta
       </h2>
       <p class="text-xs sm:text-sm" :style="{ color: 'var(--app-text-muted)' }">
-        Elige uno de los 3 algoritmos de sorteo táctico para descubrir tu próxima partida.
+        Elige cómo quieres descubrir tu próximo juego a jugar de tu backlog.
       </p>
     </div>
 
     <!-- 3 Mode Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-      <!-- MODE 1: Dial Circular -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+      <!-- MODE 1: Ruleta Tradicional -->
       <div
-        class="group relative rounded-xl border p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'classic' ? 'var(--app-primary)' : 'var(--app-border)',
@@ -239,39 +229,31 @@ onUnmounted(() => {
         <button
           type="button"
           @click="$emit('select-mode', 'classic')"
-          class="w-full flex items-center justify-between px-4 py-3.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
+          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
           :style="{
             backgroundColor: 'var(--app-primary)',
             borderColor: 'var(--app-border)',
           }"
         >
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2">
             <Compass class="w-4 h-4 group-hover:rotate-45 transition-transform duration-300" />
-            <span>Dial Circular</span>
+            <span>Ruleta Tradicional</span>
           </div>
           <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </button>
 
         <!-- Live Visual Preview: Authentic Rotating Dial Wheel (Auto-Spinning) -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
+          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
             borderColor: 'var(--app-border)',
           }"
           @click="$emit('select-mode', 'classic')"
         >
-          <!-- Top Laser Pointer at 12 o'clock -->
-          <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+          <!-- Top Minimal Pointer Needle at 12 o'clock -->
+          <div class="absolute top-1.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none drop-shadow-xs">
             <div
-              class="w-2 h-3.5 rounded-xs transition-transform duration-100"
-              :class="{ 'scale-125 animate-pulse': isDialSpinning }"
-              :style="{
-                backgroundColor: 'var(--app-primary)',
-                boxShadow: '0 0 10px var(--app-primary)',
-              }"
-            />
-            <div
-              class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px]"
+              class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[9px]"
               :style="{ borderTopColor: 'var(--app-primary)' }"
             />
           </div>
@@ -288,14 +270,14 @@ onUnmounted(() => {
               ref="miniDialCanvasRef"
               width="280"
               height="280"
-              class="w-36 h-36 rounded-full shadow-2xl"
+              class="w-28 h-28 rounded-full shadow-xl"
             />
           </div>
 
           <!-- Mini Target Winner HUD Badge -->
-          <div class="absolute bottom-2 inset-x-2 flex items-center justify-center pointer-events-none z-10">
+          <div class="absolute bottom-1.5 inset-x-2 flex items-center justify-center pointer-events-none z-10">
             <div
-              class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold truncate max-w-[90%] border transition-all duration-300"
+              class="px-2 py-0.5 rounded text-[10px] font-mono font-bold truncate max-w-[90%] border transition-all duration-300"
               :class="isDialSpinning ? '' : 'text-slate-200'"
               :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -303,17 +285,17 @@ onUnmounted(() => {
                 color: isDialSpinning ? 'var(--app-primary)' : undefined,
               }"
             >
-              <span v-if="isDialSpinning" class="animate-pulse">GIRANDO DIAL...</span>
+              <span v-if="isDialSpinning" class="animate-pulse">GIRANDO...</span>
               <span v-else-if="dialWinnerGame">{{ dialWinnerGame.title }}</span>
-              <span v-else>DIAL CIRCULAR</span>
+              <span v-else>RULETA TRADICIONAL</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MODE 2: Escáner Vertical (Authentic Continuous Slot Spin Engine) -->
+      <!-- MODE 2: Selector Vertical -->
       <div
-        class="group relative rounded-xl border p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'slot' ? 'var(--app-primary)' : 'var(--app-border)',
@@ -326,63 +308,63 @@ onUnmounted(() => {
         <button
           type="button"
           @click="$emit('select-mode', 'slot')"
-          class="w-full flex items-center justify-between px-4 py-3.5 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
+          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
           :style="{
             backgroundColor: 'var(--app-primary)',
             borderColor: 'var(--app-border)',
           }"
         >
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2">
             <SlidersVertical class="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span>Escáner Vertical</span>
+            <span>Selector Vertical</span>
           </div>
           <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </button>
 
         <!-- Live Visual Preview: Authentic Vertical Slot Reel Visor -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
+          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
             borderColor: 'var(--app-border)',
           }"
           @click="$emit('select-mode', 'slot')"
         >
-          <!-- Center Target Laser Reticle Line & Chevrons -->
+          <!-- Center Target Indicator Reticle Line & Chevrons -->
           <div
-            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[64px] border-y-2 pointer-events-none z-20 flex items-center justify-between px-2"
+            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-13 border-y pointer-events-none z-20 flex items-center justify-between px-2"
             :style="{
               borderColor: 'var(--app-primary)',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              boxShadow: 'inset 0 0 15px rgba(0, 0, 0, 0.6)',
+              boxShadow: 'inset 0 0 12px rgba(0, 0, 0, 0.6)',
             }"
           >
             <!-- Left Chevron -->
             <div
-              class="w-0 h-0 border-t-5 border-t-transparent border-b-5 border-b-transparent border-l-[7px]"
+              class="w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-[6px]"
               :style="{ borderLeftColor: 'var(--app-primary)' }"
             />
             <!-- Right Chevron -->
             <div
-              class="w-0 h-0 border-t-5 border-t-transparent border-b-5 border-b-transparent border-r-[7px]"
+              class="w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-[6px]"
               :style="{ borderRightColor: 'var(--app-primary)' }"
             />
           </div>
 
           <!-- Top & Bottom Gradient Shadows for Visor Depth -->
-          <div class="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
-          <div class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
+          <div class="absolute top-0 inset-x-0 h-8 bg-linear-to-b from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
+          <div class="absolute bottom-0 inset-x-0 h-8 bg-linear-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
 
           <!-- Continuous Vertical Sliding Strip (100% Seamless Infinite CSS Loop) -->
           <div class="slot-infinite-track w-full flex flex-col">
             <div
               v-for="(item, idx) in previewLoopGames"
               :key="`preview-loop-${idx}-${item.id}`"
-              class="h-[64px] flex items-center gap-3 px-4 border-b border-white/5 shrink-0"
+              class="h-13 flex items-center gap-2.5 px-3 border-b border-white/5 shrink-0"
             >
               <img
                 :src="item.cover"
                 :alt="item.title"
-                class="w-10 h-12 object-cover rounded shadow-xs shrink-0"
+                class="w-8 h-10 object-cover rounded shadow-xs shrink-0"
               />
               <div class="min-w-0 flex-1">
                 <p class="text-xs font-bold truncate text-slate-200">{{ item.title }}</p>
@@ -393,67 +375,37 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Mode 3: Instant Quick Pick Card -->
+      <!-- MODE 3: Selección Rápida -->
       <div
-        class="border rounded-xl p-5 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden shadow-lg"
+        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'instant' ? 'var(--app-primary)' : 'var(--app-border)',
+          boxShadow: hoveredCard === 'instant' ? '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px var(--app-primary)' : 'none',
         }"
         @mouseenter="hoveredCard = 'instant'"
         @mouseleave="hoveredCard = null"
       >
-        <!-- Header -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <div
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200"
-              :style="{
-                backgroundColor: 'var(--app-surface-hover)',
-                color: 'var(--app-primary)',
-              }"
-            >
-              <Zap class="w-5 h-5" />
-            </div>
-            <span
-              class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
-              :style="{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                color: 'var(--app-text-muted)',
-              }"
-            >
-              Express
-            </span>
-          </div>
-
-          <h3 class="text-base font-black text-white flex items-center gap-2">
-            Selección Directa
-          </h3>
-
-          <p class="text-xs leading-relaxed" :style="{ color: 'var(--app-text-muted)' }">
-            Tirada rápida sin animaciones. Perfecto si tienes poco tiempo y solo quieres que el sistema elija por ti de inmediato.
-          </p>
-        </div>
-
-        <!-- Launch Button -->
+        <!-- Top Action Button Only -->
         <button
           type="button"
           @click="$emit('select-mode', 'instant')"
-          class="w-full mt-4 py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-between transition-all duration-200 cursor-pointer text-white shadow-md active:scale-98"
+          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
           :style="{
             backgroundColor: 'var(--app-primary)',
+            borderColor: 'var(--app-border)',
           }"
         >
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2">
             <Zap class="w-4 h-4 group-hover:animate-bounce" />
-            <span>Selección Directa</span>
+            <span>Selección Rápida</span>
           </div>
           <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </button>
 
         <!-- Live Visual Preview -->
         <div
-          class="mt-5 pt-3 border-t flex flex-col items-center justify-center min-h-[220px] rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
+          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
           :style="{
             borderColor: 'var(--app-border)',
           }"
@@ -461,15 +413,15 @@ onUnmounted(() => {
         >
           <!-- Radar Pulse Effect -->
           <div
-            class="w-24 h-24 rounded-full border-2 flex items-center justify-center relative transition-all duration-300"
+            class="w-20 h-20 rounded-full border-2 flex items-center justify-center relative transition-all duration-300"
             :class="hoveredCard === 'instant' ? 'scale-110' : ''"
             :style="{
               backgroundColor: 'var(--app-surface)',
               borderColor: 'var(--app-primary)',
-              boxShadow: hoveredCard === 'instant' ? '0 0 24px var(--app-primary)' : '0 0 10px var(--app-primary)',
+              boxShadow: hoveredCard === 'instant' ? '0 0 20px var(--app-primary)' : '0 0 8px var(--app-primary)',
             }"
           >
-            <Zap class="w-10 h-10" :style="{ color: 'var(--app-primary)' }" />
+            <Zap class="w-8 h-8" :style="{ color: 'var(--app-primary)' }" />
             <div
               class="absolute inset-0 rounded-full border border-dashed animate-spin"
               :style="{ borderColor: 'var(--app-primary)', animationDuration: '6s' }"

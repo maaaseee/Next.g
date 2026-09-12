@@ -4,9 +4,10 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS games (
-  id INTEGER PRIMARY KEY,          -- Official IGDB Game ID
+  id INTEGER PRIMARY KEY,          -- Official Game ID
   title TEXT NOT NULL,             -- Game Title
-  cover_url TEXT,                  -- Cloudinary Cover URL
+  slug TEXT,                       -- Official RAWG/IGDB slug
+  cover_url TEXT,                  -- Cover URL
   release_year INTEGER,            -- First Release Year
   summary TEXT,                    -- Game Synopsis/Description
   genres TEXT,                     -- JSON Array string, e.g. ["Action", "RPG"]

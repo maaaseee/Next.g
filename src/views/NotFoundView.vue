@@ -1,5 +1,5 @@
 <template>
-  <div class="h-145 flex flex-col items-center justify-center text-center px-4 py-6 select-none">
+  <div class="flex-1 min-h-145 flex flex-col items-center justify-center text-center px-4 py-6 select-none">
     <!-- Clean Badge -->
     <div
       class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2 border"

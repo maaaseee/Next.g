@@ -28,19 +28,19 @@ const isWinnerModalOpen = ref(false);
 
 const MODES_INFO: Record<RouletteMode, { label: string; icon: any; desc: string }> = {
   classic: {
-    label: 'Dial Circular',
+    label: 'Ruleta Tradicional',
     icon: Compass,
-    desc: 'Dial de precisión angular con desaceleración inercial',
+    desc: 'Sorteo aleatorio mediante giro de rueda',
   },
   slot: {
-    label: 'Escáner Vertical',
+    label: 'Selector Vertical',
     icon: SlidersVertical,
-    desc: 'Secuencia lineal de títulos en visor HUD panorámico',
+    desc: 'Desplazamiento secuencial en visor continuo',
   },
   instant: {
-    label: 'Selección Directa',
+    label: 'Selección Rápida',
     icon: Zap,
-    desc: 'Algoritmo de cálculo instantáneo en menos de un segundo',
+    desc: 'Elección aleatoria directa e instantánea',
   },
 };
 
@@ -89,15 +89,15 @@ const resetFilters = () => {
 </script>
 
 <template>
-  <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 w-full flex-1 flex flex-col">
     <!-- VIEW 1: Initial 3-Mode Selection Hub with Previews -->
     <Transition name="fade" mode="out-in">
-      <div v-if="!selectedMode" key="mode-hub" class="min-h-173 flex flex-col justify-between">
+      <div v-if="!selectedMode" key="mode-hub" class="flex-1 min-h-[580px] flex flex-col justify-between">
         <RouletteModeHub @select-mode="handleSelectMode" />
       </div>
 
       <!-- VIEW 2: Active Roulette Workspace (Unified Container with Embedded Filters) -->
-      <div v-else key="mode-workspace" class="space-y-4">
+      <div v-else key="mode-workspace" class="flex-1 min-h-[580px] flex flex-col space-y-4">
         <!-- Breadcrumb / Back Action Bar -->
         <div class="flex items-center justify-between gap-4 flex-wrap">
           <button
@@ -141,7 +141,7 @@ const resetFilters = () => {
 
         <!-- Unified Roulette Card (Containing embedded filters + roulette mechanism) -->
         <div
-          class="rounded-xl border p-5 sm:p-7 flex flex-col items-center justify-between gap-6 shadow-xl transition-all duration-200 min-h-160"
+          class="rounded-xl border p-4 sm:p-5 flex flex-col items-center justify-between gap-4 shadow-xl transition-all duration-200 flex-1"
           :style="{
             backgroundColor: 'var(--app-surface)',
             borderColor: 'var(--app-border)',
@@ -182,7 +182,7 @@ const resetFilters = () => {
           </div>
 
           <!-- ROULETTE STAGE CONTENT -->
-          <div class="w-full flex flex-col items-center justify-center min-h-100">
+          <div class="w-full flex flex-col items-center justify-center">
             <!-- Mode 1: Classic Wheel -->
             <Transition name="fade" mode="out-in">
               <ClassicWheel

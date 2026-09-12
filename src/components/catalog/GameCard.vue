@@ -25,28 +25,28 @@ const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: 
   {
     id: 'BACKLOG',
     label: 'Backlog',
-    actionLabel: 'Mover a Backlog',
+    actionLabel: 'Backlog',
     icon: Clock,
     bgClass: 'bg-amber-500',
   },
   {
     id: 'PLAYING',
     label: 'Jugando',
-    actionLabel: 'Mover a Jugando',
+    actionLabel: 'Jugando',
     icon: Play,
     bgClass: 'bg-emerald-500',
   },
   {
     id: 'COMPLETED',
     label: 'Completado',
-    actionLabel: 'Mover a Completado',
+    actionLabel: 'Completado',
     icon: CheckCircle2,
     bgClass: 'bg-sky-500',
   },
   {
     id: 'WISHLIST',
     label: 'Deseados',
-    actionLabel: 'Mover a Deseados',
+    actionLabel: 'Deseados',
     icon: Sparkles,
     bgClass: 'bg-purple-500',
   },
@@ -76,7 +76,7 @@ function confirmDelete() {
     @dragstart="onDragStart(game, $event)"
     @dragend="onDragEnd"
     @click="emit('click', game)"
-    class="group relative rounded-lg overflow-hidden border transition-all duration-300 cursor-grab active:cursor-grabbing hover:-translate-y-1.5 hover:shadow-2xl shadow-md flex flex-col justify-end select-none"
+    class="group relative rounded-lg overflow-hidden border transition-all duration-300 cursor-grab active:cursor-grabbing hover:shadow-2xl shadow-md flex flex-col justify-end select-none"
     :class="[
       draggedGame?.id === game.id ? 'opacity-30 scale-95' : 'opacity-100',
     ]"

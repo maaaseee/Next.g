@@ -89,7 +89,7 @@ onUnmounted(() => {
             </div>
             <div>
               <span class="text-[10px] font-mono font-bold uppercase tracking-wider block" :style="{ color: 'var(--app-primary)' }">
-                OBJETIVO SELECCIONADO
+                JUEGO SELECCIONADO
               </span>
               <h2 class="text-lg sm:text-xl font-display font-bold tracking-tight" :style="{ color: 'var(--app-text)' }">
                 {{ game.title }}
@@ -111,7 +111,7 @@ onUnmounted(() => {
         <!-- Body Content -->
         <div class="p-6 flex flex-col sm:flex-row gap-5 items-center sm:items-start max-h-[60vh] overflow-y-auto">
           <!-- Game Cover -->
-          <div class="relative w-36 sm:w-44 aspect-[3/4] rounded-md overflow-hidden shadow-lg shrink-0 border border-white/10 bg-black">
+          <div class="relative w-36 sm:w-44 aspect-3/4 rounded-md overflow-hidden shadow-lg shrink-0 border border-white/10 bg-black">
             <img
               v-if="game.cover_url"
               :src="game.cover_url"

@@ -10,6 +10,7 @@ export interface Game {
   platforms: string[];
   rating: number | null;
   game_modes: string[];
+  slug?: string | null;
 }
 
 export interface UserGame extends Game {
@@ -89,14 +90,37 @@ export function formatGameRating(rating: number | null | undefined): string | nu
 }
 
 /**
- * Generates official RAWG.io game page URL from title.
+ * Generates official RAWG.io specific game page URL using the game's RAWG ID.
+ * Example: https://rawg.io/games/<id> (e.g., https://rawg.io/games/422859)
+ * RAWG redirects or resolves IDs directly to their game page.
  */
-export function getRawgGameUrl(title: string): string {
-  const slug = title
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return `https://rawg.io/games/${slug}`;
+export function getRawgGameUrl(game: { id?: number | string; title?: string; slug?: string | null } | number | string): string {
+  if (typeof game === 'number') {
+    return `https://rawg.io/games/${game}`;
+  }
+
+  if (typeof game === 'object' && game !== null) {
+    if (game.id !== undefined && game.id !== null && !isNaN(Number(game.id))) {
+      return `https://rawg.io/games/${game.id}`;
+    }
+    if (game.slug && game.slug.trim()) {
+      return `https://rawg.io/games/${game.slug.trim()}`;
+    }
+    if (game.title) {
+      const slug = game.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      return `https://rawg.io/games/${slug}`;
+    }
+  }
+
+  if (typeof game === 'string' && !isNaN(Number(game.trim()))) {
+    return `https://rawg.io/games/${game.trim()}`;
+  }
+
+  return 'https://rawg.io';
 }
+

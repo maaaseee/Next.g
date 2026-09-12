@@ -8,6 +8,7 @@ import { logger } from '../utils/logger';
 export interface IgdbRawGame {
   id: number;
   name: string;
+  slug?: string;
   cover?: { image_id: string };
   first_release_date?: number;
   summary?: string;
@@ -28,7 +29,7 @@ export class IgdbAdapter implements GameProvider {
 
     const body = `
       search "${query.replace(/"/g, '')}";
-      fields name, cover.image_id, first_release_date, summary, rating, genres.name, platforms.name, game_modes.name;
+      fields name, slug, cover.image_id, first_release_date, summary, rating, genres.name, platforms.name, game_modes.name;
       limit ${limit};
     `;
 
@@ -97,6 +98,7 @@ export class IgdbAdapter implements GameProvider {
       return {
         id: game.id,
         title: game.name,
+        slug: game.slug || null,
         cover_url,
         release_year,
         summary: game.summary || null,
