@@ -9,25 +9,31 @@
 
 import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
+import { swagger } from '@elysiajs/swagger';
+import { cron } from '@elysiajs/cron';
 import { ENV } from './config/env';
-import { initDatabase, getDatabase } from './db/index';
+import { initDatabase, getDatabase, closeDatabase } from './db/index';
 import { runSeed } from './db/seed';
 import { searchController } from './controllers/search.controller';
 import { gamesController } from './controllers/games.controller';
+import { authController } from './controllers/auth.controller';
+import { usersController } from './controllers/users.controller';
+import { ogController } from './controllers/og.controller';
 import { securityHeaders } from './middleware/security-headers';
 import { rateLimiter, rateLimiterHook } from './middleware/rate-limiter';
+import { logger } from './utils/logger';
 
 // Async database startup initializer
 export async function setupDatabase() {
   try {
     const sql = await initDatabase();
-    // Auto-seed initial catalog only if explicitly enabled via AUTO_SEED=true
+    console.log('✅ Database connected and schema ready');
+    // Seeder on startup has been removed as requested.
+    // Games are fetched dynamically on first demand from IGDB API.
+    // If explicitly forced via AUTO_SEED=true, seed can run manually.
     if (ENV.AUTO_SEED) {
-      const [count] = await sql`SELECT count(*)::int as count FROM games;`;
-      if (!count || count.count === 0) {
-        console.log('📦 AUTO_SEED enabled and empty database detected. Seeding games...');
-        await runSeed(sql, false);
-      }
+      console.log('📦 Explicit AUTO_SEED flag detected: seeding initial catalog...');
+      await runSeed(sql, false);
     }
   } catch (err) {
     console.warn('⚠️ Database connection or startup error:', err instanceof Error ? err.message : err);
@@ -37,15 +43,66 @@ export async function setupDatabase() {
 // Ensure database schema is initialized on startup
 setupDatabase();
 
+// Parse CORS origins from environment variable (supports single origin or comma-separated list)
+const parsedOrigins = ENV.CORS_ORIGIN
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOriginSetting = parsedOrigins.length === 1
+  ? parsedOrigins[0]
+  : (parsedOrigins.length > 1 ? parsedOrigins : 'http://localhost:5173');
+
 export const app = new Elysia()
   // 1. Injects OWASP defense-in-depth security headers
   .use(securityHeaders)
-  // 2. Global CORS configuration
+  // 2. Interactive OpenAPI / Swagger Documentation UI at /docs
+  .use(
+    swagger({
+      path: '/docs',
+      documentation: {
+        info: {
+          title: 'NEXT.g Game Backlog API',
+          description: 'Production-ready REST API for personal video game library management, IGDB search, and Gamer Passports.',
+          version: '1.0.0',
+        },
+        tags: [
+          { name: 'Auth', description: 'Authentication, registration, sessions, and OAuth' },
+          { name: 'Games', description: 'Personal backlog and game library CRUD operations' },
+          { name: 'Search', description: 'Video game search and discovery proxy with IGDB' },
+          { name: 'Users', description: 'User profiles, avatars, and community catalog' },
+          { name: 'OpenGraph', description: 'Dynamic SVG image generation for social cards' },
+          { name: 'Health', description: 'Liveness and Readiness probes for container management' },
+        ],
+      },
+    })
+  )
+  // 3. Automated background maintenance: purges search_cache records older than 7 days every 6 hours
+  .use(
+    cron({
+      name: 'cleanup-search-cache',
+      pattern: '0 */6 * * *',
+      async run() {
+        try {
+          const sql = getDatabase();
+          const result = await sql`
+            DELETE FROM search_cache 
+            WHERE timestamp < CURRENT_TIMESTAMP - INTERVAL '7 days';
+          `;
+          logger.info('[Cron] Expired search_cache records cleaned up', { count: result.count });
+        } catch (err) {
+          logger.warn('[Cron] Failed to run search_cache cleanup:', { error: err });
+        }
+      },
+    })
+  )
+  // 4. Global CORS configuration (strictly bounded by CORS_ORIGIN env parameter)
   .use(
     cors({
-      origin: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      origin: corsOriginSetting,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+      exposeHeaders: ['Content-Type', 'X-Total-Count', 'X-Has-More', 'Retry-After'],
       credentials: true,
     })
   )
@@ -88,16 +145,69 @@ export const app = new Elysia()
         : 'Ocurrió un error inesperado en el servidor.',
     };
   })
-  // Healthcheck endpoint
-  .get('/health', () => ({
-    status: 'ok',
+  // Healthcheck endpoints for Azure Container Apps (ACA) / Kubernetes
+  // 1. General compatibility health endpoint
+  .get('/health', async ({ set }) => {
+    try {
+      const sql = getDatabase();
+      await sql`SELECT 1`;
+      return {
+        status: 'ok',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+        service: 'nextg-backend',
+      };
+    } catch (err) {
+      logger.error('[HealthCheck] Database ping failed', { error: err instanceof Error ? err.message : err });
+      set.status = 503;
+      return {
+        status: 'degraded',
+        database: 'disconnected',
+        timestamp: new Date().toISOString(),
+        service: 'nextg-backend',
+      };
+    }
+  })
+  // 2. Liveness Probe (ACA): Verifies process and web server responsiveness without triggering on DB hiccups
+  .get('/health/live', () => ({
+    status: 'alive',
     timestamp: new Date().toISOString(),
     service: 'nextg-backend',
   }))
-  // Manual seed endpoint (Strictly rate-limited to 2 per 10 minutes)
+  // 3. Readiness Probe (ACA): Verifies if container is ready to accept incoming traffic (including DB connection)
+  .get('/health/ready', async ({ set }) => {
+    try {
+      const sql = getDatabase();
+      await sql`SELECT 1`;
+      return {
+        status: 'ready',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err) {
+      logger.warn('[ReadinessProbe] Database not ready', { error: err instanceof Error ? err.message : err });
+      set.status = 503;
+      return {
+        status: 'not_ready',
+        database: 'disconnected',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  })
+  // Manual seed endpoint (Disabled in production unless authenticated via X-Admin-Key)
   .post(
     '/api/seed',
-    async () => {
+    async ({ request, set }) => {
+      if (ENV.NODE_ENV === 'production') {
+        const adminKey = request.headers.get('x-admin-key');
+        if (!ENV.ADMIN_SEED_SECRET || adminKey !== ENV.ADMIN_SEED_SECRET) {
+          set.status = 403;
+          return {
+            error: 'Forbidden',
+            message: 'El endpoint de inicialización está deshabilitado en producción.',
+          };
+        }
+      }
       const result = await runSeed(getDatabase(), false);
       return { message: 'Database successfully seeded', ...result };
     },
@@ -111,13 +221,35 @@ export const app = new Elysia()
     }
   )
   // Route controllers
+  .use(authController)
+  .use(usersController)
+  .use(ogController)
   .use(searchController)
   .use(gamesController);
 
+// Graceful shutdown handling for Azure Container Apps revisions & autoscaling
+const handleShutdown = async (signal: string) => {
+  logger.info(`[Shutdown] Received ${signal}. Starting graceful shutdown...`);
+  try {
+    await closeDatabase();
+    logger.info('[Shutdown] PostgreSQL connection pool closed cleanly.');
+  } catch (err) {
+    logger.error('[Shutdown] Error closing database during shutdown:', { error: err });
+  } finally {
+    process.exit(0);
+  }
+};
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+
 // Only listen on port when running standalone (Docker or local Bun), not in Vercel Serverless
 if (!process.env.VERCEL) {
-  app.listen(ENV.PORT);
-  console.log(`🎮 NEXT.g Backend is running at http://localhost:${ENV.PORT}`);
+  app.listen({
+    port: ENV.PORT,
+    hostname: '0.0.0.0',
+  });
+  console.log(`🎮 NEXT.g Backend is running at http://0.0.0.0:${ENV.PORT}`);
 }
 
 // Export App type for full End-to-End TypeScript safety with Eden Treaty in Vue 3

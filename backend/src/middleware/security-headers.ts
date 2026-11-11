@@ -7,7 +7,7 @@
 import { Elysia } from 'elysia';
 
 export const securityHeaders = new Elysia({ name: 'security-headers' })
-  .onRequest(({ set }) => {
+  .onRequest(({ request, set }) => {
     // 1. Prevent MIME-sniffing
     set.headers['X-Content-Type-Options'] = 'nosniff';
 
@@ -23,6 +23,11 @@ export const securityHeaders = new Elysia({ name: 'security-headers' })
     // 5. Restrict dangerous browser features
     set.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()';
 
-    // 6. Strict Content-Security-Policy for API responses
-    set.headers['Content-Security-Policy'] = "default-src 'none'; frame-ancestors 'none';";
+    // 6. Content-Security-Policy: strict for API endpoints, permissive for interactive Swagger UI docs
+    const pathname = new URL(request.url).pathname;
+    if (pathname.startsWith('/docs')) {
+      set.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:;";
+    } else {
+      set.headers['Content-Security-Policy'] = "default-src 'none'; frame-ancestors 'none';";
+    }
   });

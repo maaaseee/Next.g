@@ -6,6 +6,7 @@
  */
 
 import { Elysia, type Context } from 'elysia';
+import { ENV } from '../config/env';
 
 export interface RateLimitOptions {
   /** Maximum allowed requests within the time window */
@@ -97,6 +98,52 @@ export class RateLimiterStore {
     };
   }
 
+  /**
+   * Evaluates rate limiting with durable Upstash Redis REST support,
+   * falling back to in-memory store if Redis is unconfigured or unavailable.
+   */
+  public async checkAsync(
+    clientId: string,
+    options: RateLimitOptions
+  ): Promise<{ allowed: boolean; remaining: number; resetInSeconds: number }> {
+    if (ENV.UPSTASH_REDIS_REST_URL && ENV.UPSTASH_REDIS_REST_TOKEN) {
+      try {
+        const key = `ratelimit:${options.name || 'global'}:${clientId}`;
+        const windowSec = Math.max(1, Math.ceil(options.windowMs / 1000));
+
+        const res = await fetch(`${ENV.UPSTASH_REDIS_REST_URL}/pipeline`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${ENV.UPSTASH_REDIS_REST_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([
+            ['INCR', key],
+            ['EXPIRE', key, windowSec, 'NX'],
+            ['TTL', key],
+          ]),
+        });
+
+        if (res.ok) {
+          const results = (await res.json()) as Array<{ result: number | string }>;
+          const count = Number(results[0]?.result || 1);
+          const ttl = Math.max(1, Number(results[2]?.result || windowSec));
+          const allowed = count <= options.max;
+
+          return {
+            allowed,
+            remaining: Math.max(0, options.max - count),
+            resetInSeconds: ttl,
+          };
+        }
+      } catch {
+        // Fallback gracefully to in-memory store
+      }
+    }
+
+    return this.check(clientId, options);
+  }
+
   public destroy(): void {
     if (this.sweepInterval) {
       clearInterval(this.sweepInterval);
@@ -119,18 +166,22 @@ export function getClientIp(headers: Headers | Record<string, string | undefined
     return (headers as Record<string, string | undefined>)[name.toLowerCase()];
   };
 
-  // 1. Cloudflare header
+  // 1. Azure Container Apps Ingress header (injected by Azure Envoy proxy)
+  const azureIp = getHeader('x-azure-clientip');
+  if (azureIp) return azureIp.trim();
+
+  // 2. Cloudflare header
   const cfIp = getHeader('cf-connecting-ip');
   if (cfIp) return cfIp.trim();
 
-  // 2. Standard X-Forwarded-For (take the first public client IP)
+  // 3. Standard X-Forwarded-For (take the first public client IP)
   const xForwardedFor = getHeader('x-forwarded-for');
   if (xForwardedFor) {
     const firstIp = xForwardedFor.split(',')[0]?.trim();
     if (firstIp) return firstIp;
   }
 
-  // 3. X-Real-IP
+  // 4. X-Real-IP
   const xRealIp = getHeader('x-real-ip');
   if (xRealIp) return xRealIp.trim();
 
@@ -141,9 +192,9 @@ export function getClientIp(headers: Headers | Record<string, string | undefined
  * Creates an Elysia onBeforeHandle hook for a specific rate limit tier.
  */
 export function rateLimiterHook(options: RateLimitOptions) {
-  return ({ request, set }: Pick<Context, 'request' | 'set'>) => {
+  return async ({ request, set }: Pick<Context, 'request' | 'set'>) => {
     const ip = getClientIp(request.headers);
-    const result = globalRateLimitStore.check(ip, options);
+    const result = await globalRateLimitStore.checkAsync(ip, options);
 
     // Set standard RateLimit telemetry headers
     set.headers['X-RateLimit-Limit'] = String(options.max);

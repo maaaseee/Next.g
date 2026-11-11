@@ -1,6 +1,5 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
-import * as path from 'path';
 
 // Define log formats
 const { combine, timestamp, printf, colorize, errors, json } = winston.format;
@@ -21,33 +20,42 @@ const consoleLogFormat = combine(
   })
 );
 
-// File transport options for daily rotation
-const fileRotateTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/combined-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  maxFiles: '14d', // Keep logs for 14 days
-  maxSize: '20m',  // Rotate if file exceeds 20MB
-  format: combine(timestamp(), json()),
-});
+const isProduction = process.env.NODE_ENV === 'production';
 
-const errorFileRotateTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  level: 'error',
-  maxFiles: '30d',
-  maxSize: '20m',
-  format: combine(errors({ stack: true }), timestamp(), json()),
-});
+// In production / container environments (e.g. Azure Container Apps), standard best practice
+// is streaming structured JSON logs directly to stdout/stderr for Azure Log Analytics ingestion.
+const transports: winston.transport[] = [
+  new winston.transports.Console({
+    format: isProduction
+      ? combine(timestamp(), errors({ stack: true }), json())
+      : consoleLogFormat,
+  }),
+];
+
+// In local development, also write rotating log files for offline inspection
+if (!isProduction) {
+  transports.push(
+    new winston.transports.DailyRotateFile({
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxFiles: '14d',
+      maxSize: '20m',
+      format: combine(timestamp(), json()),
+    }),
+    new winston.transports.DailyRotateFile({
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      maxFiles: '30d',
+      maxSize: '20m',
+      format: combine(errors({ stack: true }), timestamp(), json()),
+    })
+  );
+}
 
 // Create the logger instance
 export const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: isProduction ? 'info' : 'debug',
   format: combine(errors({ stack: true }), timestamp(), json()),
-  transports: [
-    fileRotateTransport,
-    errorFileRotateTransport,
-    new winston.transports.Console({
-      format: consoleLogFormat,
-    }),
-  ],
+  transports,
 });

@@ -3,12 +3,13 @@
  * 
  * Provides local offline search fallback and initial starter library without requiring live Twitch/IGDB API keys.
  * Cover images use official IGDB Cloudinary CDN format.
+ * All entries use official canonical IGDB IDs and slugs.
  */
 
 export interface SeedGame {
   id: number;
   title: string;
-  slug?: string | null;
+  slug: string;
   cover_url: string;
   release_year: number;
   summary: string;
@@ -21,603 +22,1386 @@ export interface SeedGame {
 
 export const SEED_GAMES: SeedGame[] = [
   {
-    id: 119133,
-    title: 'Elden Ring',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg',
-    release_year: 2022,
-    summary: 'An expansive fantasy action-RPG game developed by FromSoftware and published by Bandai Namco in a world created by Hidetaka Miyazaki and George R. R. Martin.',
-    genres: ['Role-playing (RPG)', 'Adventure', 'Action'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One'],
-    rating: 95.5,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'PLAYING',
+    "id": 119133,
+    "title": "Elden Ring",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
+    "release_year": 2022,
+    "summary": "An expansive fantasy action-RPG game developed by FromSoftware and published by Bandai Namco in a world created by Hidetaka Miyazaki and George R. R. Martin.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Adventure",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Xbox One"
+    ],
+    "rating": 95.5,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "elden-ring"
   },
   {
-    id: 9767,
-    title: 'Hollow Knight',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1rgi.jpg',
-    release_year: 2017,
-    summary: 'A challenging 2D Metroidvania action-adventure set in Hallownest, a vast interconnected underground ruined kingdom populated by insects.',
-    genres: ['Metroidvania', 'Platform', 'Adventure', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One'],
-    rating: 92.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 14593,
+    "title": "Hollow Knight",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1rgi.jpg",
+    "release_year": 2017,
+    "summary": "A challenging 2D Metroidvania action-adventure set in Hallownest, a vast interconnected underground ruined kingdom populated by insects.",
+    "genres": [
+      "Metroidvania",
+      "Platform",
+      "Adventure",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 92,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "hollow-knight"
   },
   {
-    id: 1942,
-    title: 'The Witcher 3: Wild Hunt',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg',
-    release_year: 2015,
-    summary: 'Become Geralt of Rivia, a monster slayer for hire, searching for Ciri in a visually stunning fantasy universe filled with meaningful choices and impactful consequences.',
-    genres: ['Role-playing (RPG)', 'Adventure', 'Action'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Nintendo Switch'],
-    rating: 95.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 1942,
+    "title": "The Witcher 3: Wild Hunt",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg",
+    "release_year": 2015,
+    "summary": "Become Geralt of Rivia, a monster slayer for hire, searching for Ciri in a visually stunning fantasy universe filled with meaningful choices and impactful consequences.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Adventure",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Nintendo Switch"
+    ],
+    "rating": 95,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "the-witcher-3-wild-hunt"
   },
   {
-    id: 1877,
-    title: 'Cyberpunk 2077',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2mjs.jpg',
-    release_year: 2020,
-    summary: 'An open-world, action-adventure story set in Night City, a megalopolis obsessed with power, glamour, and body modification.',
-    genres: ['Role-playing (RPG)', 'Shooter', 'Action', 'Sci-Fi'],
-    platforms: ['PC', 'PlayStation 5', 'Xbox Series X|S', 'PlayStation 4', 'Xbox One'],
-    rating: 88.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 1877,
+    "title": "Cyberpunk 2077",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2mjs.jpg",
+    "release_year": 2020,
+    "summary": "An open-world, action-adventure story set in Night City, a megalopolis obsessed with power, glamour, and body modification.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Shooter",
+      "Action",
+      "Sci-Fi"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 88,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "cyberpunk-2077"
   },
   {
-    id: 125174,
-    title: "Baldur's Gate 3",
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg',
-    release_year: 2023,
-    summary: 'A story-rich, party-based RPG set in the universe of Dungeons & Dragons, where your choices shape a tale of fellowship and betrayal.',
-    genres: ['Role-playing (RPG)', 'Turn-based strategy (TBS)', 'Adventure'],
-    platforms: ['PC', 'PlayStation 5', 'Xbox Series X|S', 'Mac'],
-    rating: 96.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'PLAYING',
+    "id": 119171,
+    "title": "Baldur's Gate III",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg",
+    "release_year": 2023,
+    "summary": "A story-rich, party-based RPG set in the universe of Dungeons & Dragons, where your choices shape a tale of fellowship and betrayal.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Turn-based strategy (TBS)",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S",
+      "Mac"
+    ],
+    "rating": 96,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "baldurs-gate-iii"
   },
   {
-    id: 113112,
-    title: 'Hades',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cob9kr.webp',
-    release_year: 2020,
-    summary: 'Defy the god of the dead as you hack and slash out of the Underworld in this rogue-like dungeon crawler from the creators of Bastion and Transistor.',
-    genres: ['Roguelike', 'Hack and slash', 'Indie', 'Action'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S'],
-    rating: 93.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 113112,
+    "title": "Hades",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cob9kr.webp",
+    "release_year": 2020,
+    "summary": "Defy the god of the dead as you hack and slash out of the Underworld in this rogue-like dungeon crawler from the creators of Bastion and Transistor.",
+    "genres": [
+      "Roguelike",
+      "Hack and slash",
+      "Indie",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S"
+    ],
+    "rating": 93,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "hades--1"
   },
   {
-    id: 228495,
-    title: 'Hades II',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/coaknx.webp',
-    release_year: 2024,
-    summary: 'Battle beyond the Underworld using dark sorcery to take on the Titan of Time in this spellbinding rogue-like sequel.',
-    genres: ['Roguelike', 'Hack and slash', 'Indie', 'Action'],
-    platforms: ['PC'],
-    rating: 91.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'WISHLIST',
+    "id": 228525,
+    "title": "Hades II",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/coaknx.webp",
+    "release_year": 2024,
+    "summary": "Battle beyond the Underworld using dark sorcery to take on the Titan of Time in this spellbinding rogue-like sequel.",
+    "genres": [
+      "Roguelike",
+      "Hack and slash",
+      "Indie",
+      "Action"
+    ],
+    "platforms": [
+      "PC"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "WISHLIST",
+    "slug": "hades-ii"
   },
   {
-    id: 7346,
-    title: 'The Legend of Zelda: Breath of the Wild',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co3p2d.jpg',
-    release_year: 2017,
-    summary: 'Step into a world of discovery, exploration, and adventure in an open-air boundary-breaking game that breathes new life into the Zelda franchise.',
-    genres: ['Adventure', 'Action', 'Open World', 'Role-playing (RPG)'],
-    platforms: ['Nintendo Switch', 'Wii U'],
-    rating: 96.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 7346,
+    "title": "The Legend of Zelda: Breath of the Wild",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p2d.jpg",
+    "release_year": 2017,
+    "summary": "Step into a world of discovery, exploration, and adventure in an open-air boundary-breaking game that breathes new life into the Zelda franchise.",
+    "genres": [
+      "Adventure",
+      "Action",
+      "Open World",
+      "Role-playing (RPG)"
+    ],
+    "platforms": [
+      "Nintendo Switch",
+      "Wii U"
+    ],
+    "rating": 96,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "the-legend-of-zelda-breath-of-the-wild"
   },
   {
-    id: 119277,
-    title: 'The Legend of Zelda: Tears of the Kingdom',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5vmg.jpg',
-    release_year: 2023,
-    summary: 'An epic adventure across the land and skies of Hyrule where you harness Link’s new abilities to craft vehicles, weapons, and explore mysterious depths.',
-    genres: ['Adventure', 'Action', 'Open World'],
-    platforms: ['Nintendo Switch'],
-    rating: 95.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 119388,
+    "title": "The Legend of Zelda: Tears of the Kingdom",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5vmg.jpg",
+    "release_year": 2023,
+    "summary": "An epic adventure across the land and skies of Hyrule where you harness Link’s new abilities to craft vehicles, weapons, and explore mysterious depths.",
+    "genres": [
+      "Adventure",
+      "Action",
+      "Open World"
+    ],
+    "platforms": [
+      "Nintendo Switch"
+    ],
+    "rating": 95,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "the-legend-of-zelda-tears-of-the-kingdom"
   },
   {
-    id: 25076,
-    title: 'Red Dead Redemption 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg',
-    release_year: 2018,
-    summary: 'Arthur Morgan and the Van der Linde gang are outlaws on the run. An epic tale of life in America at the dawn of the modern age.',
-    genres: ['Adventure', 'Shooter', 'Open World', 'Action'],
-    platforms: ['PC', 'PlayStation 4', 'Xbox One'],
-    rating: 96.5,
-    game_modes: ['Single player', 'Multiplayer'],
-    defaultStatus: 'COMPLETED',
+    "id": 25076,
+    "title": "Red Dead Redemption 2",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg",
+    "release_year": 2018,
+    "summary": "Arthur Morgan and the Van der Linde gang are outlaws on the run. An epic tale of life in America at the dawn of the modern age.",
+    "genres": [
+      "Adventure",
+      "Shooter",
+      "Open World",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 96.5,
+    "game_modes": [
+      "Single player",
+      "Multiplayer"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "red-dead-redemption-2"
   },
   {
-    id: 19560,
-    title: 'God of War',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.jpg',
-    release_year: 2018,
-    summary: 'Living as a man outside the shadow of the gods, Kratos must adapt to unfamiliar lands, unexpected threats, and a second chance at being a father alongside Atreus.',
-    genres: ['Action', 'Adventure', 'Hack and slash'],
-    platforms: ['PC', 'PlayStation 4'],
-    rating: 94.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 19560,
+    "title": "God of War",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.jpg",
+    "release_year": 2018,
+    "summary": "Living as a man outside the shadow of the gods, Kratos must adapt to unfamiliar lands, unexpected threats, and a second chance at being a father alongside Atreus.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Hack and slash"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4"
+    ],
+    "rating": 94,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "god-of-war--1"
   },
   {
-    id: 119171,
-    title: 'God of War Ragnarök',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5s5v.jpg',
-    release_year: 2022,
-    summary: 'Join Kratos and Atreus on a mythic journey for answers before the prophesied battle that will end the world across all Nine Realms.',
-    genres: ['Action', 'Adventure', 'Hack and slash'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4'],
-    rating: 94.5,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 112875,
+    "title": "God of War Ragnarök",
+    "slug": "god-of-war-ragnarok",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5s5v.jpg",
+    "release_year": 2022,
+    "summary": "Join Kratos and Atreus on a mythic journey for answers before the prophesied battle that will end the world across all Nine Realms.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Hack and slash"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 94.5,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG"
   },
   {
-    id: 27789,
-    title: 'Celeste',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cob9dh.webp',
-    release_year: 2018,
-    summary: 'Help Madeline survive her inner demons on her journey to the top of Celeste Mountain in this super-tight, hand-crafted platformer.',
-    genres: ['Platform', 'Indie', 'Adventure'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One'],
-    rating: 91.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 26226,
+    "title": "Celeste",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cob9dh.webp",
+    "release_year": 2018,
+    "summary": "Help Madeline survive her inner demons on her journey to the top of Celeste Mountain in this super-tight, hand-crafted platformer.",
+    "genres": [
+      "Platform",
+      "Indie",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "celeste"
   },
   {
-    id: 118465,
-    title: 'Persona 5 Royal',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1nic.jpg',
-    release_year: 2019,
-    summary: 'Don the mask of Joker and join the Phantom Thieves of Hearts as you break the chains of modern society and stage grand heists in Tokyo.',
-    genres: ['Role-playing (RPG)', 'Turn-based strategy (TBS)', 'Adventure'],
-    platforms: ['PC', 'PlayStation 5', 'Nintendo Switch', 'Xbox Series X|S', 'PlayStation 4'],
-    rating: 94.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 114283,
+    "title": "Persona 5 Royal",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1nic.jpg",
+    "release_year": 2019,
+    "summary": "Don the mask of Joker and join the Phantom Thieves of Hearts as you break the chains of modern society and stage grand heists in Tokyo.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Turn-based strategy (TBS)",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Nintendo Switch",
+      "Xbox Series X|S",
+      "PlayStation 4"
+    ],
+    "rating": 94,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "persona-5-royal"
   },
   {
-    id: 114283,
-    title: 'Disco Elysium - The Final Cut',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2ve1.webp',
-    release_year: 2019,
-    summary: 'A groundbreaking open world role playing game where you are a detective with a unique skill system and an entire city block to carve your path across.',
-    genres: ['Role-playing (RPG)', 'Adventure', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S'],
-    rating: 93.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 141540,
+    "title": "Disco Elysium: The Final Cut",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2ve1.webp",
+    "release_year": 2019,
+    "summary": "A groundbreaking open world role playing game where you are a detective with a unique skill system and an entire city block to carve your path across.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Adventure",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S"
+    ],
+    "rating": 93,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "disco-elysium-the-final-cut"
   },
   {
-    id: 17000,
-    title: 'Stardew Valley',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/coa93h.webp',
-    release_year: 2016,
-    summary: 'You have inherited your grandfather’s old farm plot. Armed with hand-me-down tools, you set out to begin a new life living off the land.',
-    genres: ['Simulator', 'Role-playing (RPG)', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One', 'iOS', 'Android'],
-    rating: 91.5,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'PLAYING',
+    "id": 17000,
+    "title": "Stardew Valley",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/coa93h.webp",
+    "release_year": 2016,
+    "summary": "You have inherited your grandfather’s old farm plot. Armed with hand-me-down tools, you set out to begin a new life living off the land.",
+    "genres": [
+      "Simulator",
+      "Role-playing (RPG)",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One",
+      "iOS",
+      "Android"
+    ],
+    "rating": 91.5,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "stardew-valley"
   },
   {
-    id: 103298,
-    title: 'Sekiro: Shadows Die Twice',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2a23.webp',
-    release_year: 2019,
-    summary: 'Carve your own clever path to vengeance in an action-adventure set in late 1500s Sengoku Japan as the one-armed wolf shinobi.',
-    genres: ['Action', 'Adventure', 'Souls-like'],
-    platforms: ['PC', 'PlayStation 4', 'Xbox One'],
-    rating: 92.5,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 76882,
+    "title": "Sekiro: Shadows Die Twice",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2a23.webp",
+    "release_year": 2019,
+    "summary": "Carve your own clever path to vengeance in an action-adventure set in late 1500s Sengoku Japan as the one-armed wolf shinobi.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Souls-like"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 92.5,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "sekiro-shadows-die-twice"
   },
   {
-    id: 11133,
-    title: 'Dark Souls III',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cob9ed.webp',
-    release_year: 2016,
-    summary: 'As fires fade and the world falls into ruin, journey into a universe filled with more colossal enemies and environments.',
-    genres: ['Role-playing (RPG)', 'Action', 'Souls-like'],
-    platforms: ['PC', 'PlayStation 4', 'Xbox One'],
-    rating: 91.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'BACKLOG',
+    "id": 11133,
+    "title": "Dark Souls III",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cob9ed.webp",
+    "release_year": 2016,
+    "summary": "As fires fade and the world falls into ruin, journey into a universe filled with more colossal enemies and environments.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Action",
+      "Souls-like"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "dark-souls-iii"
   },
   {
-    id: 7334,
-    title: 'Bloodborne',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cob99l.webp',
-    release_year: 2015,
-    summary: 'Hunt your nightmares in the ancient, gothic city of Yharnam, now plagued with an endemic disease that transforms people into beasts.',
-    genres: ['Role-playing (RPG)', 'Action', 'Horror', 'Souls-like'],
-    platforms: ['PlayStation 4'],
-    rating: 93.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'COMPLETED',
+    "id": 7334,
+    "title": "Bloodborne",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cob99l.webp",
+    "release_year": 2015,
+    "summary": "Hunt your nightmares in the ancient, gothic city of Yharnam, now plagued with an endemic disease that transforms people into beasts.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Action",
+      "Horror",
+      "Souls-like"
+    ],
+    "platforms": [
+      "PlayStation 4"
+    ],
+    "rating": 93,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "bloodborne"
   },
   {
-    id: 1020,
-    title: 'Grand Theft Auto V',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.jpg',
-    release_year: 2013,
-    summary: 'When a young street hustler, a retired bank robber and a terrifying psychopath find themselves entangled with the criminal underworld, they must pull off dangerous heists.',
-    genres: ['Action', 'Shooter', 'Open World'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One'],
-    rating: 95.0,
-    game_modes: ['Single player', 'Multiplayer'],
-    defaultStatus: 'COMPLETED',
+    "id": 1020,
+    "title": "Grand Theft Auto V",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.jpg",
+    "release_year": 2013,
+    "summary": "When a young street hustler, a retired bank robber and a terrifying psychopath find themselves entangled with the criminal underworld, they must pull off dangerous heists.",
+    "genres": [
+      "Action",
+      "Shooter",
+      "Open World"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Xbox One"
+    ],
+    "rating": 95,
+    "game_modes": [
+      "Single player",
+      "Multiplayer"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "grand-theft-auto-v"
   },
   {
-    id: 121,
-    title: 'Minecraft',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co8fu7.webp',
-    release_year: 2011,
-    summary: 'Explore infinite randomly generated worlds, build everything from simple homes to grand castles, and survive dangerous mobs.',
-    genres: ['Sandbox', 'Survival', 'Adventure'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One', 'iOS', 'Android'],
-    rating: 90.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'BACKLOG',
+    "id": 135400,
+    "title": "Minecraft",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co8fu7.webp",
+    "release_year": 2011,
+    "summary": "Explore infinite randomly generated worlds, build everything from simple homes to grand castles, and survive dangerous mobs.",
+    "genres": [
+      "Sandbox",
+      "Survival",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One",
+      "iOS",
+      "Android"
+    ],
+    "rating": 90,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "minecraft--1"
   },
   {
-    id: 26192,
-    title: 'Monster Hunter: World',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1rst.webp',
-    release_year: 2018,
-    summary: 'Welcome to a new world! Slay ferocious beasts in living, breathing ecosystems using diverse weapon arsenals.',
-    genres: ['Role-playing (RPG)', 'Action', 'Adventure'],
-    platforms: ['PC', 'PlayStation 4', 'Xbox One'],
-    rating: 90.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'BACKLOG',
+    "id": 36926,
+    "title": "Monster Hunter: World",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1rst.webp",
+    "release_year": 2018,
+    "summary": "Welcome to a new world! Slay ferocious beasts in living, breathing ecosystems using diverse weapon arsenals.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Action",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 90,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "monster-hunter-world"
   },
   {
-    id: 205626,
-    title: 'Resident Evil 4',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co6bo0.webp',
-    release_year: 2023,
-    summary: 'Survival is only the beginning. Six years after the biological disaster in Raccoon City, Leon S. Kennedy tracks the president’s kidnapped daughter to a secluded European village.',
-    genres: ['Shooter', 'Horror', 'Action', 'Adventure'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S'],
-    rating: 93.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 145191,
+    "title": "Resident Evil 4",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6bo0.webp",
+    "release_year": 2023,
+    "summary": "Survival is only the beginning. Six years after the biological disaster in Raccoon City, Leon S. Kennedy tracks the president’s kidnapped daughter to a secluded European village.",
+    "genres": [
+      "Shooter",
+      "Horror",
+      "Action",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S"
+    ],
+    "rating": 93,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "resident-evil-4--2"
   },
   {
-    id: 103054,
-    title: 'DOOM Eternal',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co3p5n.webp',
-    release_year: 2020,
-    summary: 'Hell’s armies have invaded Earth. Become the Slayer in an epic single-player campaign to conquer demons across dimensions and stop the final destruction of humanity.',
-    genres: ['Shooter', 'Action', 'FPS'],
-    platforms: ['PC', 'PlayStation 5', 'Nintendo Switch', 'Xbox Series X|S', 'PlayStation 4'],
-    rating: 89.0,
-    game_modes: ['Single player', 'Multiplayer'],
-    defaultStatus: 'COMPLETED',
+    "id": 103298,
+    "title": "Doom Eternal",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p5n.webp",
+    "release_year": 2020,
+    "summary": "Hell’s armies have invaded Earth. Become the Slayer in an epic single-player campaign to conquer demons across dimensions and stop the final destruction of humanity.",
+    "genres": [
+      "Shooter",
+      "Action",
+      "FPS"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Nintendo Switch",
+      "Xbox Series X|S",
+      "PlayStation 4"
+    ],
+    "rating": 89,
+    "game_modes": [
+      "Single player",
+      "Multiplayer"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "doom-eternal"
   },
   {
-    id: 151665,
-    title: 'NieR Replicant ver.1.22474487139...',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5h0n.webp',
-    release_year: 2021,
-    summary: 'NieR Replicant ver.1.22474487139... is an updated version of NieR Replicant, previously only released in Japan. Discover the one-of-a-kind prequel to the critically-acclaimed masterpiece NieR: Automata. Now with a modern upgrade, experience masterfully revived visuals, a fascinating storyline and more!',
-    genres: ['Action role-playing (Action RPG)', 'Hack and slash'],
-    platforms: ['PlayStation 4', 'Xbox One', 'PC'],
-    rating: 84.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 131999,
+    "title": "NieR Replicant ver.1.22474487139...",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5h0n.webp",
+    "release_year": 2021,
+    "summary": "NieR Replicant ver.1.22474487139... is an updated version of NieR Replicant, previously only released in Japan. Discover the one-of-a-kind prequel to the critically-acclaimed masterpiece NieR: Automata. Now with a modern upgrade, experience masterfully revived visuals, a fascinating storyline and more!",
+    "genres": [
+      "Action role-playing (Action RPG)",
+      "Hack and slash"
+    ],
+    "platforms": [
+      "PlayStation 4",
+      "Xbox One",
+      "PC"
+    ],
+    "rating": 84,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "nier-replicant-ver-dot-1-22474487139-dot-dot-dot"
   },
   {
-    id: 26758,
-    title: 'Super Mario Odyssey',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1mxf.webp',
-    release_year: 2017,
-    summary: 'Embark on a captivating, globe-trotting adventure with Mario and his ally Cappy across massive 3D sandbox kingdoms.',
-    genres: ['Platform', 'Adventure'],
-    platforms: ['Nintendo Switch'],
-    rating: 94.0,
-    game_modes: ['Single player', 'Co-operative'],
-    defaultStatus: 'COMPLETED',
+    "id": 26758,
+    "title": "Super Mario Odyssey",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1mxf.webp",
+    "release_year": 2017,
+    "summary": "Embark on a captivating, globe-trotting adventure with Mario and his ally Cappy across massive 3D sandbox kingdoms.",
+    "genres": [
+      "Platform",
+      "Adventure"
+    ],
+    "platforms": [
+      "Nintendo Switch"
+    ],
+    "rating": 94,
+    "game_modes": [
+      "Single player",
+      "Co-operative"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "super-mario-odyssey"
   },
   {
-    id: 11156,
-    title: 'Final Fantasy VII Remake',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cobcwt.webp',
-    release_year: 2020,
-    summary: 'A spectacular reimagining of the iconic original game in the gritty industrial metropolis of Midgar, featuring hybrid real-time and tactical combat.',
-    genres: ['Role-playing (RPG)', 'Adventure', 'Action'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4'],
-    rating: 88.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 11169,
+    "title": "Final Fantasy VII Remake",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cobcwt.webp",
+    "release_year": 2020,
+    "summary": "A spectacular reimagining of the iconic original game in the gritty industrial metropolis of Midgar, featuring hybrid real-time and tactical combat.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Adventure",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 88,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "final-fantasy-vii-remake"
   },
   {
-    id: 11208,
-    title: 'NieR: Automata',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5pcj.webp',
-    release_year: 2017,
-    summary: 'Humanity has been driven from the Earth by mechanical beings. In a final effort to take back the planet, the human resistance sends a squad of android soldiers, 2B and 9S.',
-    genres: ['Role-playing (RPG)', 'Hack and slash', 'Sci-Fi', 'Action'],
-    platforms: ['PC', 'PlayStation 4', 'Nintendo Switch', 'Xbox One'],
-    rating: 91.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 11208,
+    "title": "NieR: Automata",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5pcj.webp",
+    "release_year": 2017,
+    "summary": "Humanity has been driven from the Earth by mechanical beings. In a final effort to take back the planet, the human resistance sends a squad of android soldiers, 2B and 9S.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Hack and slash",
+      "Sci-Fi",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Nintendo Switch",
+      "Xbox One"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "nier-automata"
   },
   {
-    id: 11155,
-    title: 'Horizon Zero Dawn',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2una.webp',
-    release_year: 2017,
-    summary: 'Experience Aloy’s legendary quest to unravel the mysteries of a future Earth ruled by deadly Machines.',
-    genres: ['Action', 'Role-playing (RPG)', 'Adventure', 'Open World'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4'],
-    rating: 90.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 11156,
+    "title": "Horizon Zero Dawn",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2una.webp",
+    "release_year": 2017,
+    "summary": "Experience Aloy’s legendary quest to unravel the mysteries of a future Earth ruled by deadly Machines.",
+    "genres": [
+      "Action",
+      "Role-playing (RPG)",
+      "Adventure",
+      "Open World"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 90,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "horizon-zero-dawn"
   },
   {
-    id: 19564,
-    title: 'Death Stranding',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cocsvh.webp',
-    release_year: 2019,
-    summary: 'From legendary game creator Hideo Kojima comes an all-new genre-defying experience where Sam Bridges must brave a world transformed by the Death Stranding.',
-    genres: ['Adventure', 'Sci-Fi', 'Open World', 'Action'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4'],
-    rating: 87.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 19564,
+    "title": "Death Stranding",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cocsvh.webp",
+    "release_year": 2019,
+    "summary": "From legendary game creator Hideo Kojima comes an all-new genre-defying experience where Sam Bridges must brave a world transformed by the Death Stranding.",
+    "genres": [
+      "Adventure",
+      "Sci-Fi",
+      "Open World",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 87,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "death-stranding"
   },
   {
-    id: 76882,
-    title: 'Ghost of Tsushima',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.webp',
-    release_year: 2020,
-    summary: 'In the late 13th century, samurai warrior Jin Sakai must sacrifice his honor to protect his people and reclaim Tsushima from Mongol invaders.',
-    genres: ['Action', 'Adventure', 'Open World'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4'],
-    rating: 91.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'COMPLETED',
+    "id": 75235,
+    "title": "Ghost of Tsushima",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2crj.webp",
+    "release_year": 2020,
+    "summary": "In the late 13th century, samurai warrior Jin Sakai must sacrifice his honor to protect his people and reclaim Tsushima from Mongol invaders.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Open World"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "ghost-of-tsushima"
   },
   {
-    id: 26569,
-    title: 'Ori and the Will of the Wisps',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cocjl7.webp',
-    release_year: 2020,
-    summary: 'Embark on a journey with Ori across a vast world filled with new friends and foes in stunning hand-painted artwork to unravel Ori’s destiny.',
-    genres: ['Platform', 'Metroidvania', 'Adventure', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'Xbox Series X|S', 'Xbox One'],
-    rating: 92.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 37001,
+    "title": "Ori and the Will of the Wisps",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cocjl7.webp",
+    "release_year": 2020,
+    "summary": "Embark on a journey with Ori across a vast world filled with new friends and foes in stunning hand-painted artwork to unravel Ori’s destiny.",
+    "genres": [
+      "Platform",
+      "Metroidvania",
+      "Adventure",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "Xbox Series X|S",
+      "Xbox One"
+    ],
+    "rating": 92,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "ori-and-the-will-of-the-wisps"
   },
   {
-    id: 9789,
-    title: 'Outer Wilds',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co65ac.webp',
-    release_year: 2019,
-    summary: 'Named Game of the Year by multiple outlets, Outer Wilds is an open world mystery about a solar system trapped in an endless 22-minute time loop.',
-    genres: ['Adventure', 'Indie', 'Puzzle', 'Sci-Fi'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S'],
-    rating: 93.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 11737,
+    "title": "Outer Wilds",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co65ac.webp",
+    "release_year": 2019,
+    "summary": "Named Game of the Year by multiple outlets, Outer Wilds is an open world mystery about a solar system trapped in an endless 22-minute time loop.",
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Puzzle",
+      "Sci-Fi"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S"
+    ],
+    "rating": 93,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "outer-wilds"
   },
   {
-    id: 75235,
-    title: 'Slay the Spire',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1iyf.webp',
-    release_year: 2019,
-    summary: 'A masterful deckbuilder rogue-like. Craft a unique deck, encounter bizarre creatures, discover relics of immense power, and slay the Spire!',
-    genres: ['Card & Board Game', 'Roguelike', 'Strategy', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One', 'iOS', 'Android'],
-    rating: 91.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'PLAYING',
+    "id": 40477,
+    "title": "Slay the Spire",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1iyf.webp",
+    "release_year": 2019,
+    "summary": "A masterful deckbuilder rogue-like. Craft a unique deck, encounter bizarre creatures, discover relics of immense power, and slay the Spire!",
+    "genres": [
+      "Card & Board Game",
+      "Roguelike",
+      "Strategy",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One",
+      "iOS",
+      "Android"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "slay-the-spire"
   },
   {
-    id: 25902,
-    title: 'Dead Cells',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co7jfv.webp',
-    release_year: 2018,
-    summary: 'A rogue-lite, metroidvania action-platformer. You’ll explore a sprawling, ever-changing castle... assuming you’re able to fight your way past its keepers in 2D souls-lite combat.',
-    genres: ['Roguelike', 'Metroidvania', 'Platform', 'Action', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 4', 'Xbox One', 'iOS', 'Android'],
-    rating: 90.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 26855,
+    "title": "Dead Cells",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co7jfv.webp",
+    "release_year": 2018,
+    "summary": "A rogue-lite, metroidvania action-platformer. You’ll explore a sprawling, ever-changing castle... assuming you’re able to fight your way past its keepers in 2D souls-lite combat.",
+    "genres": [
+      "Roguelike",
+      "Metroidvania",
+      "Platform",
+      "Action",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 4",
+      "Xbox One",
+      "iOS",
+      "Android"
+    ],
+    "rating": 90,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "dead-cells"
   },
   {
-    id: 131920,
-    title: 'Sea of Stars',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co215b.webp',
-    release_year: 2023,
-    summary: 'A turn-based RPG inspired by the classics. It tells the story of two Children of the Solstice who combine the powers of the sun and moon to perform Eclipse Magic.',
-    genres: ['Role-playing (RPG)', 'Turn-based strategy (TBS)', 'Indie', 'Adventure'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S'],
-    rating: 88.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 131890,
+    "title": "Sea of Stars",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co215b.webp",
+    "release_year": 2023,
+    "summary": "A turn-based RPG inspired by the classics. It tells the story of two Children of the Solstice who combine the powers of the sun and moon to perform Eclipse Magic.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Turn-based strategy (TBS)",
+      "Indie",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S"
+    ],
+    "rating": 88,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "sea-of-stars"
   },
   {
-    id: 221774,
-    title: 'Dave the Diver',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/cocdlv.webp',
-    release_year: 2023,
-    summary: 'A casual, singleplayer adventure RPG featuring deep-sea exploration and fishing during the day and sushi restaurant management at night.',
-    genres: ['Adventure', 'Simulator', 'Role-playing (RPG)', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'PlayStation 4'],
-    rating: 89.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'PLAYING',
+    "id": 203722,
+    "title": "Dave the Diver",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/cocdlv.webp",
+    "release_year": 2023,
+    "summary": "A casual, singleplayer adventure RPG featuring deep-sea exploration and fishing during the day and sushi restaurant management at night.",
+    "genres": [
+      "Adventure",
+      "Simulator",
+      "Role-playing (RPG)",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "PlayStation 4"
+    ],
+    "rating": 89,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "dave-the-diver"
   },
   {
-    id: 284058,
-    title: 'Balatro',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co9f4g.webp',
-    release_year: 2024,
-    summary: 'A poker-inspired roguelike deck builder all about creating powerful synergies and winning big against escalating blinds.',
-    genres: ['Card & Board Game', 'Roguelike', 'Strategy', 'Indie'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 5', 'Xbox Series X|S', 'iOS', 'Android'],
-    rating: 92.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'PLAYING',
+    "id": 251833,
+    "title": "Balatro",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co9f4g.webp",
+    "release_year": 2024,
+    "summary": "A poker-inspired roguelike deck builder all about creating powerful synergies and winning big against escalating blinds.",
+    "genres": [
+      "Card & Board Game",
+      "Roguelike",
+      "Strategy",
+      "Indie"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 5",
+      "Xbox Series X|S",
+      "iOS",
+      "Android"
+    ],
+    "rating": 92,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "PLAYING",
+    "slug": "balatro"
   },
   {
-    id: 109462,
-    title: 'Animal Crossing: New Horizons',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co3wls.webp',
-    release_year: 2020,
-    summary: 'Escape to a deserted island and create your own paradise as you explore, create, and customize in the relaxing Animal Crossing world.',
-    genres: ['Simulator', 'Casual'],
-    platforms: ['Nintendo Switch'],
-    rating: 89.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'WISHLIST',
+    "id": 109462,
+    "title": "Animal Crossing: New Horizons",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co3wls.webp",
+    "release_year": 2020,
+    "summary": "Escape to a deserted island and create your own paradise as you explore, create, and customize in the relaxing Animal Crossing world.",
+    "genres": [
+      "Simulator",
+      "Casual"
+    ],
+    "platforms": [
+      "Nintendo Switch"
+    ],
+    "rating": 89,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "WISHLIST",
+    "slug": "animal-crossing-new-horizons"
   },
   {
-    id: 180907,
-    title: 'Alan Wake 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co6jar.webp',
-    release_year: 2023,
-    summary: 'A psychological survival horror game with dual protagonists: FBI agent Saga Anderson and tortured writer Alan Wake.',
-    genres: ['Horror', 'Shooter', 'Adventure', 'Mystery'],
-    platforms: ['PC', 'PlayStation 5', 'Xbox Series X|S'],
-    rating: 91.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 185246,
+    "title": "Alan Wake II",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6jar.webp",
+    "release_year": 2023,
+    "summary": "A psychological survival horror game with dual protagonists: FBI agent Saga Anderson and tortured writer Alan Wake.",
+    "genres": [
+      "Horror",
+      "Shooter",
+      "Adventure",
+      "Mystery"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S"
+    ],
+    "rating": 91,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "alan-wake-ii"
   },
   {
-    id: 9927,
-    title: 'Resident Evil 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1h9f.jpg',
-    release_year: 2019,
-    summary: 'A masterpiece remake of the classic survival horror with breathtakingly realistic visuals, heart-pounding immersive audio, and a modern over-the-shoulder camera.',
-    genres: ['Horror', 'Shooter', 'Action', 'Adventure'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One'],
-    rating: 92.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 217953,
+    "title": "Resident Evil 2",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1h9f.jpg",
+    "release_year": 2019,
+    "summary": "A masterpiece remake of the classic survival horror with breathtakingly realistic visuals, heart-pounding immersive audio, and a modern over-the-shoulder camera.",
+    "genres": [
+      "Horror",
+      "Shooter",
+      "Action",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Xbox One"
+    ],
+    "rating": 92,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "resident-evil-2--4"
   },
   {
-    id: 141525,
-    title: 'Mass Effect Legendary Edition',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2k5h.webp',
-    release_year: 2021,
-    summary: 'Relive the cinematic saga of Commander Shepard across the highly acclaimed Mass Effect trilogy, remastered in 4K Ultra HD.',
-    genres: ['Role-playing (RPG)', 'Shooter', 'Sci-Fi', 'Adventure'],
-    platforms: ['PC', 'PlayStation 4', 'Xbox One'],
-    rating: 92.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 140839,
+    "title": "Mass Effect Legendary Edition",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2k5h.webp",
+    "release_year": 2021,
+    "summary": "Relive the cinematic saga of Commander Shepard across the highly acclaimed Mass Effect trilogy, remastered in 4K Ultra HD.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Shooter",
+      "Sci-Fi",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 92,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "mass-effect-legendary-edition"
   },
   {
-    id: 72,
-    title: 'Portal 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1rs4.jpg',
-    release_year: 2011,
-    summary: 'The mind-bending portal-gun sequel with hilarious writing, ingenious puzzle design, and an unforgettable cooperative campaign.',
-    genres: ['Puzzle', 'Sci-Fi', 'Adventure', 'Platform'],
-    platforms: ['PC', 'Nintendo Switch', 'PlayStation 3', 'Xbox 360', 'Mac'],
-    rating: 95.0,
-    game_modes: ['Single player', 'Multiplayer', 'Co-operative'],
-    defaultStatus: 'COMPLETED',
+    "id": 72,
+    "title": "Portal 2",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1rs4.jpg",
+    "release_year": 2011,
+    "summary": "The mind-bending portal-gun sequel with hilarious writing, ingenious puzzle design, and an unforgettable cooperative campaign.",
+    "genres": [
+      "Puzzle",
+      "Sci-Fi",
+      "Adventure",
+      "Platform"
+    ],
+    "platforms": [
+      "PC",
+      "Nintendo Switch",
+      "PlayStation 3",
+      "Xbox 360",
+      "Mac"
+    ],
+    "rating": 95,
+    "game_modes": [
+      "Single player",
+      "Multiplayer",
+      "Co-operative"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "portal-2"
   },
   {
-    id: 233,
-    title: 'Half-Life 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1nmw.webp',
-    release_year: 2004,
-    summary: 'Gordon Freeman takes up his crowbar again on an alien-infested Earth being picked to the bone by the Combine.',
-    genres: ['Shooter', 'Sci-Fi', 'FPS', 'Action'],
-    platforms: ['PC', 'Mac', 'Linux'],
-    rating: 95.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'COMPLETED',
+    "id": 233,
+    "title": "Half-Life 2",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1nmw.webp",
+    "release_year": 2004,
+    "summary": "Gordon Freeman takes up his crowbar again on an alien-infested Earth being picked to the bone by the Combine.",
+    "genres": [
+      "Shooter",
+      "Sci-Fi",
+      "FPS",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "Mac",
+      "Linux"
+    ],
+    "rating": 95,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "COMPLETED",
+    "slug": "half-life-2"
   },
   {
-    id: 223594,
-    title: 'Silent Hill 2',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/coavaf.webp',
-    release_year: 2024,
-    summary: 'Having received a letter from his deceased wife, James heads to where they shared so many memories: the fog-drenched town of Silent Hill.',
-    genres: ['Horror', 'Psychological Horror', 'Adventure', 'Mystery'],
-    platforms: ['PC', 'PlayStation 5'],
-    rating: 90.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'WISHLIST',
+    "id": 222341,
+    "title": "Silent Hill 2",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/coavaf.webp",
+    "release_year": 2024,
+    "summary": "Having received a letter from his deceased wife, James heads to where they shared so many memories: the fog-drenched town of Silent Hill.",
+    "genres": [
+      "Horror",
+      "Psychological Horror",
+      "Adventure",
+      "Mystery"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5"
+    ],
+    "rating": 90,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "WISHLIST",
+    "slug": "silent-hill-2--1"
   },
   {
-    id: 205858,
-    title: "Dragon's Dogma 2",
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co833w.webp',
-    release_year: 2024,
-    summary: 'A narrative-driven action-RPG that challenges players to choose their own experience – from the appearance of their Arisen to their Pawns and party approach.',
-    genres: ['Role-playing (RPG)', 'Adventure', 'Action'],
-    platforms: ['PC', 'PlayStation 5', 'Xbox Series X|S'],
-    rating: 87.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 115060,
+    "title": "Dragon's Dogma II",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co833w.webp",
+    "release_year": 2024,
+    "summary": "A narrative-driven action-RPG that challenges players to choose their own experience – from the appearance of their Arisen to their Pawns and party approach.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Adventure",
+      "Action"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S"
+    ],
+    "rating": 87,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "dragons-dogma-ii"
   },
   {
-    id: 138546,
-    title: 'Black Myth: Wukong',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co8h3y.webp',
-    release_year: 2024,
-    summary: 'An action RPG rooted in Chinese mythology. Set out as the Destined One to uncover the obscured truth beneath the veil of a glorious legend.',
-    genres: ['Action', 'Role-playing (RPG)', 'Adventure'],
-    platforms: ['PC', 'PlayStation 5'],
-    rating: 89.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'WISHLIST',
+    "id": 136879,
+    "title": "Black Myth: Wukong",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co8h3y.webp",
+    "release_year": 2024,
+    "summary": "An action RPG rooted in Chinese mythology. Set out as the Destined One to uncover the obscured truth beneath the veil of a glorious legend.",
+    "genres": [
+      "Action",
+      "Role-playing (RPG)",
+      "Adventure"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5"
+    ],
+    "rating": 89,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "WISHLIST",
+    "slug": "black-myth-wukong"
   },
   {
-    id: 204363,
-    title: 'Star Wars Jedi: Survivor',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5uzk.webp',
-    release_year: 2023,
-    summary: 'The story of Cal Kestis continues in this galaxy-spanning third-person action-adventure from Respawn Entertainment.',
-    genres: ['Action', 'Adventure', 'Sci-Fi'],
-    platforms: ['PC', 'PlayStation 5', 'Xbox Series X|S', 'PlayStation 4', 'Xbox One'],
-    rating: 88.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
+    "id": 201156,
+    "title": "Star Wars Jedi: Survivor",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5uzk.webp",
+    "release_year": 2023,
+    "summary": "The story of Cal Kestis continues in this galaxy-spanning third-person action-adventure from Respawn Entertainment.",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S",
+      "PlayStation 4",
+      "Xbox One"
+    ],
+    "rating": 88,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "star-wars-jedi-survivor"
   },
   {
-    id: 228498,
-    title: 'Armored Core VI: Fires of Rubicon',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/coc408.webp',
-    release_year: 2023,
-    summary: 'Combining FromSoftware’s longstanding expertise in mech games with their signature action gameplay, ARMORED CORE VI FIRES OF RUBICON brings a brand-new high-octane experience.',
-    genres: ['Action', 'Shooter', 'Sci-Fi', 'Mecha'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One'],
-    rating: 88.5,
-    game_modes: ['Single player', 'Multiplayer'],
-    defaultStatus: 'BACKLOG',
+    "id": 228542,
+    "title": "Armored Core VI: Fires of Rubicon",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/coc408.webp",
+    "release_year": 2023,
+    "summary": "Combining FromSoftware’s longstanding expertise in mech games with their signature action gameplay, ARMORED CORE VI FIRES OF RUBICON brings a brand-new high-octane experience.",
+    "genres": [
+      "Action",
+      "Shooter",
+      "Sci-Fi",
+      "Mecha"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Xbox One"
+    ],
+    "rating": 88.5,
+    "game_modes": [
+      "Single player",
+      "Multiplayer"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "armored-core-vi-fires-of-rubicon"
   },
   {
-    id: 151596,
-    title: 'Lies of P',
-    cover_url: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co6lxr.webp',
-    release_year: 2023,
-    summary: 'A thrilling souls-like that takes the story of Pinocchio, turns it on its head, and sets it against the darkly elegant backdrop of the Belle Époque era.',
-    genres: ['Role-playing (RPG)', 'Action', 'Souls-like', 'Dark Fantasy'],
-    platforms: ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One', 'Mac'],
-    rating: 89.0,
-    game_modes: ['Single player'],
-    defaultStatus: 'BACKLOG',
-  },
+    "id": 148241,
+    "title": "Lies of P",
+    "cover_url": "https://images.igdb.com/igdb/image/upload/t_cover_big/co6lxr.webp",
+    "release_year": 2023,
+    "summary": "A thrilling souls-like that takes the story of Pinocchio, turns it on its head, and sets it against the darkly elegant backdrop of the Belle Époque era.",
+    "genres": [
+      "Role-playing (RPG)",
+      "Action",
+      "Souls-like",
+      "Dark Fantasy"
+    ],
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "PlayStation 4",
+      "Xbox Series X|S",
+      "Xbox One",
+      "Mac"
+    ],
+    "rating": 89,
+    "game_modes": [
+      "Single player"
+    ],
+    "defaultStatus": "BACKLOG",
+    "slug": "lies-of-p"
+  }
 ];
+
+const EXTRA_TEST_GAME_TITLES = [
+  'Dark Souls Remastered',
+  'Dark Souls II: Scholar of the First Sin',
+  'Bloodborne: The Old Hunters',
+  'Demon\'s Souls Remake',
+  'The Witcher 2: Assassins of Kings',
+  'Hollow Knight: Silksong',
+  'Mass Effect Legendary Edition',
+  'Persona 3 Reload',
+  'Persona 4 Golden',
+  'Final Fantasy VII Rebirth',
+  'Final Fantasy XVI',
+  'Final Fantasy X/X-2 HD Remaster',
+  'Resident Evil 2 Remake',
+  'Resident Evil 3 Remake',
+  'Resident Evil Village',
+  'Resident Evil 7: Biohazard',
+  'Monster Hunter: World - Iceborne',
+  'Monster Hunter Rise: Sunbreak',
+  'Dragon\'s Dogma 2',
+  'Alan Wake 2',
+  'Control: Ultimate Edition',
+  'Metaphor: ReFantazio',
+  'Astro Bot',
+  'Silent Hill 2 Remake',
+  'Black Myth: Wukong',
+  'Stardew Valley',
+  'Terraria',
+  'Subnautica',
+  'Outer Wilds',
+  'Disco Elysium: The Final Cut',
+  'Divinity: Original Sin II',
+  'Pillars of Eternity II: Deadfire',
+  'Chrono Trigger',
+  'Castlevania: Symphony of the Night',
+  'Metroid Prime Remastered',
+  'Super Metroid',
+  'Ori and the Blind Forest',
+  'Ori and the Will of the Wisps',
+  'Cuphead: The Delicious Last Course',
+  'Dead Cells',
+  'Slay the Spire',
+  'Balatro',
+  'Vampire Survivors',
+  'Inscryption',
+  'Return of the Obra Dinn',
+  'Tunic',
+  'Sea of Stars',
+  'Chained Echoes',
+  'Octopath Traveler II',
+  'Xenoblade Chronicles: Definitive Edition',
+  'Xenoblade Chronicles 2',
+  'Xenoblade Chronicles 3',
+  'Fire Emblem: Three Houses',
+  'Astral Chain',
+  'Bayonetta 3',
+  'Nier: Replicant ver.1.22474487139',
+  'Devil May Cry 5: Special Edition',
+  'Hi-Fi RUSH',
+  'Doom (2016)',
+  'Wolfenstein II: The New Colossus',
+  'Prey (2017)',
+  'Dishonored 2',
+  'BioShock Infinite',
+  'BioShock Remastered',
+  'Deus Ex: Human Revolution',
+  'Deus Ex: Mankind Divided',
+  'Half-Life: Alyx',
+  'Portal: Companion Collection',
+  'Left 4 Dead 2',
+  'Titanfall 2',
+  'Apex Legends',
+  'It Takes Two',
+  'A Way Out',
+  'Split Fiction',
+  'Kingdom Come: Deliverance',
+  'Kingdom Come: Deliverance II',
+  'Ghostwire: Tokyo',
+  'Death Stranding Director\'s Cut',
+  'Metal Gear Solid V: The Phantom Pain',
+  'Metal Gear Solid Delta: Snake Eater',
+  'Yakuza: Like a Dragon',
+  'Like a Dragon: Infinite Wealth',
+  'Judgment',
+  'Lost Judgment',
+  'Sleeping Dogs: Definitive Edition',
+];
+
+/**
+ * Generates a 135-game catalog specifically for the local development test account:
+ * - 105 games in BACKLOG (to thoroughly test infinite scroll & filtering)
+ * - 12 games in COMPLETED
+ * - 10 games in PLAYING
+ * - 8 games in WISHLIST
+ */
+export function generateLocalTestCatalog(): SeedGame[] {
+  const result: SeedGame[] = [];
+
+  // Combine the 50 curated SEED_GAMES + 85 additional titles = 135 games total
+  const baseGames: SeedGame[] = [
+    ...SEED_GAMES,
+    ...EXTRA_TEST_GAME_TITLES.map((title, idx) => {
+      const template = SEED_GAMES[idx % SEED_GAMES.length];
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      return {
+        id: 900001 + idx,
+        title,
+        slug: `${slug}-${900001 + idx}`,
+        cover_url: template.cover_url,
+        release_year: 2012 + (idx % 14),
+        summary: `${title} — Edición de prueba local para validación de scroll infinito, filtros y drag & drop en NEXT.g.`,
+        genres: template.genres,
+        platforms: template.platforms,
+        rating: Math.round((82 + (idx % 16) + 0.5) * 10) / 10,
+        game_modes: template.game_modes,
+      };
+    }),
+  ];
+
+  baseGames.forEach((game, index) => {
+    let status: 'BACKLOG' | 'PLAYING' | 'COMPLETED' | 'WISHLIST' = 'BACKLOG';
+    if (index < 12) {
+      status = 'COMPLETED';
+    } else if (index < 22) {
+      status = 'PLAYING';
+    } else if (index < 30) {
+      status = 'WISHLIST';
+    } else {
+      // Indices 30..134 => 105 games in BACKLOG!
+      status = 'BACKLOG';
+    }
+
+    result.push({
+      ...game,
+      defaultStatus: status,
+    });
+  });
+
+  return result;
+}
+

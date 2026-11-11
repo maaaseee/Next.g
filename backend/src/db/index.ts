@@ -8,42 +8,11 @@
 
 import postgres from 'postgres';
 import { ENV } from '../config/env';
+import { runMigrations } from './migrate';
 
 export type SqlClient = ReturnType<typeof postgres>;
 
 let sqlInstance: SqlClient | null = null;
-
-const SCHEMA_SQL = `
-CREATE TABLE IF NOT EXISTS games (
-  id BIGINT PRIMARY KEY,
-  title TEXT NOT NULL,
-  slug TEXT,
-  cover_url TEXT,
-  release_year INTEGER,
-  summary TEXT,
-  genres JSONB DEFAULT '[]'::jsonb,
-  platforms JSONB DEFAULT '[]'::jsonb,
-  rating REAL,
-  game_modes JSONB DEFAULT '[]'::jsonb
-);
-
-CREATE TABLE IF NOT EXISTS user_games (
-  id SERIAL PRIMARY KEY,
-  game_id BIGINT NOT NULL REFERENCES games(id) ON DELETE CASCADE,
-  status VARCHAR(20) NOT NULL CHECK(status IN ('BACKLOG', 'PLAYING', 'COMPLETED', 'WISHLIST')),
-  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(game_id)
-);
-
-CREATE TABLE IF NOT EXISTS search_cache (
-  query_text TEXT PRIMARY KEY,
-  json_response JSONB NOT NULL,
-  timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_user_games_status ON user_games(status);
-`;
 
 export async function initDatabase(customUrl?: string): Promise<SqlClient> {
   if (sqlInstance && !customUrl) {
@@ -52,8 +21,13 @@ export async function initDatabase(customUrl?: string): Promise<SqlClient> {
 
   const connectionString = customUrl || ENV.DATABASE_URL;
 
-  // Determine if SSL is needed (Neon, Supabase, AWS require SSL; local docker usually does not)
-  const isSsl = connectionString.includes('sslmode=require') || connectionString.includes('neon.tech') || connectionString.includes('supabase.co');
+  // Determine if SSL is needed (Neon, Supabase, Azure, AWS require SSL; local docker usually does not)
+  const isSsl =
+    connectionString.includes('sslmode=require') ||
+    connectionString.includes('neon.tech') ||
+    connectionString.includes('supabase.co') ||
+    connectionString.includes('postgres.database.azure.com') ||
+    ENV.NODE_ENV === 'production';
 
   const sql = postgres(connectionString, {
     ssl: isSsl ? 'require' : false,
@@ -62,11 +36,8 @@ export async function initDatabase(customUrl?: string): Promise<SqlClient> {
     connect_timeout: 10,
   });
 
-  // Run schema creation
-  await sql.unsafe(SCHEMA_SQL);
-
-  // Ensure slug column exists for existing tables created before this update
-  await sql.unsafe(`ALTER TABLE games ADD COLUMN IF NOT EXISTS slug TEXT;`);
+  // Run versioned migrations safely with PostgreSQL advisory lock
+  await runMigrations(sql);
 
   if (!customUrl) {
     sqlInstance = sql;
