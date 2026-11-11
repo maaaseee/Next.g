@@ -1,0 +1,61 @@
+{
+  "lastUpdated": "Noviembre de 2026",
+  "version": "1.2",
+  "intro": "Bienvenido a NEXT.g. Al registrar una cuenta, acceder o utilizar nuestros servicios de catálogo, seguimiento de backlog de videojuegos y funciones de la comunidad, aceptas quedar vinculado por estos Términos y Condiciones.",
+  "sections": [
+    {
+      "id": "acceptance",
+      "number": 1,
+      "title": "Aceptación y Registro de Cuenta",
+      "paragraphs": [
+        "Para acceder a funciones interactivas como guardar videojuegos en tu biblioteca, gestionar estados (Backlog, Jugando, Completados), agregar valoraciones y participar en la ruleta, debes registrarte proporcionando información veraz (mediante correo electrónico, cuenta de Google o GitHub). Eres responsable de mantener la confidencialidad de tu cuenta."
+      ]
+    },
+    {
+      "id": "igdb-sources",
+      "number": 2,
+      "title": "Catálogo y Fuentes de Datos (IGDB / Twitch)",
+      "paragraphs": [
+        "La información de videojuegos, carátulas, capturas de pantalla, géneros y desarrolladores provienen de la API pública de IGDB (Twitch Interactive / Amazon). NEXT.g no reclama derechos de propiedad sobre las marcas, títulos o imágenes comerciales de los videojuegos indexados, los cuales pertenecen a sus respectivos desarrolladores y editores."
+      ]
+    },
+    {
+      "id": "conduct",
+      "number": 3,
+      "title": "Uso Permitido y Conducta del Usuario",
+      "paragraphs": [
+        "Al utilizar NEXT.g te comprometes a:"
+      ],
+      "list": [
+        "No utilizar la plataforma para fines ilegales o no autorizados.",
+        "No enviar contenido malicioso, virus o intentar vulnerar la seguridad de la API o la base de datos.",
+        "Mantener un trato respetuoso en tu perfil público de la comunidad gamer.",
+        "No realizar raspado automatizado masivo (scraping) que degrade el servicio para otros usuarios."
+      ]
+    },
+    {
+      "id": "community-profiles",
+      "number": 4,
+      "title": "Perfiles Públicos de la Comunidad",
+      "paragraphs": [
+        "Las listas de videojuegos de los usuarios en NEXT.g y sus estadísticas de juego pueden ser visibles para otros miembros y visitantes a través del buscador de la comunidad y enlaces de perfil público, fomentando el intercambio y la recomendación de videojuegos."
+      ]
+    },
+    {
+      "id": "warranty-disclaimer",
+      "number": 5,
+      "title": "Exclusión de Garantías y Responsabilidad",
+      "paragraphs": [
+        "El servicio se proporciona «tal cual» y «según disponibilidad». NEXT.g no garantiza que el servicio sea ininterrumpido, oportuno o libre de errores derivados de fallos en proveedores de conectividad o de la API externa de IGDB."
+      ]
+    },
+    {
+      "id": "termination",
+      "number": 6,
+      "title": "Modificación y Terminación",
+      "paragraphs": [
+        "Nos reservamos el derecho de actualizar estos términos en cualquier momento. El uso continuado de NEXT.g después de dichas modificaciones implicará la aceptación de los nuevos términos. Puedes cancelar tu cuenta en cualquier momento solicitándolo a soporte."
+      ]
+    }
+  ]
+}

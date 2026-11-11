@@ -1,0 +1,37 @@
+[
+  {
+    "id": "tier-lists",
+    "stepNumber": "01",
+    "title": "Sistema de Tierlists de Videojuegos",
+    "sentence": "Crea, personaliza y comparte rankings visuales por niveles (S, A, B, C, D, F) integrados con tu biblioteca y los filtros de la ruleta.",
+    "iconName": "ListOrdered"
+  },
+  {
+    "id": "diary-reviews",
+    "stepNumber": "02",
+    "title": "Diario de Juego, Calificaciones y Reseñas",
+    "sentence": "Registra horas jugadas, escribe reseñas con soporte Markdown y califica cada título del 1 al 10 para construir la valoración de la comunidad.",
+    "iconName": "BookOpen"
+  },
+  {
+    "id": "gamer-dna",
+    "stepNumber": "03",
+    "title": "Estadísticas del Jugador (Gamer DNA & Wrapped)",
+    "sentence": "Visualiza métricas avanzadas sobre tus géneros predilectos, plataformas principales y genera tu resumen anual de partidas estilo Wrapped.",
+    "iconName": "BarChart3"
+  },
+  {
+    "id": "custom-collections",
+    "stepNumber": "05",
+    "title": "Colecciones Temáticas y Listas Personalizadas",
+    "sentence": "Organiza listas temáticas más allá del backlog canónico, como juegos cortos para el fin de semana o sagas cooperativas con amigos.",
+    "iconName": "Layers"
+  },
+  {
+    "id": "social-feed",
+    "stepNumber": "06",
+    "title": "Feed Social de Actividad y Seguidos",
+    "sentence": "Sigue a otros miembros de la comunidad para descubrir qué están jugando, leer sus valoraciones y enterarte de sus partidas completadas.",
+    "iconName": "Users"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "iconName": "Gamepad2",
+    "question": "¿Qué es NEXT.g y para qué sirve?",
+    "answer": "NEXT.g es un gestor inteligente de videojuegos y organizador de backlog. Te permite llevar el control de tus títulos pendientes, en progreso y completados, además de ayudarte a decidir qué jugar mediante ruletas aleatorias."
+  },
+  {
+    "iconName": "Shield",
+    "question": "¿Por qué necesito registrar una cuenta?",
+    "answer": "Registrar una cuenta personal te permite guardar de forma permanente tu colección privada de videojuegos, clasificar títulos en Backlog, Jugando, Completados o Deseados, fijar tus juegos favoritos y tener un perfil público gamer."
+  },
+  {
+    "iconName": "Search",
+    "question": "¿De dónde proviene la información de los videojuegos?",
+    "answer": "Toda la información, carátulas, capturas de pantalla, géneros y desarrolladores provienen en tiempo real de la base de datos oficial de IGDB (Twitch Interactive / Amazon), garantizando datos actualizados y fichas completas."
+  },
+  {
+    "iconName": "Users",
+    "question": "¿Cómo funciona la búsqueda y la comunidad?",
+    "answer": "En la pantalla de búsqueda puedes alternar entre buscar títulos de videojuegos en IGDB o buscar otros jugadores de la comunidad NEXT.g para explorar qué están jugando, qué títulos completaron y descubrir nuevas recomendaciones."
+  },
+  {
+    "iconName": "Dices",
+    "question": "¿Cómo funciona la ruleta de selección?",
+    "answer": "La ruleta interactiva analiza los videojuegos de tu biblioteca personal (por ejemplo, aquellos en Backlog o con un género específico) y selecciona aleatoriamente el próximo juego al que debes dedicarle tu tiempo de juego."
+  },
+  {
+    "iconName": "Palette",
+    "question": "¿Puedo personalizar los temas visuales?",
+    "answer": "¡Sí! En la barra superior encontrarás el selector de temas con múltiples paletas de colores (Default, Cyberpunk, Forest, Crimson, etc.) para adaptar NEXT.g a tu estilo visual preferido."
+  }
+]

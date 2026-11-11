@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#121820" />
+      <stop offset="100%" stop-color="#080c10" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="680" fill="url(#sGrad)" />
+
+  <!-- Navbar -->
+  <rect x="0" y="0" width="1200" height="60" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+  <text x="40" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="1">NEXT<tspan fill="#38bdf8">.g</tspan></text>
+  <rect x="180" y="16" width="180" height="28" rx="2" fill="#38bdf8" />
+  <text x="195" y="35" fill="#000000" font-family="system-ui, sans-serif" font-weight="800" font-size="12">SINCRONIZACIÓN AUTOMÁTICA</text>
+
+  <!-- Big Roadmap Tag on Top Right -->
+  <rect x="960" y="16" width="180" height="28" rx="2" fill="#38bdf8" fill-opacity="0.25" stroke="#38bdf8" stroke-width="1" />
+  <text x="975" y="35" fill="#7dd3fc" font-family="monospace" font-weight="bold" font-size="11">🚀 ROADMAP V2.0</text>
+
+  <g transform="translate(60, 90)">
+    <text x="0" y="24" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22">CUENTAS VINCULADAS & IMPORTACIÓN DE HORAS</text>
+    <text x="0" y="48" fill="#9ca3af" font-family="system-ui, sans-serif" font-size="13">Importa automáticamente tus compras, horas registradas y trofeos sin tener que cargar nada a mano.</text>
+  </g>
+
+  <!-- 3 Big Service Cards -->
+  <!-- Service 1: Steam -->
+  <g transform="translate(60, 160)">
+    <rect width="340" height="460" rx="2" fill="#182029" stroke="#26384a" stroke-width="1" />
+    <circle cx="50" cy="50" r="22" fill="#1b2838" stroke="#66c0f4" stroke-width="2" />
+    <text x="50" y="56" text-anchor="middle" fill="#66c0f4" font-family="system-ui, sans-serif" font-weight="900" font-size="14">S</text>
+    <text x="85" y="46" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="16">Steam Network</text>
+    <text x="85" y="64" fill="#10b981" font-family="monospace" font-weight="bold" font-size="11">● CONECTADO & SINCRONIZADO</text>
+
+    <!-- Stats -->
+    <rect x="24" y="90" width="292" height="180" rx="2" fill="#0f141a" stroke="#1d2630" stroke-width="1" />
+    <text x="40" y="125" fill="#9ca3af" font-family="monospace" font-size="11">JUEGOS EN BIBLIOTECA STEAM</text>
+    <text x="40" y="155" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="28">248 TÍTULOS</text>
+
+    <text x="40" y="195" fill="#9ca3af" font-family="monospace" font-size="11">HORAS JUGADAS TOTALES</text>
+    <text x="40" y="225" fill="#38bdf8" font-family="system-ui, sans-serif" font-weight="900" font-size="28">1,842 HS</text>
+    <text x="40" y="250" fill="#10b981" font-family="monospace" font-size="11">14 Juegos al 100% de logros</text>
+
+    <!-- Last Sync -->
+    <text x="24" y="300" fill="#6b7280" font-family="monospace" font-size="11">Última sync: Hace 12 minutos</text>
+
+    <rect x="24" y="380" width="292" height="44" rx="2" fill="#253545" />
+    <text x="170" y="407" text-anchor="middle" fill="#66c0f4" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">Sincronizar ahora</text>
+  </g>
+
+  <!-- Service 2: PlayStation Network -->
+  <g transform="translate(430, 160)">
+    <rect width="340" height="460" rx="2" fill="#182029" stroke="#26384a" stroke-width="1" />
+    <circle cx="50" cy="50" r="22" fill="#003791" stroke="#0070d1" stroke-width="2" />
+    <text x="50" y="56" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="14">PS</text>
+    <text x="85" y="46" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="16">PlayStation Network</text>
+    <text x="85" y="64" fill="#10b981" font-family="monospace" font-weight="bold" font-size="11">● CONECTADO & SINCRONIZADO</text>
+
+    <!-- Stats -->
+    <rect x="24" y="90" width="292" height="180" rx="2" fill="#0f141a" stroke="#1d2630" stroke-width="1" />
+    <text x="40" y="125" fill="#9ca3af" font-family="monospace" font-size="11">TROFEOS DE PLAYSTATION</text>
+    <text x="40" y="155" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="28">1,420 TROFEOS</text>
+
+    <text x="40" y="195" fill="#9ca3af" font-family="monospace" font-size="11">PLATINOS CONSEGUIDOS</text>
+    <text x="40" y="225" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="900" font-size="28">🏆 18 PLATINOS</text>
+    <text x="40" y="250" fill="#38bdf8" font-family="monospace" font-size="11">Bloodborne · Elden Ring · God of War</text>
+
+    <text x="24" y="300" fill="#6b7280" font-family="monospace" font-size="11">Última sync: Hace 2 horas</text>
+    <rect x="24" y="380" width="292" height="44" rx="2" fill="#253545" />
+    <text x="170" y="407" text-anchor="middle" fill="#38bdf8" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">Sincronizar ahora</text>
+  </g>
+
+  <!-- Service 3: Xbox Network -->
+  <g transform="translate(800, 160)">
+    <rect width="340" height="460" rx="2" fill="#182029" stroke="#26384a" stroke-width="1" />
+    <circle cx="50" cy="50" r="22" fill="#107c10" stroke="#52b043" stroke-width="2" />
+    <text x="50" y="56" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="14">X</text>
+    <text x="85" y="46" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="16">Xbox & Game Pass</text>
+    <text x="85" y="64" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">○ VINCULACIÓN DISPONIBLE</text>
+
+    <!-- Stats -->
+    <rect x="24" y="90" width="292" height="180" rx="2" fill="#0f141a" stroke="#1d2630" stroke-width="1" />
+    <text x="40" y="145" fill="#9ca3af" font-family="system-ui, sans-serif" font-size="13">Sincroniza tu Gamertag, puntos de Gamerscore y catálogo de Xbox Game Pass Ultimate.</text>
+
+    <rect x="24" y="380" width="292" height="44" rx="2" fill="#107c10" />
+    <text x="170" y="407" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">Vincular cuenta Xbox</text>
+  </g>
+</svg>

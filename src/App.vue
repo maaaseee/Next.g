@@ -1,27 +1,25 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRouter, useRoute } from 'vue-router';
 import Navbar from '@/components/common/Navbar.vue';
 import Footer from '@/components/common/Footer.vue';
-import SearchModal from '@/components/catalog/SearchModal.vue';
-import FaqModal from '@/components/common/FaqModal.vue';
 import ToastContainer from '@/components/common/ToastContainer.vue';
+import FavoriteGamesModal from '@/components/auth/FavoriteGamesModal.vue';
 import { useTheme } from '@/composables/useTheme';
 import { useGamesStore } from '@/stores/gamesStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const { initTheme } = useTheme();
+const router = useRouter();
+const route = useRoute();
 const gamesStore = useGamesStore();
+const authStore = useAuthStore();
 const isInitialLoading = ref(true);
-const isFaqModalOpen = ref(false);
 
 function handleGlobalKeydown(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
-    if (gamesStore.isSearchModalOpen) {
-      gamesStore.closeSearchModal();
-    } else {
-      gamesStore.openSearchModal();
-    }
+    router.push('/search');
   }
 }
 
@@ -29,6 +27,8 @@ onMounted(async () => {
   initTheme();
   const startTime = Date.now();
   try {
+    // Check for incoming OAuth tokens or active session
+    await authStore.initAuth();
     await gamesStore.fetchGames();
   } finally {
     const elapsed = Date.now() - startTime;
@@ -36,6 +36,8 @@ onMounted(async () => {
     const remaining = Math.max(0, minDuration - elapsed);
     setTimeout(() => {
       isInitialLoading.value = false;
+      gamesStore.isAppReady = true;
+      window.dispatchEvent(new CustomEvent('nextg:app-ready'));
     }, remaining);
   }
   window.addEventListener('keydown', handleGlobalKeydown);
@@ -76,30 +78,18 @@ onUnmounted(() => {
       </div>
     </Transition>
 
-    <Navbar
-      @open-search="gamesStore.openSearchModal"
-      @open-faq="isFaqModalOpen = true"
-    />
+    <Navbar v-if="!route.meta.hideNavbar" />
 
-    <main class="flex-1 flex flex-col">
+    <main class="flex-1 flex flex-col w-full">
       <RouterView />
     </main>
 
-    <Footer />
-
-    <!-- Global Search Modal accessible from Navbar and shortcut Ctrl+K -->
-    <SearchModal
-      :is-open="gamesStore.isSearchModalOpen"
-      @close="gamesStore.closeSearchModal"
-    />
-
-    <!-- FAQ / Help Modal -->
-    <FaqModal
-      :is-open="isFaqModalOpen"
-      @close="isFaqModalOpen = false"
-    />
+    <Footer v-if="!route.meta.hideFooter" />
 
     <!-- Global Toast Notifications -->
     <ToastContainer />
+
+    <!-- Onboarding Modal (Netflix-style Favorite Games Selector) -->
+    <FavoriteGamesModal />
   </div>
 </template>

@@ -1,0 +1,18 @@
+{
+  "genres": [
+    "Acción",
+    "Aventura",
+    "RPG",
+    "Shooter",
+    "Indie",
+    "Estrategia",
+    "Carreras",
+    "Plataformas"
+  ],
+  "platforms": [
+    "PC",
+    "PlayStation 5",
+    "Nintendo Switch",
+    "Xbox Series X"
+  ]
+}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router';
 import { Code2, ExternalLink, Github, Sparkles } from 'lucide-vue-next';
 
 const APP_VERSION = __APP_VERSION__;
@@ -39,7 +40,7 @@ const CURRENT_YEAR = new Date().getFullYear();
         <div class="flex items-center gap-2 text-xs" :style="{ color: 'var(--app-text-muted)' }">
           <span class="font-medium">Powered by</span>
           <a
-            href="https://rawg.io/apidocs"
+            href="https://www.igdb.com/api"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-bold text-xs border transition-all duration-150 hover:brightness-110"
@@ -50,7 +51,7 @@ const CURRENT_YEAR = new Date().getFullYear();
             }"
           >
             <Sparkles class="w-3.5 h-3.5" :style="{ color: 'var(--app-primary)' }" />
-            <span>RAWG API</span>
+            <span>IGDB API</span>
             <ExternalLink class="w-3 h-3 opacity-60" />
           </a>
         </div>
@@ -92,7 +93,19 @@ const CURRENT_YEAR = new Date().getFullYear();
         <div class="flex items-center gap-2">
           <span>&copy; {{ CURRENT_YEAR }} NEXT.g</span>
           <span>•</span>
-          <span>Todos los datos e imágenes provienen de RAWG.</span>
+          <span>Todos los datos e imágenes provienen de IGDB vía Twitch Developer Portal.</span>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-sans">
+          <RouterLink to="/faq" class="hover:underline transition-colors" :style="{ color: 'var(--app-text-muted)' }">
+            Preguntas Frecuentes
+          </RouterLink>
+          <RouterLink to="/terms" class="hover:underline transition-colors" :style="{ color: 'var(--app-text-muted)' }">
+            Términos
+          </RouterLink>
+          <RouterLink to="/privacy" class="hover:underline transition-colors" :style="{ color: 'var(--app-text-muted)' }">
+            Privacidad
+          </RouterLink>
         </div>
       </div>
     </div>

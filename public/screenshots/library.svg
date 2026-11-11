@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#121316" />
+      <stop offset="100%" stop-color="#0a0a0c" />
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="680" fill="url(#bgGrad)" />
+
+  <!-- App Header / Navbar -->
+  <rect x="0" y="0" width="1200" height="60" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+  <text x="40" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="1">NEXT<tspan fill="#ec4899">.g</tspan></text>
+  
+  <!-- Nav items -->
+  <rect x="180" y="16" width="110" height="28" rx="2" fill="#26282e" />
+  <text x="200" y="35" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="12">BIBLIOTECA</text>
+  <text x="320" y="35" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="600" font-size="12">EXPLORAR</text>
+  <text x="420" y="35" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="600" font-size="12">RULETA</text>
+
+  <!-- Search input in nav -->
+  <rect x="850" y="14" width="220" height="32" rx="2" fill="#121316" stroke="#2e323b" stroke-width="1" />
+  <text x="870" y="35" fill="#6b7280" font-family="system-ui, sans-serif" font-size="12">Buscar en catálogo... (Ctrl+K)</text>
+  <circle cx="1110" cy="30" r="14" fill="#ec4899" />
+  <text x="1105" y="35" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">M</text>
+
+  <!-- Subheader with Status Tabs -->
+  <rect x="40" y="80" width="1120" height="50" rx="2" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+  <rect x="45" y="85" width="130" height="40" rx="2" fill="#10b981" />
+  <text x="65" y="110" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="12">JUGANDO (4)</text>
+
+  <rect x="185" y="85" width="130" height="40" rx="2" fill="#20232a" />
+  <text x="205" y="110" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="700" font-size="12">BACKLOG (28)</text>
+
+  <rect x="325" y="85" width="150" height="40" rx="2" fill="#20232a" />
+  <text x="345" y="110" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="700" font-size="12">COMPLETADOS (64)</text>
+
+  <rect x="485" y="85" width="140" height="40" rx="2" fill="#20232a" />
+  <text x="505" y="110" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="700" font-size="12">DESEADOS (12)</text>
+
+  <!-- Filter pills on right -->
+  <text x="960" y="110" fill="#6b7280" font-family="monospace" font-size="11">FILTRO: PC · PS5 · RPG</text>
+
+  <!-- 5 Game Cards Grid in Library -->
+  <!-- Game 1: Elden Ring -->
+  <g transform="translate(40, 150)">
+    <rect width="208" height="290" rx="2" fill="#1e2128" stroke="#333742" stroke-width="1" />
+    <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" width="208" height="240" preserveAspectRatio="xMidYMid slice" />
+    <rect x="135" y="10" width="63" height="22" rx="2" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="0.5" />
+    <text x="145" y="25" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="bold" font-size="11">★ 95.5</text>
+    <rect x="0" y="240" width="208" height="50" fill="#181a1f" />
+    <text x="12" y="260" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="13">Elden Ring</text>
+    <text x="12" y="278" fill="#10b981" font-family="monospace" font-weight="bold" font-size="10">JUGANDO · 64h</text>
+  </g>
+
+  <!-- Game 2: Baldur's Gate 3 -->
+  <g transform="translate(268, 150)">
+    <rect width="208" height="290" rx="2" fill="#1e2128" stroke="#333742" stroke-width="1" />
+    <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg" width="208" height="240" preserveAspectRatio="xMidYMid slice" />
+    <rect x="135" y="10" width="63" height="22" rx="2" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="0.5" />
+    <text x="145" y="25" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="bold" font-size="11">★ 96.0</text>
+    <rect x="0" y="240" width="208" height="50" fill="#181a1f" />
+    <text x="12" y="260" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="13">Baldur's Gate 3</text>
+    <text x="12" y="278" fill="#10b981" font-family="monospace" font-weight="bold" font-size="10">JUGANDO · Acto II</text>
+  </g>
+
+  <!-- Game 3: Cyberpunk 2077 -->
+  <g transform="translate(496, 150)">
+    <rect width="208" height="290" rx="2" fill="#1e2128" stroke="#333742" stroke-width="1" />
+    <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co2mjs.jpg" width="208" height="240" preserveAspectRatio="xMidYMid slice" />
+    <rect x="135" y="10" width="63" height="22" rx="2" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="0.5" />
+    <text x="145" y="25" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="bold" font-size="11">★ 88.0</text>
+    <rect x="0" y="240" width="208" height="50" fill="#181a1f" />
+    <text x="12" y="260" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="13">Cyberpunk 2077</text>
+    <text x="12" y="278" fill="#10b981" font-family="monospace" font-weight="bold" font-size="10">JUGANDO · Phantom Liberty</text>
+  </g>
+
+  <!-- Game 4: Hollow Knight -->
+  <g transform="translate(724, 150)">
+    <rect width="208" height="290" rx="2" fill="#1e2128" stroke="#333742" stroke-width="1" />
+    <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co1rgi.jpg" width="208" height="240" preserveAspectRatio="xMidYMid slice" />
+    <rect x="135" y="10" width="63" height="22" rx="2" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="0.5" />
+    <text x="145" y="25" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="bold" font-size="11">★ 92.0</text>
+    <rect x="0" y="240" width="208" height="50" fill="#181a1f" />
+    <text x="12" y="260" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="13">Hollow Knight</text>
+    <text x="12" y="278" fill="#f59e0b" font-family="monospace" font-weight="bold" font-size="10">BACKLOG · 107%</text>
+  </g>
+
+  <!-- Game 5: The Witcher 3 -->
+  <g transform="translate(952, 150)">
+    <rect width="208" height="290" rx="2" fill="#1e2128" stroke="#333742" stroke-width="1" />
+    <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg" width="208" height="240" preserveAspectRatio="xMidYMid slice" />
+    <rect x="135" y="10" width="63" height="22" rx="2" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="0.5" />
+    <text x="145" y="25" fill="#f59e0b" font-family="system-ui, sans-serif" font-weight="bold" font-size="11">★ 95.0</text>
+    <rect x="0" y="240" width="208" height="50" fill="#181a1f" />
+    <text x="12" y="260" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="13">The Witcher 3</text>
+    <text x="12" y="278" fill="#38bdf8" font-family="monospace" font-weight="bold" font-size="10">COMPLETADO · 140h</text>
+  </g>
+
+  <!-- Bottom Drag & Drop Action Banner -->
+  <g transform="translate(40, 470)">
+    <rect width="1120" height="150" rx="2" fill="#15171d" stroke="#282c37" stroke-width="1" stroke-dasharray="4" />
+    <text x="560" y="535" text-anchor="middle" fill="#ec4899" font-family="system-ui, sans-serif" font-weight="800" font-size="18">ARRASTRA Y SUELTA CUALQUIER TÍTULO ENTRE ESTADOS</text>
+    <text x="560" y="565" text-anchor="middle" fill="#9ca3af" font-family="system-ui, sans-serif" font-size="13">La biblioteca se actualiza instantáneamente con sincronización automática en la base de datos.</text>
+  </g>
+</svg>

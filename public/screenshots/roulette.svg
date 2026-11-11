@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rBgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141118" />
+      <stop offset="100%" stop-color="#09080c" />
+    </linearGradient>
+    <radialGradient id="wheelGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="680" fill="url(#rBgGrad)" />
+
+  <!-- Navbar -->
+  <rect x="0" y="0" width="1200" height="60" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+  <text x="40" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="1">NEXT<tspan fill="#ec4899">.g</tspan></text>
+  <rect x="400" y="16" width="100" height="28" rx="2" fill="#ec4899" />
+  <text x="425" y="35" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="12">RULETA</text>
+
+  <!-- Left Sidebar Filters -->
+  <g transform="translate(40, 80)">
+    <rect width="320" height="540" rx="2" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+    <text x="24" y="35" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="15">CONFIGURACIÓN DE RULETA</text>
+    
+    <text x="24" y="75" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">MODO DE SELECCIÓN</text>
+    <rect x="24" y="85" width="272" height="34" rx="2" fill="#ec4899" />
+    <text x="36" y="107" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">● Rueda Clásica (Física)</text>
+    <rect x="24" y="125" width="272" height="34" rx="2" fill="#20232a" />
+    <text x="36" y="147" fill="#9ca3af" font-family="system-ui, sans-serif" font-weight="bold" font-size="12">○ Tragamonedas (Slots)</text>
+
+    <text x="24" y="195" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">FILTRAR POR PLATAFORMA</text>
+    <rect x="24" y="205" width="80" height="28" rx="2" fill="#10b981" />
+    <text x="36" y="223" fill="#ffffff" font-family="monospace" font-weight="bold" font-size="11">PC (18)</text>
+    <rect x="110" y="205" width="85" height="28" rx="2" fill="#26282e" />
+    <text x="122" y="223" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">PS5 (12)</text>
+    <rect x="200" y="205" width="96" height="28" rx="2" fill="#26282e" />
+    <text x="212" y="223" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">SWITCH (6)</text>
+
+    <text x="24" y="270" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">FILTRAR POR GÉNERO</text>
+    <rect x="24" y="280" width="130" height="28" rx="2" fill="#ec4899" />
+    <text x="36" y="298" fill="#ffffff" font-family="monospace" font-weight="bold" font-size="11">RPG / Acción</text>
+    <rect x="160" y="280" width="136" height="28" rx="2" fill="#26282e" />
+    <text x="172" y="298" fill="#9ca3af" font-family="monospace" font-weight="bold" font-size="11">Metroidvania</text>
+
+    <rect x="24" y="440" width="272" height="50" rx="2" fill="#f59e0b" />
+    <text x="160" y="471" text-anchor="middle" fill="#000000" font-family="system-ui, sans-serif" font-weight="900" font-size="14">¡GIRAR RULETA AHORA!</text>
+  </g>
+
+  <!-- Center Roulette Wheel -->
+  <g transform="translate(760, 350)">
+    <!-- Wheel Glow -->
+    <circle cx="0" cy="0" r="260" fill="url(#wheelGlow)" />
+    
+    <!-- Outer Wheel Rim -->
+    <circle cx="0" cy="0" r="220" fill="#181a1f" stroke="#ec4899" stroke-width="4" />
+    
+    <!-- Wheel Slices (Wedges) -->
+    <path d="M 0 0 L 0 -220 A 220 220 0 0 1 190.5 -110 Z" fill="#ec4899" />
+    <text x="60" y="-100" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(30, 60, -100)">Elden Ring</text>
+
+    <path d="M 0 0 L 190.5 -110 A 220 220 0 0 1 190.5 110 Z" fill="#8b5cf6" />
+    <text x="110" y="10" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(90, 110, 10)">Baldur's Gate 3</text>
+
+    <path d="M 0 0 L 190.5 110 A 220 220 0 0 1 0 220 Z" fill="#3b82f6" />
+    <text x="60" y="100" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(150, 60, 100)">Cyberpunk 2077</text>
+
+    <path d="M 0 0 L 0 220 A 220 220 0 0 1 -190.5 110 Z" fill="#10b981" />
+    <text x="-60" y="100" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(-150, -60, 100)">Hades II</text>
+
+    <path d="M 0 0 L -190.5 110 A 220 220 0 0 1 -190.5 -110 Z" fill="#f59e0b" />
+    <text x="-110" y="10" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(-90, -110, 10)">Hollow Knight</text>
+
+    <path d="M 0 0 L -190.5 -110 A 220 220 0 0 1 0 -220 Z" fill="#ef4444" />
+    <text x="-60" y="-100" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="bold" font-size="12" transform="rotate(-30, -60, -100)">The Witcher 3</text>
+
+    <!-- Center Hub -->
+    <circle cx="0" cy="0" r="45" fill="#181a1f" stroke="#ffffff" stroke-width="2" />
+    <circle cx="0" cy="0" r="15" fill="#ec4899" />
+
+    <!-- Pointer -->
+    <polygon points="0,-240 -15,-210 15,-210" fill="#ffffff" stroke="#ec4899" stroke-width="2" />
+  </g>
+</svg>

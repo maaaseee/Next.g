@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "title": "The Witcher 3",
+    "genre": "Action RPG",
+    "rating": 9.4,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg"
+  },
+  {
+    "id": "2",
+    "title": "Cyberpunk 2077",
+    "genre": "Sci-Fi RPG",
+    "rating": 8.8,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2mdf.jpg"
+  },
+  {
+    "id": "3",
+    "title": "Elden Ring",
+    "genre": "Soulsborne",
+    "rating": 9.6,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg"
+  },
+  {
+    "id": "4",
+    "title": "Hollow Knight",
+    "genre": "Metroidvania",
+    "rating": 9.2,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co93d7.jpg"
+  },
+  {
+    "id": "5",
+    "title": "God of War Ragnarök",
+    "genre": "Adventure",
+    "rating": 9.5,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co5s5v.jpg"
+  },
+  {
+    "id": "6",
+    "title": "Baldur’s Gate 3",
+    "genre": "cRPG",
+    "rating": 9.6,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg"
+  },
+  {
+    "id": "7",
+    "title": "Red Dead Redemption 2",
+    "genre": "Open World",
+    "rating": 9.7,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg"
+  },
+  {
+    "id": "8",
+    "title": "Hades II",
+    "genre": "Roguelike",
+    "rating": 9.3,
+    "cover": "https://images.igdb.com/igdb/image/upload/t_cover_big/co8300.jpg"
+  }
+]

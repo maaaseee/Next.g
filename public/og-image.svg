@@ -1,4 +1,4 @@
-﻿<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0b0d14"/>
@@ -64,7 +64,7 @@
 
       <!-- Badge 3 -->
       <rect x="440" y="0" width="200" height="48" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
-      <text x="540" y="30" fill="#e2e8f0" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="600" text-anchor="middle">&#9889; RAWG Database</text>
+      <text x="540" y="30" fill="#e2e8f0" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="600" text-anchor="middle">&#9889; IGDB Database</text>
     </g>
 
     <!-- Graphic Roulette & Controller Mockup on Right Side -->

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c131a" />
+      <stop offset="100%" stop-color="#0d090c" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="680" fill="url(#tGrad)" />
+
+  <!-- Navbar -->
+  <rect x="0" y="0" width="1200" height="60" fill="#181a1f" stroke="#26282e" stroke-width="1" />
+  <text x="40" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="1">NEXT<tspan fill="#f43f5e">.g</tspan></text>
+  <rect x="180" y="16" width="160" height="28" rx="2" fill="#f43f5e" />
+  <text x="195" y="35" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="700" font-size="12">CREADOR DE TIER LISTS</text>
+
+  <!-- Big Roadmap Tag on Top Right -->
+  <rect x="960" y="16" width="180" height="28" rx="2" fill="#f43f5e" fill-opacity="0.25" stroke="#f43f5e" stroke-width="1" />
+  <text x="975" y="35" fill="#fda4af" font-family="monospace" font-weight="bold" font-size="11">🚀 ROADMAP V1.3</text>
+
+  <!-- Header info -->
+  <g transform="translate(60, 90)">
+    <text x="0" y="24" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="22">TIER LIST: MEJORES OBRAS MAESTRAS DEL GAMING</text>
+    <text x="0" y="48" fill="#9ca3af" font-family="system-ui, sans-serif" font-size="13">Creado por @MaxeGamer · 2,410 Votos de la Comunidad · Exportable a PNG y Redes Sociales</text>
+  </g>
+
+  <!-- Tier List Rows -->
+  <g transform="translate(60, 160)">
+    <!-- S TIER (God Tier) -->
+    <g transform="translate(0, 0)">
+      <rect width="100" height="100" rx="2" fill="#ef4444" />
+      <text x="50" y="62" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="36">S</text>
+      <rect x="105" y="0" width="975" height="100" rx="2" fill="#181419" stroke="#2d212b" stroke-width="1" />
+      <!-- Games in S Tier -->
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg" x="115" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg" x="185" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg" x="255" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co1rgi.jpg" x="325" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+    </g>
+
+    <!-- A TIER -->
+    <g transform="translate(0, 110)">
+      <rect width="100" height="100" rx="2" fill="#f59e0b" />
+      <text x="50" y="62" text-anchor="middle" fill="#000000" font-family="system-ui, sans-serif" font-weight="900" font-size="36">A</text>
+      <rect x="105" y="0" width="975" height="100" rx="2" fill="#181419" stroke="#2d212b" stroke-width="1" />
+      <!-- Games in A Tier -->
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co2mjs.jpg" x="115" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.jpg" x="185" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+      <image href="https://images.igdb.com/igdb/image/upload/t_cover_big/co203u.jpg" x="255" y="5" width="60" height="90" preserveAspectRatio="xMidYMid slice" />
+    </g>
+
+    <!-- B TIER -->
+    <g transform="translate(0, 220)">
+      <rect width="100" height="100" rx="2" fill="#10b981" />
+      <text x="50" y="62" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="36">B</text>
+      <rect x="105" y="0" width="975" height="100" rx="2" fill="#181419" stroke="#2d212b" stroke-width="1" />
+      <text x="130" y="55" fill="#6b7280" font-family="system-ui, sans-serif" font-size="13">Arrastra juegos desde tu biblioteca para añadirlos a este nivel...</text>
+    </g>
+
+    <!-- C TIER -->
+    <g transform="translate(0, 330)">
+      <rect width="100" height="100" rx="2" fill="#3b82f6" />
+      <text x="50" y="62" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="36">C</text>
+      <rect x="105" y="0" width="975" height="100" rx="2" fill="#181419" stroke="#2d212b" stroke-width="1" />
+    </g>
+  </g>
+</svg>

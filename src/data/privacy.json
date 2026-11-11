@@ -1,0 +1,62 @@
+{
+  "lastUpdated": "Noviembre de 2026",
+  "version": "1.2",
+  "intro": "En NEXT.g nos tomamos muy en serio la privacidad y protección de tus datos personales. Esta política detalla qué datos recopilamos, cómo los usamos y los mecanismos que tienes para controlarlos.",
+  "sections": [
+    {
+      "id": "collected-info",
+      "number": 1,
+      "title": "Información que Recopilamos",
+      "iconName": "Database",
+      "paragraphs": [
+        "Recopilamos únicamente la información necesaria para brindarte la mejor experiencia de gestión de backlog:"
+      ],
+      "list": [
+        "Datos de Cuenta: Nombre, dirección de correo electrónico y contraseña encriptada (con hash bcrypt). En caso de autenticarte con Google o GitHub, recibimos tu identificador de perfil, nombre público y avatar.",
+        "Colección de Juegos: Videojuegos que agregas a tu biblioteca, su estado (Jugando, Backlog, Completado, Deseado), notas y tus 3 videojuegos favoritos elegidos en el onboarding.",
+        "Preferencias del Sistema: Tema visual seleccionado (Default, Cyberpunk, Forest, etc.) almacenado en tu navegador."
+      ]
+    },
+    {
+      "id": "storage",
+      "number": 2,
+      "title": "Almacenamiento Local y Sesión",
+      "iconName": "Lock",
+      "paragraphs": [
+        "NEXT.g utiliza cookies seguras HttpOnly y almacenamiento local en tu navegador para mantener activa tu sesión:"
+      ],
+      "list": [
+        "Autenticación por Cookies: Las credenciales de sesión se gestionan mediante cookies HttpOnly seguras con SameSite, evitando su exposición al entorno de scripts del navegador.",
+        "Si marcas 'Recuérdame': Tu correo electrónico se recuerda en el navegador para agilizar futuros inicios de sesión.",
+        "No utilizamos cookies de seguimiento publicitario de terceros ni comercializamos tus datos."
+      ]
+    },
+    {
+      "id": "visibility",
+      "number": 3,
+      "title": "Visibilidad Comunitaria y Privacidad",
+      "iconName": "Eye",
+      "paragraphs": [
+        "Tu nombre de usuario, avatar público y la lista de títulos que juegas o has completado son accesibles para otros usuarios mediante la barra de búsqueda de la comunidad y tu enlace de perfil. Tu correo electrónico y contraseñas nunca son compartidos públicamente ni mostrados a terceros."
+      ]
+    },
+    {
+      "id": "security",
+      "number": 4,
+      "title": "Seguridad de la Información",
+      "iconName": "ShieldCheck",
+      "paragraphs": [
+        "Implementamos medidas técnicas y organizativas para proteger tus datos contra accesos no autorizados, incluyendo cifrado SSL/TLS en tránsito, autenticación mediante tokens JWT y hashing seguro de contraseñas con bcrypt."
+      ]
+    },
+    {
+      "id": "rights",
+      "number": 5,
+      "title": "Tus Derechos",
+      "iconName": "ShieldCheck",
+      "paragraphs": [
+        "Puedes solicitar en cualquier momento la consulta, rectificación o eliminación total de tu cuenta y los datos asociados de tu biblioteca escribiéndonos o a través de la configuración de perfil."
+      ]
+    }
+  ]
+}
