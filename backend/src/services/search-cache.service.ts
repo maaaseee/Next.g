@@ -1,7 +1,7 @@
 /**
  * Hybrid In-Memory & Persistent SQLite Search Cache Service.
  * 
- * Protects external RAWG/IGDB API quotas and drastically reduces search latency by:
+ * Protects external IGDB API quotas and drastically reduces search latency by:
  * 1. Fast in-memory LRU cache with short-term TTL
  * 2. Long-term persistent SQLite search_cache table with 30-60 day TTL
  * 3. Storing empty results `[]` so non-existent game queries do not re-drain quotas
@@ -79,7 +79,7 @@ export class SearchCacheService {
     const queryText = query.trim().toLowerCase();
 
     try {
-      const [row] = await sql<[{ json_response: any; timestamp: Date | string }?]>`
+      const [row] = await sql<[{ json_response: NormalizedGame[] | string; timestamp: Date | string }?]>`
         SELECT json_response, timestamp 
         FROM search_cache 
         WHERE query_text = ${queryText};

@@ -13,7 +13,7 @@ const emit = defineEmits<{
 
 const isSelecting = ref(false);
 const previewGame = ref<UserGame | null>(null);
-let shuffleInterval: any = null;
+let shuffleInterval: ReturnType<typeof setInterval> | null = null;
 
 const pickInstant = () => {
   if (isSelecting.value || props.candidates.length === 0) return;
@@ -39,7 +39,10 @@ const pickInstant = () => {
     }
 
     if (count >= maxCycles) {
-      clearInterval(shuffleInterval);
+      if (shuffleInterval !== null) {
+        clearInterval(shuffleInterval);
+        shuffleInterval = null;
+      }
       previewGame.value = winner;
 
       setTimeout(() => {

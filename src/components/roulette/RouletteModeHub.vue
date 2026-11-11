@@ -1,451 +1,650 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
-import type { RouletteMode } from '@/types/theme';
-import { useGamesStore } from '@/stores/gamesStore';
-import { useTheme } from '@/composables/useTheme';
-import { Compass, SlidersVertical, Zap, ChevronRight, Sparkles, Star, Gamepad2 } from 'lucide-vue-next';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import type { RouletteMode } from '@/types/theme'
+import { useGamesStore } from '@/stores/gamesStore'
+import { useTheme } from '@/composables/useTheme'
+import fallbackGamesData from '@/data/rouletteFallbacks.json'
+import {
+  Compass,
+  SlidersVertical,
+  Zap,
+  ArrowRight,
+  Sparkles,
+  Star,
+  Activity,
+  Crosshair,
+} from 'lucide-vue-next'
 
-defineEmits<{
-  (e: 'select-mode', mode: RouletteMode): void;
-}>();
+const emit = defineEmits<{
+  (e: 'select-mode', mode: RouletteMode): void
+}>()
 
-const gamesStore = useGamesStore();
-const { currentTheme, themes } = useTheme();
-const hoveredCard = ref<RouletteMode | null>(null);
+const gamesStore = useGamesStore()
+const { currentTheme, themes } = useTheme()
+const hoveredCard = ref<RouletteMode | null>(null)
 
 const currentThemeOption = computed(() => {
-  return themes.find((t) => t.id === currentTheme.value) || themes[0];
-});
+  return themes.find((t) => t.id === currentTheme.value) || themes[0]
+})
 
 const dialShades = computed(() => {
-  return currentThemeOption.value?.wheelShades || [
-    '#131a27', '#1a2332', '#0f1724', '#172233',
-    '#111928', '#1e293b', '#141d2d', '#1c2638',
-  ];
-});
+  return (
+    currentThemeOption.value?.wheelShades || [
+      '#131a27',
+      '#1a2332',
+      '#0f1724',
+      '#172233',
+      '#111928',
+      '#1e293b',
+      '#141d2d',
+      '#1c2638',
+    ]
+  )
+})
 
-// Rich sample game catalogue for the simulation
-const SAMPLE_GAMES = [
-  { id: '1', title: 'The Witcher 3: Wild Hunt', year: 2015, genre: 'RPG', rating: 9.4, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg' },
-  { id: '2', title: 'Cyberpunk 2077', year: 2020, genre: 'Action', rating: 8.8, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2mdf.jpg' },
-  { id: '3', title: 'Elden Ring', year: 2022, genre: 'RPG', rating: 9.6, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg' },
-  { id: '4', title: 'Hollow Knight', year: 2017, genre: 'Metroidvania', rating: 9.2, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co93d7.jpg' },
-  { id: '5', title: 'God of War Ragnarök', year: 2022, genre: 'Adventure', rating: 9.5, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5s5v.jpg' },
-  { id: '6', title: 'Red Dead Redemption 2', year: 2018, genre: 'Action', rating: 9.7, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg' },
-  { id: '7', title: "Baldur's Gate 3", year: 2023, genre: 'RPG', rating: 9.6, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.jpg' },
-  { id: '8', title: 'Hades II', year: 2024, genre: 'Roguelike', rating: 9.3, cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co8300.jpg' },
-];
+type GameItem = { id: string; title: string; genre: string; rating: number; cover: string }
 
-const baseGames = computed(() => {
+const FALLBACK_GAMES: GameItem[] = fallbackGamesData
+const DEFAULT_GAME: GameItem = FALLBACK_GAMES[0] || {
+  id: '1',
+  title: 'The Witcher 3',
+  genre: 'Action RPG',
+  rating: 9.4,
+  cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg',
+}
+
+const activeGames = computed<GameItem[]>(() => {
   if (gamesStore.games && gamesStore.games.length >= 3) {
     return gamesStore.games.slice(0, 8).map((g) => ({
       id: String(g.id),
       title: g.title,
-      year: g.release_year || 2024,
-      genre: g.genres && g.genres[0] ? g.genres[0] : 'Juego',
-      rating: g.rating || 8.5,
-      cover: g.cover_url || '',
-    }));
+      genre: g.genres?.[0] || 'Aventura',
+      rating: g.rating || 9.0,
+      cover: g.cover_url || DEFAULT_GAME.cover,
+    }))
   }
-  return SAMPLE_GAMES;
-});
+  return FALLBACK_GAMES
+})
 
-// ==========================================
-// 1. DIAL CIRCULAR PREVIEW ENGINE (Canvas + Auto-Spin)
-// ==========================================
-const miniDialCanvasRef = ref<HTMLCanvasElement | null>(null);
-const dialRotationAngle = ref(0);
-const isDialSpinning = ref(false);
-const dialWinnerGame = ref<(typeof SAMPLE_GAMES)[0] | null>(null);
-let autoDialTimer: any = null;
+// =========================================================================
+// 1. PREVIEW 1: RULETA TRADICIONAL
+// =========================================================================
+const dialCanvasRef = ref<HTMLCanvasElement | null>(null)
+const dialRotationAngle = ref(0)
+const isDialSpinning = ref(false)
+const dialWinnerGame = ref<GameItem | null>(null)
+let dialTimer: ReturnType<typeof setTimeout> | null = null
 
-const drawDialPreviewWheel = () => {
-  const canvas = miniDialCanvasRef.value;
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+const drawDialCanvas = () => {
+  const canvas = dialCanvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
 
-  const width = canvas.width;
-  const height = canvas.height;
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radius = width / 2 - 8;
+  const dpr = window.devicePixelRatio || 2
+  const displaySize = 210
+  canvas.width = displaySize * dpr
+  canvas.height = displaySize * dpr
+  ctx.scale(dpr, dpr)
 
-  ctx.clearRect(0, 0, width, height);
+  const centerX = displaySize / 2
+  const centerY = displaySize / 2
+  const radius = displaySize / 2 - 6
 
-  const list = baseGames.value;
-  const total = list.length;
-  if (total === 0) return;
+  ctx.clearRect(0, 0, displaySize, displaySize)
 
-  const arc = (2 * Math.PI) / total;
-  const shades = dialShades.value;
+  const list = activeGames.value
+  const total = list.length
+  if (total === 0) return
 
-  // Draw Slices
+  const arc = (2 * Math.PI) / total
+  const shades = dialShades.value
+
   for (let i = 0; i < total; i++) {
-    const angle = i * arc;
-    const game = list[i];
-    if (!game) continue;
+    const angle = i * arc
+    const game = list[i]
+    if (!game) continue
 
-    // Sector body
-    ctx.beginPath();
-    ctx.fillStyle = shades[i % shades.length] || '#131a27';
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, radius, angle, angle + arc);
-    ctx.lineTo(centerX, centerY);
-    ctx.fill();
+    ctx.beginPath()
+    ctx.fillStyle = shades[i % shades.length] || '#141d2d'
+    ctx.moveTo(centerX, centerY)
+    ctx.arc(centerX, centerY, radius, angle, angle + arc)
+    ctx.lineTo(centerX, centerY)
+    ctx.fill()
 
-    // Slice border line
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)'
+    ctx.lineWidth = 1
+    ctx.stroke()
 
-    // Text label - Clean and readable
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(angle + arc / 2);
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '600 9px system-ui, -apple-system, sans-serif';
-    const shortTitle = game.title.length > 12 ? game.title.slice(0, 11) + '…' : game.title;
-    ctx.fillText(shortTitle, radius - 8, 0);
-    ctx.restore();
+    ctx.save()
+    ctx.translate(centerX, centerY)
+    ctx.rotate(angle + arc / 2)
+    ctx.textAlign = 'right'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#f8fafc'
+    ctx.font = '700 9.5px "Space Grotesk", system-ui, sans-serif'
+    const cleanTitle = game.title.length > 13 ? game.title.slice(0, 12) + '…' : game.title
+    ctx.fillText(cleanTitle, radius - 8, 0)
+    ctx.restore()
   }
 
-  // Outer ring
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
 
-  // Center Hub
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 16, 0, 2 * Math.PI);
-  ctx.fillStyle = currentThemeOption.value?.surfaceColor || '#0f172a';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 16, 0, 2 * Math.PI)
+  ctx.fillStyle = currentThemeOption.value?.surfaceColor || '#0a0f1d'
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'
+  ctx.lineWidth = 1.2
+  ctx.stroke()
 
-  // Center Pip
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
-  ctx.fillStyle = currentThemeOption.value?.primaryColor || '#6366f1';
-  ctx.fill();
-};
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 5.5, 0, 2 * Math.PI)
+  ctx.fillStyle = currentThemeOption.value?.primaryColor || '#6366f1'
+  ctx.fill()
+}
 
-const runDialPreviewCycle = () => {
-  if (isDialSpinning.value) return;
+const runDialCycle = () => {
+  if (isDialSpinning.value) return
+  const total = activeGames.value.length
+  if (total === 0) return
 
-  const total = baseGames.value.length;
-  if (total === 0) return;
+  const winnerIdx = Math.floor(Math.random() * total)
+  const winning = activeGames.value[winnerIdx]
+  if (!winning) return
 
-  const winnerIndex = Math.floor(Math.random() * total);
-  const winningGame = baseGames.value[winnerIndex];
-  if (!winningGame) return;
+  const arcDeg = 360 / total
+  const sliceCenterDeg = (winnerIdx + 0.5) * arcDeg
+  const currentAngleMod = dialRotationAngle.value % 360
+  const targetMod = (270 - sliceCenterDeg + 360) % 360
+  const deltaForward = (targetMod - currentAngleMod + 360) % 360
+  const spinsToAdd = 1080 + deltaForward
 
-  const arcDeg = 360 / total;
-  // Center angle of slice in canvas space (3 o'clock is 0deg)
-  const sliceCenterDeg = (winnerIndex + 0.5) * arcDeg;
-  // Top pointer is at 12 o'clock (270deg)
-  const currentAngleMod = dialRotationAngle.value % 360;
-  const targetMod = (270 - sliceCenterDeg + 360) % 360;
-  const deltaForward = (targetMod - currentAngleMod + 360) % 360;
-  
-  // Advance by 4 full revolutions (1440deg) + forward offset
-  const spinsToAdd = 1440 + deltaForward;
-
-  isDialSpinning.value = true;
-  dialRotationAngle.value += spinsToAdd;
+  isDialSpinning.value = true
+  dialRotationAngle.value += spinsToAdd
 
   setTimeout(() => {
-    isDialSpinning.value = false;
-    dialWinnerGame.value = winningGame;
+    isDialSpinning.value = false
+    dialWinnerGame.value = winning
 
-    // Highlight winner for 2.2s
     setTimeout(() => {
-      // Normalize angle silently if high
-      if (dialRotationAngle.value > 5000) {
-        dialRotationAngle.value = dialRotationAngle.value % 360;
-      }
-      autoDialTimer = setTimeout(runDialPreviewCycle, 1000);
-    }, 2200);
-  }, 3400);
-};
+      if (dialRotationAngle.value > 10000) dialRotationAngle.value %= 360
+      dialTimer = setTimeout(runDialCycle, 1200)
+    }, 2400)
+  }, 3200)
+}
 
-// Redraw canvas on theme or game changes
-watch([baseGames, dialShades], () => {
-  nextTick(drawDialPreviewWheel);
-});
+// =========================================================================
+// 2. PREVIEW 2: SELECTOR VERTICAL
+// =========================================================================
+const slotState = ref<'idle' | 'spinning' | 'locked'>('idle')
+const slotWinnerGame = ref<GameItem | null>(null)
+const slotTranslateY = ref(0)
+let slotTimer: ReturnType<typeof setTimeout> | null = null
 
-// ==========================================
-// 2. ESCÁNER VERTICAL PREVIEW (Pure Seamless Infinite Loop)
-// ==========================================
-// 2 identical duplicate sets to ensure 100% seamless mathematical loop with translateY(-50%)
-const previewLoopGames = computed(() => {
-  const list = baseGames.value;
-  return [...list, ...list];
-});
+const extendedSlotGames = computed<GameItem[]>(() => {
+  const g = activeGames.value
+  return [...g, ...g, ...g, ...g]
+})
+
+const runSlotCycle = () => {
+  slotState.value = 'spinning'
+  const list = activeGames.value
+  if (list.length === 0) return
+  const targetIndex = Math.floor(Math.random() * list.length) + list.length
+  const candidate = extendedSlotGames.value[targetIndex]
+  const fallback = list[0]
+  const winning: GameItem = candidate || fallback || DEFAULT_GAME
+  slotWinnerGame.value = winning
+
+  const itemHeight = 80
+  slotTranslateY.value = -(targetIndex * itemHeight) + itemHeight
+
+  setTimeout(() => {
+    slotState.value = 'locked'
+
+    setTimeout(() => {
+      slotTranslateY.value = 0
+      slotState.value = 'idle'
+      slotTimer = setTimeout(runSlotCycle, 1000)
+    }, 2800)
+  }, 2200)
+}
+
+// =========================================================================
+// 3. PREVIEW 3: SELECCIÓN RÁPIDA
+// =========================================================================
+const instantState = ref<'shuffling' | 'locked'>('shuffling')
+const instantCurrentGame = ref<GameItem>(DEFAULT_GAME)
+let instantInterval: ReturnType<typeof setInterval> | null = null
+let instantLoopTimer: ReturnType<typeof setTimeout> | null = null
+
+const runInstantCycle = () => {
+  instantState.value = 'shuffling'
+  let ticks = 0
+  const maxTicks = 16
+
+  if (instantInterval) clearInterval(instantInterval)
+  instantInterval = setInterval(() => {
+    ticks++
+    const list = activeGames.value
+    const rnd = Math.floor(Math.random() * list.length)
+    const picked = list[rnd]
+    if (picked) {
+      instantCurrentGame.value = picked
+    }
+
+    if (ticks >= maxTicks) {
+      if (instantInterval) clearInterval(instantInterval)
+      instantState.value = 'locked'
+      instantLoopTimer = setTimeout(runInstantCycle, 2800)
+    }
+  }, 70)
+}
+
+watch([activeGames, dialShades], () => {
+  nextTick(drawDialCanvas)
+})
 
 onMounted(() => {
   nextTick(() => {
-    drawDialPreviewWheel();
-  });
-  autoDialTimer = setTimeout(runDialPreviewCycle, 800);
-});
+    drawDialCanvas()
+    dialTimer = setTimeout(runDialCycle, 500)
+    slotTimer = setTimeout(runSlotCycle, 900)
+    instantLoopTimer = setTimeout(runInstantCycle, 300)
+  })
+})
 
 onUnmounted(() => {
-  if (autoDialTimer) clearTimeout(autoDialTimer);
-});
+  if (dialTimer) clearTimeout(dialTimer)
+  if (slotTimer) clearTimeout(slotTimer)
+  if (instantInterval) clearInterval(instantInterval)
+  if (instantLoopTimer) clearTimeout(instantLoopTimer)
+})
 </script>
 
 <template>
-  <div class="w-full max-w-6xl mx-auto space-y-6">
-    <!-- Hub Header Banner (Concise and serious) -->
-    <div class="text-center max-w-2xl mx-auto mb-5 space-y-1.5">
-      <h2 class="text-xl sm:text-2xl font-display font-extrabold tracking-tight" :style="{ color: 'var(--app-text)' }">
-        Selecciona el Tipo de Ruleta
-      </h2>
-      <p class="text-xs sm:text-sm" :style="{ color: 'var(--app-text-muted)' }">
-        Elige cómo quieres descubrir tu próximo juego a jugar de tu backlog.
+  <div class="w-full max-w-6xl mx-auto flex flex-col justify-center px-4 sm:px-6 py-6">
+    <!-- Header Centrado y Limpio -->
+    <header class="w-full text-center pb-8">
+      <h1
+        class="text-3xl sm:text-4xl font-display font-black tracking-tight"
+        :style="{ color: 'var(--app-text)' }"
+      >
+        Selecciona tu Sistema de Ruleta
+      </h1>
+      <p class="text-base mt-2 max-w-2xl mx-auto" :style="{ color: 'var(--app-text-muted)' }">
+        Elige la dinámica visual que determinará tu próxima aventura en tu backlog personal.
       </p>
-    </div>
+    </header>
 
-    <!-- 3 Mode Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-      <!-- MODE 1: Ruleta Tradicional -->
-      <div
-        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+    <!-- 3 Ruletas en Orientación Vertical Amplias y Claras -->
+    <main class="flex flex-col gap-6">
+      <!-- ======================================================== -->
+      <!-- FILA 1: RULETA TRADICIONAL                               -->
+      <!-- ======================================================== -->
+      <section
+        class="group relative rounded-2xl border flex flex-col md:flex-row items-stretch overflow-hidden transition-all duration-200 cursor-pointer"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'classic' ? 'var(--app-primary)' : 'var(--app-border)',
-          boxShadow: hoveredCard === 'classic' ? '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px var(--app-primary)' : 'none',
+          boxShadow:
+            hoveredCard === 'classic'
+              ? '0 18px 40px -10px rgba(0,0,0,0.7), 0 0 26px -4px var(--app-primary)'
+              : 'none',
         }"
         @mouseenter="hoveredCard = 'classic'"
         @mouseleave="hoveredCard = null"
+        @click="emit('select-mode', 'classic')"
       >
-        <!-- Top Action Button Only -->
-        <button
-          type="button"
-          @click="$emit('select-mode', 'classic')"
-          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
-          :style="{
-            backgroundColor: 'var(--app-primary)',
-            borderColor: 'var(--app-border)',
-          }"
-        >
-          <div class="flex items-center gap-2">
-            <Compass class="w-4 h-4 group-hover:rotate-45 transition-transform duration-300" />
-            <span>Ruleta Tradicional</span>
+        <!-- Información y Botón Izquierdo -->
+        <div class="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-6 z-10">
+          <div>
+            <div class="flex items-center gap-3.5 mb-3">
+              <div
+                class="p-3 rounded-xl text-white shadow-md transition-transform duration-300 group-hover:rotate-45"
+                :style="{ backgroundColor: 'var(--app-primary)' }"
+              >
+                <Compass class="w-6 h-6" />
+              </div>
+              <h3
+                class="text-xl sm:text-2xl font-display font-black tracking-tight"
+                :style="{ color: 'var(--app-text)' }"
+              >
+                Ruleta Tradicional
+              </h3>
+            </div>
+            <p class="text-base leading-relaxed" :style="{ color: 'var(--app-text-muted)' }">
+              Sorteo clásico por giro de rueda circular con aguja superior y visor lateral en tiempo
+              real. Se adapta automáticamente a cualquier cantidad de juegos en tu colección.
+            </p>
           </div>
-          <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
 
-        <!-- Live Visual Preview: Authentic Rotating Dial Wheel (Auto-Spinning) -->
+          <button
+            type="button"
+            class="w-full sm:w-fit py-3.5 px-6 rounded-xl font-bold text-sm uppercase tracking-wider text-white inline-flex items-center justify-between sm:justify-start gap-3 shadow-lg transition-all duration-200 group-hover:translate-x-1 cursor-pointer"
+            :style="{ backgroundColor: 'var(--app-primary)' }"
+          >
+            <span>Iniciar Ruleta Circular</span>
+            <ArrowRight
+              class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </button>
+        </div>
+
+        <!-- Preview Derecha Amplia -->
         <div
-          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
-          :style="{
-            borderColor: 'var(--app-border)',
-          }"
-          @click="$emit('select-mode', 'classic')"
+          class="w-full md:w-96 h-60 border-t md:border-t-0 md:border-l flex flex-col items-center justify-center p-4 relative overflow-hidden bg-black/35 shrink-0"
+          :style="{ borderColor: 'var(--app-border)' }"
         >
-          <!-- Top Minimal Pointer Needle at 12 o'clock -->
-          <div class="absolute top-1.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none drop-shadow-xs">
+          <!-- Aguja Superior -->
+          <div class="absolute top-2.5 left-1/2 -translate-x-1/2 z-30 drop-shadow">
             <div
-              class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[9px]"
+              class="w-0 h-0 border-l-[9px] border-l-transparent border-r-[9px] border-r-transparent border-t-15"
+              :class="isDialSpinning ? 'animate-bounce' : ''"
               :style="{ borderTopColor: 'var(--app-primary)' }"
             />
           </div>
 
-          <!-- Dynamic Rotating Canvas Wheel Preview -->
+          <!-- Rueda Giratoria -->
           <div
-            class="relative flex items-center justify-center transition-transform"
+            class="relative flex items-center justify-center transition-transform -mt-2"
             :style="{
               transform: `rotate(${dialRotationAngle}deg)`,
-              transition: isDialSpinning ? 'transform 3.4s cubic-bezier(0.15, 0.85, 0.2, 1)' : 'none',
+              transition: isDialSpinning
+                ? 'transform 3.2s cubic-bezier(0.12, 0.88, 0.2, 1)'
+                : 'none',
             }"
           >
             <canvas
-              ref="miniDialCanvasRef"
-              width="280"
-              height="280"
-              class="w-28 h-28 rounded-full shadow-xl"
+              ref="dialCanvasRef"
+              style="width: 184px; height: 184px"
+              class="rounded-full shadow-2xl"
             />
           </div>
 
-          <!-- Mini Target Winner HUD Badge -->
-          <div class="absolute bottom-1.5 inset-x-2 flex items-center justify-center pointer-events-none z-10">
+          <!-- HUD Flotante -->
+          <div
+            class="absolute bottom-2.5 inset-x-4 flex items-center justify-center pointer-events-none z-20"
+          >
             <div
-              class="px-2 py-0.5 rounded text-[10px] font-mono font-bold truncate max-w-[90%] border transition-all duration-300"
-              :class="isDialSpinning ? '' : 'text-slate-200'"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold truncate max-w-full border shadow-lg flex items-center gap-2"
               :style="{
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                borderColor: isDialSpinning ? 'var(--app-primary)' : 'rgba(255, 255, 255, 0.1)',
-                color: isDialSpinning ? 'var(--app-primary)' : undefined,
+                backgroundColor: 'rgba(5, 8, 18, 0.94)',
+                borderColor: isDialSpinning ? 'var(--app-primary)' : 'rgba(255, 255, 255, 0.14)',
+                color: isDialSpinning ? 'var(--app-primary)' : 'var(--app-text)',
               }"
             >
-              <span v-if="isDialSpinning" class="animate-pulse">GIRANDO...</span>
-              <span v-else-if="dialWinnerGame">{{ dialWinnerGame.title }}</span>
-              <span v-else>RULETA TRADICIONAL</span>
+              <Crosshair
+                class="w-3.5 h-3.5 shrink-0"
+                :class="isDialSpinning ? 'animate-spin' : ''"
+              />
+              <span v-if="isDialSpinning">GIRANDO...</span>
+              <span v-else-if="dialWinnerGame" class="truncate">{{ dialWinnerGame.title }}</span>
+              <span v-else>LISTO</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- MODE 2: Selector Vertical -->
-      <div
-        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+      <!-- ======================================================== -->
+      <!-- FILA 2: SELECTOR VERTICAL                                -->
+      <!-- ======================================================== -->
+      <section
+        class="group relative rounded-2xl border flex flex-col md:flex-row items-stretch overflow-hidden transition-all duration-200 cursor-pointer"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'slot' ? 'var(--app-primary)' : 'var(--app-border)',
-          boxShadow: hoveredCard === 'slot' ? '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px var(--app-primary)' : 'none',
+          boxShadow:
+            hoveredCard === 'slot'
+              ? '0 18px 40px -10px rgba(0,0,0,0.7), 0 0 26px -4px var(--app-primary)'
+              : 'none',
         }"
         @mouseenter="hoveredCard = 'slot'"
         @mouseleave="hoveredCard = null"
+        @click="emit('select-mode', 'slot')"
       >
-        <!-- Top Action Button Only -->
-        <button
-          type="button"
-          @click="$emit('select-mode', 'slot')"
-          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
-          :style="{
-            backgroundColor: 'var(--app-primary)',
-            borderColor: 'var(--app-border)',
-          }"
-        >
-          <div class="flex items-center gap-2">
-            <SlidersVertical class="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span>Selector Vertical</span>
+        <!-- Información y Botón Izquierdo -->
+        <div class="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-6 z-10">
+          <div>
+            <div class="flex items-center gap-3.5 mb-3">
+              <div
+                class="p-3 rounded-xl text-white shadow-md transition-transform duration-300 group-hover:scale-110"
+                :style="{ backgroundColor: 'var(--app-primary)' }"
+              >
+                <SlidersVertical class="w-6 h-6" />
+              </div>
+              <h3
+                class="text-xl sm:text-2xl font-display font-black tracking-tight"
+                :style="{ color: 'var(--app-text)' }"
+              >
+                Selector Vertical
+              </h3>
+            </div>
+            <p class="text-base leading-relaxed" :style="{ color: 'var(--app-text-muted)' }">
+              Carrete vertical continuo estilo tragamonedas con desaceleración progresiva. Las
+              portadas desfilan a gran velocidad hasta bloquear el juego ganador en la mira central.
+            </p>
           </div>
-          <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
 
-        <!-- Live Visual Preview: Authentic Vertical Slot Reel Visor -->
+          <button
+            type="button"
+            class="w-full sm:w-fit py-3.5 px-6 rounded-xl font-bold text-sm uppercase tracking-wider text-white inline-flex items-center justify-between sm:justify-start gap-3 shadow-lg transition-all duration-200 group-hover:translate-x-1 cursor-pointer"
+            :style="{ backgroundColor: 'var(--app-primary)' }"
+          >
+            <span>Iniciar Selector Vertical</span>
+            <ArrowRight
+              class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </button>
+        </div>
+
+        <!-- Preview Derecha Amplia (240px = 3 filas de 80px) -->
         <div
-          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
-          :style="{
-            borderColor: 'var(--app-border)',
-          }"
-          @click="$emit('select-mode', 'slot')"
+          class="w-full md:w-96 h-60 border-t md:border-t-0 md:border-l flex flex-col items-start justify-start relative overflow-hidden bg-black/40 shrink-0"
+          :style="{ borderColor: 'var(--app-border)' }"
         >
-          <!-- Center Target Indicator Reticle Line & Chevrons -->
+          <!-- Retícula central (alineada a la 2da fila: top-20 h-20 = 80px) -->
           <div
-            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-13 border-y pointer-events-none z-20 flex items-center justify-between px-2"
+            class="absolute inset-x-3 top-20 h-20 border-y-2 pointer-events-none z-20 flex items-center justify-between px-3"
             :style="{
               borderColor: 'var(--app-primary)',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              boxShadow: 'inset 0 0 12px rgba(0, 0, 0, 0.6)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              boxShadow: 'inset 0 0 16px rgba(0,0,0,0.7)',
             }"
           >
-            <!-- Left Chevron -->
             <div
-              class="w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-[6px]"
-              :style="{ borderLeftColor: 'var(--app-primary)' }"
+              class="w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: 'var(--app-primary)' }"
             />
-            <!-- Right Chevron -->
             <div
-              class="w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-r-[6px]"
-              :style="{ borderRightColor: 'var(--app-primary)' }"
+              class="w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: 'var(--app-primary)' }"
             />
           </div>
 
-          <!-- Top & Bottom Gradient Shadows for Visor Depth -->
-          <div class="absolute top-0 inset-x-0 h-8 bg-linear-to-b from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
-          <div class="absolute bottom-0 inset-x-0 h-8 bg-linear-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none" />
+          <div
+            class="absolute top-0 inset-x-0 h-14 bg-linear-to-b from-black via-black/80 to-transparent z-10 pointer-events-none"
+          />
+          <div
+            class="absolute bottom-0 inset-x-0 h-14 bg-linear-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"
+          />
 
-          <!-- Continuous Vertical Sliding Strip (100% Seamless Infinite CSS Loop) -->
-          <div class="slot-infinite-track w-full flex flex-col">
+          <div
+            class="w-full flex flex-col transition-transform will-change-transform"
+            :style="{
+              transform: `translateY(${slotTranslateY}px)`,
+              transition:
+                slotState === 'spinning'
+                  ? 'transform 2.2s cubic-bezier(0.15, 0.9, 0.25, 1)'
+                  : slotState === 'locked'
+                    ? 'transform 0.3s ease-out'
+                    : 'none',
+              filter: slotState === 'spinning' ? 'blur(0.6px)' : 'none',
+            }"
+          >
             <div
-              v-for="(item, idx) in previewLoopGames"
-              :key="`preview-loop-${idx}-${item.id}`"
-              class="h-13 flex items-center gap-2.5 px-3 border-b border-white/5 shrink-0"
+              v-for="(item, idx) in extendedSlotGames"
+              :key="`slot-${idx}-${item.id}`"
+              class="h-20 flex items-center gap-3.5 px-5 border-b border-white/5 shrink-0"
+              :class="slotState === 'locked' && slotWinnerGame?.id === item.id ? 'bg-white/10' : ''"
             >
               <img
                 :src="item.cover"
                 :alt="item.title"
-                class="w-8 h-10 object-cover rounded shadow-xs shrink-0"
+                class="w-11 h-15 object-cover rounded-md shadow shrink-0 border border-white/10"
               />
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold truncate text-slate-200">{{ item.title }}</p>
-                <p class="text-[10px] text-slate-400 truncate">{{ item.genre }}</p>
+                <p class="text-sm font-bold truncate" :style="{ color: 'var(--app-text)' }">
+                  {{ item.title }}
+                </p>
+                <div class="flex items-center gap-2 text-xs opacity-80 font-mono mt-1">
+                  <span class="truncate">{{ item.genre }}</span>
+                  <span class="text-amber-400 flex items-center gap-1 shrink-0">
+                    <Star class="w-3 h-3 fill-amber-400" />
+                    {{ item.rating }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- MODE 3: Selección Rápida -->
-      <div
-        class="group relative rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+      <!-- ======================================================== -->
+      <!-- FILA 3: SELECCIÓN RÁPIDA                                 -->
+      <!-- ======================================================== -->
+      <section
+        class="group relative rounded-2xl border flex flex-col md:flex-row items-stretch overflow-hidden transition-all duration-200 cursor-pointer"
         :style="{
           backgroundColor: 'var(--app-surface)',
           borderColor: hoveredCard === 'instant' ? 'var(--app-primary)' : 'var(--app-border)',
-          boxShadow: hoveredCard === 'instant' ? '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 16px var(--app-primary)' : 'none',
+          boxShadow:
+            hoveredCard === 'instant'
+              ? '0 18px 40px -10px rgba(0,0,0,0.7), 0 0 26px -4px var(--app-primary)'
+              : 'none',
         }"
         @mouseenter="hoveredCard = 'instant'"
         @mouseleave="hoveredCard = null"
+        @click="emit('select-mode', 'instant')"
       >
-        <!-- Top Action Button Only -->
-        <button
-          type="button"
-          @click="$emit('select-mode', 'instant')"
-          class="w-full flex items-center justify-between px-3.5 py-3 rounded-md font-bold text-xs uppercase tracking-wider text-white shadow-md transition-all duration-150 cursor-pointer group-hover:scale-[1.02] border"
-          :style="{
-            backgroundColor: 'var(--app-primary)',
-            borderColor: 'var(--app-border)',
-          }"
-        >
-          <div class="flex items-center gap-2">
-            <Zap class="w-4 h-4 group-hover:animate-bounce" />
-            <span>Selección Rápida</span>
+        <!-- Información y Botón Izquierdo -->
+        <div class="flex-1 p-6 sm:p-8 flex flex-col justify-between gap-6 z-10">
+          <div>
+            <div class="flex items-center gap-3.5 mb-3">
+              <div
+                class="p-3 rounded-xl text-white shadow-md transition-transform duration-300 group-hover:scale-110"
+                :style="{ backgroundColor: 'var(--app-primary)' }"
+              >
+                <Zap class="w-6 h-6" />
+              </div>
+              <h3
+                class="text-xl sm:text-2xl font-display font-black tracking-tight"
+                :style="{ color: 'var(--app-text)' }"
+              >
+                Selección Rápida
+              </h3>
+            </div>
+            <p class="text-base leading-relaxed" :style="{ color: 'var(--app-text-muted)' }">
+              Extracción aleatoria directa e instantánea mediante escaneo rápido de fichas. Pensada
+              para decidir qué jugar al instante y sin esperas.
+            </p>
           </div>
-          <ChevronRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </button>
 
-        <!-- Live Visual Preview -->
+          <button
+            type="button"
+            class="w-full sm:w-fit py-3.5 px-6 rounded-xl font-bold text-sm uppercase tracking-wider text-white inline-flex items-center justify-between sm:justify-start gap-3 shadow-lg transition-all duration-200 group-hover:translate-x-1 cursor-pointer"
+            :style="{ backgroundColor: 'var(--app-primary)' }"
+          >
+            <span>Iniciar Selección Rápida</span>
+            <ArrowRight
+              class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </button>
+        </div>
+
+        <!-- Preview Derecha Amplia -->
         <div
-          class="mt-4 pt-2 border-t flex flex-col items-center justify-center h-42.5 rounded-lg overflow-hidden relative cursor-pointer bg-slate-950"
-          :style="{
-            borderColor: 'var(--app-border)',
-          }"
-          @click="$emit('select-mode', 'instant')"
+          class="w-full md:w-96 h-60 border-t md:border-t-0 md:border-l flex flex-col items-center justify-center p-5 relative overflow-hidden bg-black/40 shrink-0"
+          :style="{ borderColor: 'var(--app-border)' }"
         >
-          <!-- Radar Pulse Effect -->
           <div
-            class="w-20 h-20 rounded-full border-2 flex items-center justify-center relative transition-all duration-300"
-            :class="hoveredCard === 'instant' ? 'scale-110' : ''"
+            class="relative w-full h-44 rounded-xl border p-4 flex items-center gap-4 transition-all duration-300 shadow-xl overflow-hidden"
             :style="{
               backgroundColor: 'var(--app-surface)',
-              borderColor: 'var(--app-primary)',
-              boxShadow: hoveredCard === 'instant' ? '0 0 20px var(--app-primary)' : '0 0 8px var(--app-primary)',
+              borderColor:
+                instantState === 'locked' ? 'var(--app-primary)' : 'rgba(255, 255, 255, 0.15)',
+              boxShadow: instantState === 'locked' ? '0 0 26px -5px var(--app-primary)' : 'none',
             }"
           >
-            <Zap class="w-8 h-8" :style="{ color: 'var(--app-primary)' }" />
+            <!-- Scanline láser -->
             <div
-              class="absolute inset-0 rounded-full border border-dashed animate-spin"
-              :style="{ borderColor: 'var(--app-primary)', animationDuration: '6s' }"
+              v-if="instantState === 'shuffling'"
+              class="absolute inset-x-0 h-0.5 z-20 pointer-events-none animate-scanline"
+              :style="{
+                backgroundColor: 'var(--app-primary)',
+                boxShadow: '0 0 10px var(--app-primary)',
+              }"
             />
+
+            <img
+              :src="instantCurrentGame.cover"
+              :alt="instantCurrentGame.title"
+              class="w-24 h-34 object-cover rounded-lg border border-white/10 shrink-0 transition-all duration-150 shadow-md"
+              :class="instantState === 'shuffling' ? 'opacity-50 blur-[1px]' : 'opacity-100 blur-0'"
+            />
+
+            <div class="min-w-0 flex-1 flex flex-col justify-between h-34">
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="px-2.5 py-1 rounded font-mono text-[10px] font-bold uppercase tracking-wider"
+                  :style="{ backgroundColor: 'var(--app-primary)', color: '#fff' }"
+                >
+                  {{ instantState === 'locked' ? 'ELEGIDO' : 'SORTEANDO' }}
+                </span>
+                <Sparkles
+                  v-if="instantState === 'locked'"
+                  class="w-4 h-4 text-amber-300 animate-pulse shrink-0"
+                />
+                <Activity v-else class="w-4 h-4 text-white/50 animate-spin shrink-0" />
+              </div>
+
+              <div>
+                <p class="font-display font-bold text-base sm:text-lg text-white truncate">
+                  {{ instantCurrentGame.title }}
+                </p>
+                <div
+                  class="flex items-center justify-between text-xs font-mono text-white/75 mt-1.5"
+                >
+                  <span class="truncate">{{ instantCurrentGame.genre }}</span>
+                  <span class="text-amber-400 font-bold shrink-0"
+                    >★ {{ instantCurrentGame.rating }}</span
+                  >
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <style scoped>
-.slot-infinite-track {
-  animation: slotInfiniteScroll 10s linear infinite;
-  will-change: transform;
-}
-
-@keyframes slotInfiniteScroll {
+@keyframes scanlineAnim {
   0% {
-    transform: translateY(0);
+    top: 5%;
   }
   100% {
-    transform: translateY(-50%);
+    top: 95%;
   }
 }
-</style>
 
+.animate-scanline {
+  animation: scanlineAnim 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+</style>

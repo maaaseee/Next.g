@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, type Component } from 'vue';
 import { useGamesStore } from '@/stores/gamesStore';
 import { useDragAndDrop } from '@/composables/useDragAndDrop';
 import type { GameStatus } from '@/types/game';
 import { GAME_STATUS_CONFIG } from '@/types/game';
-import { Clock, Play, CheckCircle2, Sparkles } from 'lucide-vue-next';
+import { Clock, Play, CheckCircle2, Sparkles, ArrowDownToLine } from 'lucide-vue-next';
 
 const gamesStore = useGamesStore();
-const { isDragging, handleDropOnTab } = useDragAndDrop();
+const { isDragging, currentOrder, hoveredTab } = useDragAndDrop();
 
-const hoveredTab = ref<GameStatus | null>(null);
+const ICON_MAP: Record<GameStatus, Component> = {
+  COMPLETED: CheckCircle2,
+  PLAYING: Play,
+  BACKLOG: Clock,
+  WISHLIST: Sparkles,
+};
 
-const TABS: { id: GameStatus; icon: any }[] = [
-  { id: 'BACKLOG', icon: Clock },
-  { id: 'COMPLETED', icon: CheckCircle2 },
-  { id: 'PLAYING', icon: Play },
-  { id: 'WISHLIST', icon: Sparkles },
-];
+const orderedTabs = computed(() =>
+  currentOrder.value.map((id) => ({
+    id,
+    icon: ICON_MAP[id],
+    config: GAME_STATUS_CONFIG[id],
+  }))
+);
 
 function getCount(status: GameStatus) {
   switch (status) {
@@ -30,58 +36,110 @@ function getCount(status: GameStatus) {
       return gamesStore.wishlistGames.length;
   }
 }
-
-function handleDragOver(e: DragEvent, tabId: GameStatus) {
-  e.preventDefault();
-  hoveredTab.value = tabId;
-}
-
-function handleDragLeave() {
-  hoveredTab.value = null;
-}
-
-function onDrop(tabId: GameStatus) {
-  hoveredTab.value = null;
-  handleDropOnTab(tabId);
-}
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-2 overflow-x-auto pb-2 border-b no-scrollbar" :style="{ borderColor: 'var(--app-border)' }">
-    <div class="flex items-center gap-1.5 p-1 rounded-lg border" :style="{ backgroundColor: 'var(--app-surface)', borderColor: 'var(--app-border)' }">
+  <div
+    class="w-full pb-2 border-b transition-colors duration-200"
+    :style="{ borderColor: 'var(--app-border)' }"
+  >
+    <div
+      class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 rounded-[4px] border w-full transition-all duration-200"
+      :style="{
+        backgroundColor: 'var(--app-surface)',
+        borderColor: isDragging ? 'var(--app-primary)' : 'var(--app-border)',
+        boxShadow: isDragging ? '0 0 20px var(--app-glow)' : undefined,
+      }"
+    >
       <button
-        v-for="tab in TABS"
+        v-for="tab in orderedTabs"
         :key="tab.id"
         type="button"
+        :data-drop-tab="tab.id"
         @click="gamesStore.activeTab = tab.id"
-        @dragover="handleDragOver($event, tab.id)"
-        @dragleave="handleDragLeave"
-        @drop="onDrop(tab.id)"
-        class="relative flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer select-none"
+        class="relative w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-[4px] text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer select-none border"
         :class="[
-          gamesStore.activeTab === tab.id
-            ? 'shadow-md scale-100 text-white'
-            : 'text-app-text opacity-70 hover:opacity-100 hover:bg-white/5',
+          gamesStore.activeTab === tab.id && !isDragging
+            ? 'shadow-md text-white border-transparent'
+            : 'border-transparent hover:opacity-95',
           isDragging && hoveredTab === tab.id
-            ? 'ring-2 ring-(--app-primary) scale-105 bg-(--app-primary)/20'
+            ? 'scale-[1.02] shadow-xl text-white z-10'
+            : '',
+          isDragging && hoveredTab !== tab.id
+            ? 'border-dashed opacity-90 hover:opacity-100'
             : '',
         ]"
         :style="{
-          backgroundColor: gamesStore.activeTab === tab.id ? 'var(--app-primary)' : 'transparent',
+          backgroundColor:
+            isDragging && hoveredTab === tab.id
+              ? 'var(--app-primary)'
+              : gamesStore.activeTab === tab.id
+                ? 'var(--app-primary)'
+                : isDragging
+                  ? 'var(--app-surface-hover)'
+                  : 'transparent',
+          borderColor:
+            isDragging && hoveredTab === tab.id
+              ? 'var(--app-primary-light)'
+              : isDragging
+                ? 'var(--app-border)'
+                : 'transparent',
+          color:
+            gamesStore.activeTab === tab.id || (isDragging && hoveredTab === tab.id)
+              ? '#ffffff'
+              : 'var(--app-text)',
+          boxShadow:
+            isDragging && hoveredTab === tab.id
+              ? '0 0 22px var(--app-glow)'
+              : undefined,
         }"
       >
-        <component :is="tab.icon" class="w-4 h-4 shrink-0" />
-        <span>{{ GAME_STATUS_CONFIG[tab.id].label }}</span>
-        <!-- Counter Badge -->
-        <span
-          class="px-2 py-0.5 rounded text-[11px] font-black"
-          :class="gamesStore.activeTab === tab.id ? 'text-white' : 'text-app-text-muted'"
-          :style="{
-            backgroundColor: gamesStore.activeTab === tab.id ? 'rgba(0,0,0,0.25)' : 'var(--app-surface-hover)',
-          }"
-        >
-          {{ getCount(tab.id) }}
-        </span>
+        <div class="flex items-center gap-2 min-w-0 pointer-events-none">
+          <component
+            :is="isDragging && hoveredTab === tab.id ? ArrowDownToLine : tab.icon"
+            class="w-4 h-4 shrink-0 transition-transform duration-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]"
+            :class="isDragging && hoveredTab === tab.id ? 'animate-bounce' : ''"
+            :style="{
+              color: tab.config.color,
+            }"
+          />
+          <span class="truncate">
+            {{ tab.config.label }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0 pointer-events-none">
+          <span
+            v-if="isDragging"
+            class="hidden md:inline-block text-[10px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-[2px] border"
+            :style="{
+              backgroundColor:
+                hoveredTab === tab.id ? 'rgba(0, 0, 0, 0.25)' : 'var(--app-surface)',
+              borderColor:
+                hoveredTab === tab.id ? 'transparent' : 'var(--app-border)',
+              color: hoveredTab === tab.id ? '#ffffff' : 'var(--app-text-muted)',
+            }"
+          >
+            {{ hoveredTab === tab.id ? 'Soltar aquí' : 'Mover' }}
+          </span>
+
+          <!-- Counter Badge -->
+          <span
+            class="px-2 py-0.5 rounded-[3px] text-[11px] font-black tabular-nums"
+            :style="{
+              backgroundColor:
+                gamesStore.activeTab === tab.id || (isDragging && hoveredTab === tab.id)
+                  ? 'rgba(0, 0, 0, 0.28)'
+                  : 'var(--app-surface-hover)',
+              color:
+                gamesStore.activeTab === tab.id || (isDragging && hoveredTab === tab.id)
+                  ? '#ffffff'
+                  : 'var(--app-text-muted)',
+            }"
+          >
+            {{ getCount(tab.id) }}
+          </span>
+        </div>
       </button>
     </div>
   </div>

@@ -4,6 +4,7 @@ export interface Game {
   id: number;
   title: string;
   cover_url: string | null;
+  banner_url?: string | null;
   release_year: number | null;
   summary: string | null;
   genres: string[];
@@ -11,12 +12,62 @@ export interface Game {
   rating: number | null;
   game_modes: string[];
   slug?: string | null;
+  hypes?: number | null;
+  first_release_date?: number | null;
+}
+
+export interface AnticipatedGame extends Game {
+  release_date?: string | null;
+  target_timestamp?: number | null;
 }
 
 export interface UserGame extends Game {
   status: GameStatus;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface GameWebsite {
+  category: number;
+  category_name?: string;
+  url: string;
+}
+
+export interface GameVideo {
+  video_id: string;
+  name?: string;
+  thumbnail_url?: string;
+}
+
+export interface SimilarGameSummary {
+  id: number;
+  title: string;
+  slug?: string | null;
+  cover_url: string | null;
+  rating: number | null;
+}
+
+export interface GameLanguageSupport {
+  language: string;
+  interface: boolean;
+  audio: boolean;
+  subtitles: boolean;
+}
+
+export interface DetailedGame extends Game {
+  storyline?: string | null;
+  screenshots?: string[];
+  artworks?: string[];
+  developers?: string[];
+  publishers?: string[];
+  themes?: string[];
+  player_perspectives?: string[];
+  aggregated_rating?: number | null;
+  aggregated_rating_count?: number | null;
+  videos?: GameVideo[];
+  similar_games?: SimilarGameSummary[];
+  websites?: GameWebsite[];
+  language_supports?: GameLanguageSupport[];
 }
 
 export const GAME_STATUS_CONFIG: Record<
@@ -81,7 +132,7 @@ export const GAME_STATUS_CONFIG: Record<
 
 /**
  * Normalizes game rating to a 5-star scale (0.0 to 5.0).
- * Handles legacy IGDB ratings (0-100) by dividing by 20.
+ * IGDB ratings are on a 0-100 scale, so ratings > 5 are normalized by dividing by 20.
  */
 export function formatGameRating(rating: number | null | undefined): string | null {
   if (rating === null || rating === undefined || isNaN(rating)) return null;
@@ -90,37 +141,42 @@ export function formatGameRating(rating: number | null | undefined): string | nu
 }
 
 /**
- * Generates official RAWG.io specific game page URL using the game's RAWG ID.
- * Example: https://rawg.io/games/<id> (e.g., https://rawg.io/games/422859)
- * RAWG redirects or resolves IDs directly to their game page.
+ * Generates official IGDB game page URL using the game's slug or title.
+ * Example: https://www.igdb.com/games/the-witcher-3-wild-hunt
  */
-export function getRawgGameUrl(game: { id?: number | string; title?: string; slug?: string | null } | number | string): string {
-  if (typeof game === 'number') {
-    return `https://rawg.io/games/${game}`;
-  }
-
+export function getIgdbGameUrl(
+  game: { id?: number | string; title?: string; slug?: string | null } | number | string
+): string {
   if (typeof game === 'object' && game !== null) {
-    if (game.id !== undefined && game.id !== null && !isNaN(Number(game.id))) {
-      return `https://rawg.io/games/${game.id}`;
-    }
     if (game.slug && game.slug.trim()) {
-      return `https://rawg.io/games/${game.slug.trim()}`;
+      return `https://www.igdb.com/games/${encodeURIComponent(game.slug.trim())}`;
     }
-    if (game.title) {
+    if (game.title && game.title.trim()) {
       const slug = game.title
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
-      return `https://rawg.io/games/${slug}`;
+      return `https://www.igdb.com/games/${slug}`;
     }
   }
 
-  if (typeof game === 'string' && !isNaN(Number(game.trim()))) {
-    return `https://rawg.io/games/${game.trim()}`;
+  if (typeof game === 'string' && game.trim()) {
+    const slug = game
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return `https://www.igdb.com/games/${slug}`;
   }
 
-  return 'https://rawg.io';
+  return 'https://www.igdb.com';
 }
+
+/**
+ * @deprecated Use getIgdbGameUrl instead. Migrated from RAWG to IGDB.
+ */
+export const getRawgGameUrl = getIgdbGameUrl;
 

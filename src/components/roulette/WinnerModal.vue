@@ -1,52 +1,62 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import type { UserGame } from '@/types/game';
-import { formatGameRating } from '@/types/game';
-import { useGamesStore } from '@/stores/gamesStore';
-import { Star, Calendar, Gamepad2, RotateCcw, X, Check, Target, Layers } from 'lucide-vue-next';
+import { ref, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import type { UserGame } from '@/types/game'
+import { formatGameRating } from '@/types/game'
+import { useGamesStore } from '@/stores/gamesStore'
+import {
+  Star,
+  Calendar,
+  Gamepad2,
+  RotateCcw,
+  X,
+  Check,
+  Target,
+  ExternalLink,
+} from 'lucide-vue-next'
 
 const props = defineProps<{
-  game: UserGame | null;
-  isOpen: boolean;
-}>();
+  game: UserGame | null
+  isOpen: boolean
+}>()
 
 const emit = defineEmits<{
-  (e: 'close'): void;
-  (e: 'spinAgain'): void;
-}>();
+  (e: 'close'): void
+  (e: 'spinAgain'): void
+}>()
 
-const gamesStore = useGamesStore();
-const isStartingPlay = ref(false);
-const playStarted = ref(false);
+const gamesStore = useGamesStore()
+const isStartingPlay = ref(false)
+const playStarted = ref(false)
 
 const handlePlayNow = async () => {
-  if (!props.game) return;
-  isStartingPlay.value = true;
+  if (!props.game) return
+  isStartingPlay.value = true
   try {
-    await gamesStore.updateGameStatus(props.game.id, 'PLAYING');
-    playStarted.value = true;
+    await gamesStore.updateGameStatus(props.game.id, 'PLAYING')
+    playStarted.value = true
     setTimeout(() => {
-      emit('close');
-      playStarted.value = false;
-    }, 1000);
+      emit('close')
+      playStarted.value = false
+    }, 1000)
   } finally {
-    isStartingPlay.value = false;
+    isStartingPlay.value = false
   }
-};
+}
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && props.isOpen) {
-    emit('close');
+    emit('close')
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown);
-});
+  window.addEventListener('keydown', handleKeyDown)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown);
-});
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <template>
@@ -59,10 +69,7 @@ onUnmounted(() => {
       :aria-label="'Juego seleccionado: ' + game.title"
     >
       <!-- Backdrop -->
-      <div
-        class="fixed inset-0 bg-black/85 transition-opacity"
-        @click="emit('close')"
-      />
+      <div class="fixed inset-0 bg-black/85 transition-opacity" @click="emit('close')" />
 
       <!-- Modal Card -->
       <div
@@ -88,10 +95,16 @@ onUnmounted(() => {
               <Target class="w-4 h-4" />
             </div>
             <div>
-              <span class="text-[10px] font-mono font-bold uppercase tracking-wider block" :style="{ color: 'var(--app-primary)' }">
+              <span
+                class="text-[10px] font-mono font-bold uppercase tracking-wider block"
+                :style="{ color: 'var(--app-primary)' }"
+              >
                 JUEGO SELECCIONADO
               </span>
-              <h2 class="text-lg sm:text-xl font-display font-bold tracking-tight" :style="{ color: 'var(--app-text)' }">
+              <h2
+                class="text-lg sm:text-xl font-display font-bold tracking-tight"
+                :style="{ color: 'var(--app-text)' }"
+              >
                 {{ game.title }}
               </h2>
             </div>
@@ -109,9 +122,13 @@ onUnmounted(() => {
         </div>
 
         <!-- Body Content -->
-        <div class="p-6 flex flex-col sm:flex-row gap-5 items-center sm:items-start max-h-[60vh] overflow-y-auto">
+        <div
+          class="p-6 flex flex-col sm:flex-row gap-5 items-center sm:items-start max-h-[60vh] overflow-y-auto"
+        >
           <!-- Game Cover -->
-          <div class="relative w-36 sm:w-44 aspect-3/4 rounded-md overflow-hidden shadow-lg shrink-0 border border-white/10 bg-black">
+          <div
+            class="relative w-36 sm:w-44 aspect-3/4 rounded-md overflow-hidden shadow-lg shrink-0 border border-white/10 bg-black"
+          >
             <img
               v-if="game.cover_url"
               :src="game.cover_url"
@@ -162,7 +179,10 @@ onUnmounted(() => {
             </div>
 
             <!-- Platforms -->
-            <div v-if="game.platforms && game.platforms.length > 0" class="flex flex-wrap items-center justify-center sm:justify-start gap-1">
+            <div
+              v-if="game.platforms && game.platforms.length > 0"
+              class="flex flex-wrap items-center justify-center sm:justify-start gap-1"
+            >
               <span
                 v-for="platform in game.platforms.slice(0, 4)"
                 :key="platform"
@@ -184,11 +204,7 @@ onUnmounted(() => {
             >
               {{ game.summary }}
             </p>
-            <p
-              v-else
-              class="text-xs italic"
-              :style="{ color: 'var(--app-text-muted)' }"
-            >
+            <p v-else class="text-xs italic" :style="{ color: 'var(--app-text-muted)' }">
               Sin descripción adicional registrada para este título.
             </p>
           </div>
@@ -202,6 +218,20 @@ onUnmounted(() => {
             borderColor: 'var(--app-border)',
           }"
         >
+          <RouterLink
+            :to="`/game/${game.id}`"
+            @click="emit('close')"
+            class="w-full sm:w-auto px-4 py-2 rounded-md text-xs font-bold flex items-center justify-center gap-2 border transition cursor-pointer"
+            :style="{
+              backgroundColor: 'transparent',
+              borderColor: 'var(--app-border)',
+              color: 'var(--app-text)',
+            }"
+          >
+            <ExternalLink class="w-3.5 h-3.5" />
+            Ver Ficha
+          </RouterLink>
+
           <button
             type="button"
             @click="emit('spinAgain')"

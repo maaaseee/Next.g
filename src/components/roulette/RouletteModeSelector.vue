@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Component } from 'vue';
 import type { RouletteMode } from '@/types/theme';
 import { Compass, SlidersVertical, Zap } from 'lucide-vue-next';
 
@@ -10,7 +11,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', mode: RouletteMode): void;
 }>();
 
-const MODES: { id: RouletteMode; label: string; icon: any; desc: string }[] = [
+const MODES: { id: RouletteMode; label: string; icon: Component; desc: string }[] = [
   {
     id: 'classic',
     label: 'Dial Circular',

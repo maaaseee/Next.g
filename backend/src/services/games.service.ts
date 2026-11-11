@@ -32,10 +32,10 @@ interface RawSqlUserGame {
   cover_url: string | null;
   release_year: number | null;
   summary: string | null;
-  genres: any;
-  platforms: any;
+  genres: unknown;
+  platforms: unknown;
   rating: number | null;
-  game_modes: any;
+  game_modes: unknown;
   status: GameStatus;
   created_at: string | Date;
   updated_at: string | Date;
@@ -55,8 +55,20 @@ export interface UpsertGameInput {
   status: GameStatus;
 }
 
+export interface GetGamesFilters {
+  status?: GameStatus;
+  genre?: string;
+  platform?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export class GamesService {
-  private static parseJsonArray(value: any): string[] {
+  private static isSqlClient(val: unknown): val is SqlClient {
+    return typeof val === 'function' || (Boolean(val) && typeof (val as Record<string, unknown>).unsafe === 'function');
+  }
+
+  private static parseJsonArray(value: unknown): string[] {
     if (!value) return [];
     if (Array.isArray(value)) return value.map(String);
     try {
@@ -86,17 +98,46 @@ export class GamesService {
   }
 
   /**
-   * Retrieves all games in the user's catalog, optionally filtered by status, genre or platform.
+   * Retrieves games in the user's catalog, optionally filtered by status, genre, platform and paginated.
    */
   public static async getAll(
-    filters?: { status?: GameStatus; genre?: string; platform?: string },
+    filters?: GetGamesFilters,
+    userIdOrSql?: string | SqlClient | null,
     customSql?: SqlClient
-  ): Promise<UserGameRecord[]> {
-    const sql = customSql || getDatabase();
+  ): Promise<UserGameRecord[] & { total?: number; hasMore?: boolean }> {
+    let sql = customSql || getDatabase();
+    let uid: string | null = null;
+
+    if (this.isSqlClient(userIdOrSql)) {
+      sql = userIdOrSql;
+    } else if (typeof userIdOrSql === 'string') {
+      uid = userIdOrSql;
+    }
 
     const statusFilter = filters?.status || null;
+    const rawGenre = filters?.genre || null;
+    const rawPlatform = filters?.platform || null;
     const genreFilter = filters?.genre ? `%${filters.genre}%` : null;
     const platformFilter = filters?.platform ? `%${filters.platform}%` : null;
+    const limit = filters?.limit ? Math.min(Math.max(Number(filters.limit), 1), 500) : null;
+    const offset = filters?.offset ? Math.max(Number(filters.offset), 0) : null;
+
+    let totalCount: number | undefined = undefined;
+
+    // Execute total count query when limit is explicitly provided for pagination
+    if (limit !== null) {
+      const [countRow] = await sql<{ count: string | number }[]>`
+        SELECT COUNT(ug.id)::int as count
+        FROM user_games ug
+        JOIN games g ON ug.game_id = g.id
+        WHERE 
+          (${uid}::text IS NULL OR ug.user_id = ${uid}::uuid)
+          AND (${statusFilter}::text IS NULL OR ug.status = ${statusFilter})
+          AND (${genreFilter}::text IS NULL OR g.genres ? ${rawGenre} OR g.genres::text ILIKE ${genreFilter})
+          AND (${platformFilter}::text IS NULL OR g.platforms ? ${rawPlatform} OR g.platforms::text ILIKE ${platformFilter});
+      `;
+      totalCount = Number(countRow?.count || 0);
+    }
 
     const rawRecords = await sql<RawSqlUserGame[]>`
       SELECT 
@@ -116,20 +157,44 @@ export class GamesService {
       FROM user_games ug
       JOIN games g ON ug.game_id = g.id
       WHERE 
-        (${statusFilter}::text IS NULL OR ug.status = ${statusFilter})
-        AND (${genreFilter}::text IS NULL OR g.genres::text ILIKE ${genreFilter})
-        AND (${platformFilter}::text IS NULL OR g.platforms::text ILIKE ${platformFilter})
-      ORDER BY ug.updated_at DESC;
+        (${uid}::text IS NULL OR ug.user_id = ${uid}::uuid)
+        AND (${statusFilter}::text IS NULL OR ug.status = ${statusFilter})
+        AND (${genreFilter}::text IS NULL OR g.genres ? ${rawGenre} OR g.genres::text ILIKE ${genreFilter})
+        AND (${platformFilter}::text IS NULL OR g.platforms ? ${rawPlatform} OR g.platforms::text ILIKE ${platformFilter})
+      ORDER BY ug.updated_at DESC
+      ${limit ? sql`LIMIT ${limit}` : sql``}
+      ${offset ? sql`OFFSET ${offset}` : sql``};
     `;
 
-    return rawRecords.map((r) => this.formatRecord(r));
+    const records = rawRecords.map((r) => this.formatRecord(r)) as UserGameRecord[] & {
+      total?: number;
+      hasMore?: boolean;
+    };
+
+    if (totalCount !== undefined) {
+      records.total = totalCount;
+      records.hasMore = (offset || 0) + records.length < totalCount;
+    }
+
+    return records;
   }
 
   /**
    * Upserts a game into the PostgreSQL database and user catalog within a transaction.
    */
-  public static async upsertGame(input: UpsertGameInput, customSql?: SqlClient): Promise<UserGameRecord> {
-    const sql = customSql || getDatabase();
+  public static async upsertGame(
+    input: UpsertGameInput,
+    userIdOrSql?: string | SqlClient | null,
+    customSql?: SqlClient
+  ): Promise<UserGameRecord> {
+    let sql = customSql || getDatabase();
+    let uid: string | null = null;
+
+    if (this.isSqlClient(userIdOrSql)) {
+      sql = userIdOrSql;
+    } else if (typeof userIdOrSql === 'string') {
+      uid = userIdOrSql;
+    }
 
     const serializeJson = (val: string[] | string | null | undefined): string => {
       if (!val) return '[]';
@@ -142,10 +207,19 @@ export class GamesService {
     const gameModesJson = serializeJson(input.game_modes);
 
     await sql.begin(async (tx) => {
-      // 1. Check capacity limit (500 games)
-      const [existing] = await tx`SELECT count(*)::int as count FROM user_games WHERE game_id = ${input.id};`;
+      // 1. Check capacity limit (500 games per user/session)
+      const [existing] = await tx`
+        SELECT count(*)::int as count 
+        FROM user_games 
+        WHERE game_id = ${input.id} 
+          AND (${uid}::text IS NULL OR user_id = ${uid}::uuid);
+      `;
       if (!existing || existing.count === 0) {
-        const [total] = await tx`SELECT count(*)::int as count FROM user_games;`;
+        const [total] = await tx`
+          SELECT count(*)::int as count 
+          FROM user_games
+          WHERE (${uid}::text IS NULL OR user_id = ${uid}::uuid);
+        `;
         if (total && total.count >= 500) {
           throw new Error('La biblioteca ha alcanzado su capacidad máxima permitida (500 videojuegos). Elimina algunos para agregar nuevos.');
         }
@@ -178,11 +252,11 @@ export class GamesService {
           game_modes = EXCLUDED.game_modes;
       `;
 
-      // 3. Upsert user_games catalog link
+      // 3. Upsert user_games catalog link (supports both authenticated user and fallback guest mode)
       await tx`
-        INSERT INTO user_games (game_id, status, updated_at)
-        VALUES (${input.id}, ${input.status}, CURRENT_TIMESTAMP)
-        ON CONFLICT(game_id) DO UPDATE SET
+        INSERT INTO user_games (user_id, game_id, status, updated_at)
+        VALUES (${uid ? tx`${uid}::uuid` : null}, ${input.id}, ${input.status}, CURRENT_TIMESTAMP)
+        ON CONFLICT (COALESCE(user_id, '00000000-0000-0000-0000-000000000000'::uuid), game_id) DO UPDATE SET
           status = EXCLUDED.status,
           updated_at = CURRENT_TIMESTAMP;
       `;
@@ -205,7 +279,9 @@ export class GamesService {
         ug.updated_at
       FROM user_games ug
       JOIN games g ON ug.game_id = g.id
-      WHERE g.id = ${input.id};
+      WHERE g.id = ${input.id}
+        AND (${uid}::text IS NULL OR ug.user_id = ${uid}::uuid)
+      LIMIT 1;
     `;
 
     if (!raw) {
@@ -218,9 +294,26 @@ export class GamesService {
   /**
    * Deletes a game from the user's catalog.
    */
-  public static async deleteGame(id: number, customSql?: SqlClient): Promise<{ success: boolean; deleted_id: number }> {
-    const sql = customSql || getDatabase();
-    await sql`DELETE FROM user_games WHERE game_id = ${id};`;
-    return { success: true, deleted_id: id };
+  public static async deleteGame(
+    id: number,
+    userIdOrSql?: string | SqlClient | null,
+    customSql?: SqlClient
+  ): Promise<{ success: boolean; deleted_id: number }> {
+    let sql = customSql || getDatabase();
+    let uid: string | null = null;
+
+    if (this.isSqlClient(userIdOrSql)) {
+      sql = userIdOrSql;
+    } else if (typeof userIdOrSql === 'string') {
+      uid = userIdOrSql;
+    }
+
+    const result = await sql`
+      DELETE FROM user_games 
+      WHERE game_id = ${id}
+        AND (${uid}::text IS NULL OR user_id = ${uid}::uuid);
+    `;
+
+    return { success: result.count > 0, deleted_id: id };
   }
 }

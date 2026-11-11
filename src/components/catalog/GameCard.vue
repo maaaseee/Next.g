@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, type Component } from 'vue';
 import { Trash2, CheckCircle2, Play, Clock, Sparkles } from 'lucide-vue-next';
 import type { UserGame, GameStatus } from '@/types/game';
 import { useGamesStore } from '@/stores/gamesStore';
+import { usePreferencesStore } from '@/stores/preferencesStore';
 import { useDragAndDrop } from '@/composables/useDragAndDrop';
 import ConfirmModal from '@/components/common/ConfirmModal.vue';
 
 const props = defineProps<{
   game: UserGame;
+  index?: number;
 }>();
 
 const emit = defineEmits<{
@@ -15,19 +17,26 @@ const emit = defineEmits<{
 }>();
 
 const gamesStore = useGamesStore();
-const { onDragStart, onDragEnd, draggedGame } = useDragAndDrop();
+const preferencesStore = usePreferencesStore();
+const { startPointerDrag, wasRecentlyDragged, draggedGame } = useDragAndDrop();
 
 const imageError = ref(false);
 const hoveredActionStatus = ref<GameStatus | null>(null);
 const showDeleteConfirm = ref(false);
 
-const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: any; bgClass: string }[] = [
+const ALL_STATUSES: {
+  id: GameStatus;
+  label: string;
+  actionLabel: string;
+  icon: Component;
+  bgClass: string;
+}[] = [
   {
-    id: 'BACKLOG',
-    label: 'Backlog',
-    actionLabel: 'Backlog',
-    icon: Clock,
-    bgClass: 'bg-amber-500',
+    id: 'COMPLETED',
+    label: 'Completado',
+    actionLabel: 'Completado',
+    icon: CheckCircle2,
+    bgClass: 'bg-sky-500',
   },
   {
     id: 'PLAYING',
@@ -37,11 +46,11 @@ const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: 
     bgClass: 'bg-emerald-500',
   },
   {
-    id: 'COMPLETED',
-    label: 'Completado',
-    actionLabel: 'Completado',
-    icon: CheckCircle2,
-    bgClass: 'bg-sky-500',
+    id: 'BACKLOG',
+    label: 'Backlog',
+    actionLabel: 'Backlog',
+    icon: Clock,
+    bgClass: 'bg-amber-500',
   },
   {
     id: 'WISHLIST',
@@ -51,6 +60,11 @@ const ALL_STATUSES: { id: GameStatus; label: string; actionLabel: string; icon: 
     bgClass: 'bg-purple-500',
   },
 ];
+
+function handleCardClick() {
+  if (wasRecentlyDragged.value) return;
+  emit('click', props.game);
+}
 
 function handleImageError() {
   imageError.value = true;
@@ -72,13 +86,15 @@ function confirmDelete() {
 
 <template>
   <div
-    draggable="true"
-    @dragstart="onDragStart(game, $event)"
-    @dragend="onDragEnd"
-    @click="emit('click', game)"
-    class="group relative rounded-lg overflow-hidden border transition-all duration-300 cursor-grab active:cursor-grabbing hover:shadow-2xl shadow-md flex flex-col justify-end select-none"
+    @pointerdown="startPointerDrag(game, $event)"
+    @dragstart.prevent
+    @click="handleCardClick"
+    class="group relative rounded-[4px] overflow-hidden border transition-all duration-300 hover:shadow-2xl shadow-md flex flex-col justify-end select-none touch-pan-y"
     :class="[
-      draggedGame?.id === game.id ? 'opacity-30 scale-95' : 'opacity-100',
+      preferencesStore.enableDragAndDrop
+        ? 'cursor-grab active:cursor-grabbing'
+        : 'cursor-pointer',
+      draggedGame?.id === game.id ? 'opacity-25 scale-95 ring-2 ring-(--app-primary)/50' : 'opacity-100',
     ]"
     :style="{
       backgroundColor: 'var(--app-surface)',
@@ -113,7 +129,9 @@ function confirmDelete() {
       </div>
 
       <!-- Dark Vignette Gradient: Only visible on Hover -->
-      <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div
+        class="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+      />
     </div>
 
     <!-- Bottom Content Overlay: Appears smoothly on Hover -->
@@ -142,13 +160,18 @@ function confirmDelete() {
         <!-- Floating Tooltip showing category name on button hover -->
         <div
           v-if="hoveredActionStatus"
-          class="absolute bottom-full left-0 right-0 mb-2 py-1 px-2 rounded-md bg-black/95 border border-white/20 text-center text-[10px] font-bold text-white shadow-2xl pointer-events-none animate-fadeIn z-20"
+          class="absolute bottom-full left-0 right-0 mb-2 py-1 px-2 rounded-[4px] border text-center text-[10px] font-bold shadow-2xl pointer-events-none animate-fadeIn z-20"
+          :style="{
+            backgroundColor: 'var(--app-surface)',
+            borderColor: 'var(--app-border)',
+            color: 'var(--app-text)',
+          }"
         >
           {{ ALL_STATUSES.find(s => s.id === hoveredActionStatus)?.actionLabel }}
         </div>
 
         <!-- 4-State Segmented Slider -->
-        <div class="flex items-center gap-0.5 flex-1 bg-white/5 p-0.5 rounded-md">
+        <div class="flex items-center gap-0.5 flex-1 bg-white/5 p-0.5 rounded-[4px]">
           <button
             v-for="target in ALL_STATUSES"
             :key="target.id"
@@ -158,7 +181,7 @@ function confirmDelete() {
             @mouseleave="hoveredActionStatus = null"
             :aria-label="target.actionLabel"
             :title="target.actionLabel"
-            class="flex-1 flex items-center justify-center py-1 rounded transition-all duration-150 cursor-pointer active:scale-95"
+            class="flex-1 flex items-center justify-center py-1 rounded-[3px] transition-all duration-150 cursor-pointer active:scale-95"
             :class="[
               game.status === target.id
                 ? [target.bgClass, 'text-white shadow-xs font-bold']

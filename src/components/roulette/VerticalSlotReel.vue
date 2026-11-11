@@ -1,101 +1,112 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
-import type { UserGame } from '@/types/game';
-import { formatGameRating } from '@/types/game';
-import { Star, Gamepad2, SlidersVertical, Target } from 'lucide-vue-next';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import gsap from 'gsap'
+import type { UserGame } from '@/types/game'
+import { formatGameRating } from '@/types/game'
+import { Star, Gamepad2, SlidersVertical } from 'lucide-vue-next'
 
 const props = defineProps<{
-  candidates: UserGame[];
-}>();
+  candidates: UserGame[]
+}>()
 
 const emit = defineEmits<{
-  (e: 'spin-end', game: UserGame): void;
-}>();
+  (e: 'spin-end', game: UserGame): void
+}>()
 
-const isSpinning = ref(false);
-const ITEM_HEIGHT = 80; // px
-const VISOR_HEIGHT = 260; // px (allows seeing items before and after without dominating viewport)
-const centerOffset = (VISOR_HEIGHT - ITEM_HEIGHT) / 2; // 90px
+const isSpinning = ref(false)
+const ITEM_HEIGHT = 80 // px
+const VISOR_HEIGHT = 260 // px (allows seeing items before and after without dominating viewport)
+const centerOffset = (VISOR_HEIGHT - ITEM_HEIGHT) / 2 // 90px
 
 // 250-item continuous virtual strip
-const BUFFER_SIZE = 250;
+const BUFFER_SIZE = 250
 const reelItems = computed(() => {
-  const list = props.candidates;
-  if (!list || list.length === 0) return [];
-  const items: { key: string; game: UserGame; originalIndex: number }[] = [];
+  const list = props.candidates
+  if (!list || list.length === 0) return []
+  const items: { key: string; game: UserGame; originalIndex: number }[] = []
   for (let idx = 0; idx < BUFFER_SIZE; idx++) {
-    const origIndex = idx % list.length;
-    const game = list[origIndex];
+    const origIndex = idx % list.length
+    const game = list[origIndex]
     if (game) {
       items.push({
         key: `slot-reel-${idx}-${game.id}`,
         game,
         originalIndex: origIndex,
-      });
+      })
     }
   }
-  return items;
-});
+  return items
+})
 
-const currentReelIndex = ref(6);
-const translateY = ref(-(6 * ITEM_HEIGHT - centerOffset));
+const currentReelIndex = ref(6)
+const translateY = ref(-(6 * ITEM_HEIGHT - centerOffset))
 
 const initPosition = () => {
   if (props.candidates.length > 0) {
-    currentReelIndex.value = Math.min(6, props.candidates.length * 2);
-    translateY.value = -(currentReelIndex.value * ITEM_HEIGHT - centerOffset);
+    currentReelIndex.value = Math.min(6, props.candidates.length * 2)
+    translateY.value = -(currentReelIndex.value * ITEM_HEIGHT - centerOffset)
   }
-};
+}
 
 watch(
   () => props.candidates,
   () => {
     if (!isSpinning.value) {
-      initPosition();
+      initPosition()
     }
   },
-  { deep: true }
-);
+  { deep: true },
+)
 
 onMounted(() => {
-  initPosition();
-});
+  initPosition()
+})
 
 const spin = () => {
-  if (isSpinning.value || props.candidates.length < 2) return;
+  if (isSpinning.value || props.candidates.length < 2) return
 
-  const total = props.candidates.length;
-  const winnerIndex = Math.floor(Math.random() * total);
-  const winningGame = props.candidates[winnerIndex];
-  if (!winningGame) return;
+  const total = props.candidates.length
+  const winnerIndex = Math.floor(Math.random() * total)
+  const winningGame = props.candidates[winnerIndex]
+  if (!winningGame) return
 
-  const currentMod = currentReelIndex.value % total;
-  const distanceToGame = (winnerIndex - currentMod + total) % total;
+  const currentMod = currentReelIndex.value % total
+  const distanceToGame = (winnerIndex - currentMod + total) % total
 
   // Advance forward by at least 3-4 revolutions (at least 24 items)
-  const fullRevolutions = Math.max(3, Math.ceil(24 / total));
-  const stepsToAdvance = fullRevolutions * total + distanceToGame;
+  const fullRevolutions = Math.max(3, Math.ceil(24 / total))
+  const stepsToAdvance = fullRevolutions * total + distanceToGame
 
-  const nextTargetIndex = currentReelIndex.value + stepsToAdvance;
+  const nextTargetIndex = currentReelIndex.value + stepsToAdvance
 
-  isSpinning.value = true;
-  currentReelIndex.value = nextTargetIndex;
-  translateY.value = -(nextTargetIndex * ITEM_HEIGHT - centerOffset);
+  isSpinning.value = true
+  currentReelIndex.value = nextTargetIndex
+  const targetY = -(nextTargetIndex * ITEM_HEIGHT - centerOffset)
 
-  setTimeout(() => {
-    isSpinning.value = false;
-    emit('spin-end', winningGame);
+  gsap.killTweensOf(translateY)
+  gsap.to(translateY, {
+    value: targetY,
+    duration: 4.4,
+    ease: 'power3.out',
+    onComplete: () => {
+      isSpinning.value = false
+      emit('spin-end', winningGame)
 
-    // Silently normalize index if past 150 so we never run out of items
-    if (currentReelIndex.value > 150) {
-      const normalizedIndex = (currentReelIndex.value % total) + total * 3;
-      currentReelIndex.value = normalizedIndex;
-      translateY.value = -(normalizedIndex * ITEM_HEIGHT - centerOffset);
-    }
-  }, 4200);
-};
+      // Silently normalize index if past 150 so we never run out of items
+      if (currentReelIndex.value > 150) {
+        const normalizedIndex = (currentReelIndex.value % total) + total * 3
+        currentReelIndex.value = normalizedIndex
+        translateY.value = -(normalizedIndex * ITEM_HEIGHT - centerOffset)
+      }
+    },
+  })
+}
 
-defineExpose({ spin });
+onUnmounted(() => {
+  gsap.killTweensOf(translateY)
+})
+
+defineExpose({ spin })
 </script>
 
 <template>
@@ -137,16 +148,19 @@ defineExpose({ spin });
         </div>
 
         <!-- Top & Bottom Gradient Shadows for depth -->
-        <div class="absolute top-0 inset-x-0 h-12 bg-linear-to-b from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
-        <div class="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none" />
+        <div
+          class="absolute top-0 inset-x-0 h-12 bg-linear-to-b from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none"
+        />
+        <div
+          class="absolute bottom-0 inset-x-0 h-12 bg-linear-to-t from-slate-950 via-slate-950/70 to-transparent z-10 pointer-events-none"
+        />
 
-        <!-- Vertical Sliding Strip -->
+        <!-- Vertical Sliding Strip driven by GSAP -->
         <div
           v-if="candidates.length > 0"
-          class="w-full flex flex-col"
+          class="w-full flex flex-col will-change-transform"
           :style="{
             transform: `translateY(${translateY}px)`,
-            transition: isSpinning ? 'transform 4.2s cubic-bezier(0.12, 0.8, 0.15, 1)' : 'none',
           }"
         >
           <div
@@ -155,7 +169,9 @@ defineExpose({ spin });
             class="h-20 px-3 sm:px-5 flex items-center gap-3 sm:gap-4 border-b border-white/5 shrink-0"
           >
             <!-- Game Thumb -->
-            <div class="w-11 h-15 rounded overflow-hidden bg-black/60 shrink-0 border border-white/15 shadow-sm">
+            <div
+              class="w-11 h-15 rounded overflow-hidden bg-black/60 shrink-0 border border-white/15 shadow-sm"
+            >
               <img
                 v-if="item.game.cover_url"
                 :src="item.game.cover_url"
@@ -204,9 +220,7 @@ defineExpose({ spin });
 
         <!-- Empty State -->
         <div v-else class="h-full flex items-center justify-center text-center p-4">
-          <p class="text-xs text-gray-400 font-medium">
-            No hay juegos para los filtros activos.
-          </p>
+          <p class="text-xs text-gray-400 font-medium">No hay juegos para los filtros activos.</p>
         </div>
       </div>
     </div>
@@ -227,16 +241,10 @@ defineExpose({ spin });
         <span>{{ isSpinning ? 'Seleccionando...' : 'Sortear Juego' }}</span>
       </button>
 
-      <span
-        v-if="candidates.length === 0"
-        class="text-xs font-semibold text-rose-400"
-      >
+      <span v-if="candidates.length === 0" class="text-xs font-semibold text-rose-400">
         No hay candidatos disponibles con los filtros actuales.
       </span>
-      <span
-        v-else-if="candidates.length === 1"
-        class="text-xs font-medium text-amber-300"
-      >
+      <span v-else-if="candidates.length === 1" class="text-xs font-medium text-amber-300">
         Se necesitan al menos 2 juegos para realizar el sorteo.
       </span>
     </div>
