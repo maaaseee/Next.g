@@ -38,11 +38,17 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 
-# Backend local data & env
+# Environment variables & secrets
 .env
-.env.*
+.env.local
+.env.*.local
+!.env.example
+!.env.development
+!.env.production
 backend/.env
-backend/.env.*
+backend/.env.local
+backend/.env.*.local
+!backend/.env.example
 backend/data/
 backend/logs/
 *.db

@@ -25,13 +25,20 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - ./backend/.env
     environment:
       PORT: 3000
-      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgrespassword@db:5432/nextg_db}
-      RAWG_API_KEY: ${RAWG_API_KEY:-}
+      DATABASE_URL: postgres://postgres:postgrespassword@db:5432/nextg_db
       CORS_ORIGIN: "http://localhost:5173"
       NODE_ENV: production
       AUTO_SEED: ${AUTO_SEED:-false}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     depends_on:
       db:
         condition: service_healthy
