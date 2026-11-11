@@ -23,8 +23,10 @@ docs/
 ├── design/                # Tokens visuales y recursos de diseño
 │   └── palettes.css           # Paletas de colores (Midnight, Emerald, Cyberpunk, Rose)
 ├── images/                # Recursos visuales e identidad gráfica oficial
-│   ├── logo.svg               # Logo vectorial adaptable (Light/Dark mode)
-│   └── banner.svg             # Banner panorámico gamer para README y headers
+│   ├── logo.png               # Logo transparente capturado del componente CSS
+│   ├── logo-light.png         # Logo optimizado para fondos claros
+│   ├── logo-dark.png          # Logo con fondo oscuro oficial de la app
+│   └── navbar.png             # Captura del header completo en vivo
 └── tasks/                 # Tareas y planes de ejecución iniciales del MVP
     ├── backend-plan.md        # Plan de fases del backend
     ├── backend-todo.md        # Checklist de tareas del backend
@@ -66,8 +68,10 @@ docs/
 
 ## 🖼️ Recursos Visuales & Marca ([`images/`](./images/))
 
-* [**logo.svg**](./images/logo.svg): Logo vectorial oficial adaptable a temas claro y oscuro (`NEXT.g`).
-* [**banner.svg**](./images/banner.svg): Banner panorámico cyberpunk oficial (1200x340) con iluminación de neón para READMEs y cabeceras.
+* [**logo.png**](./images/logo.png): Captura oficial en alta resolución (Retina 3x) con fondo transparente del componente CSS `.font-brand` de la Navbar.
+* [**logo-light.png**](./images/logo-light.png): Versión del logo con contraste adaptado para entornos y fondos claros.
+* [**logo-dark.png**](./images/logo-dark.png): Logo con el contenedor y fondo temático `--app-bg` de la aplicación.
+* [**navbar.png**](./images/navbar.png): Captura completa del header de navegación renderizado en vivo por el navegador.
 
 ---
 

@@ -1,8 +1,10 @@
 <div align="center">
 
-<a href="#-nextg--video-game-backlog--discovery-hub">
-  <img src="./docs/images/banner.svg" alt="NEXT.g Banner" width="100%" />
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/images/logo.png">
+  <source media="(prefers-color-scheme: light)" srcset="./docs/images/logo-light.png">
+  <img src="./docs/images/logo.png" alt="NEXT.g Logo" width="280">
+</picture>
 
 # 🎮 NEXT.g — Video Game Backlog & Discovery Hub
 
@@ -288,7 +290,7 @@ Toda la documentación técnica, guías operativas y arquitectura se encuentran 
 - 🏛️ [Arquitectura y PRD](./docs/architecture/)
 - 🚀 [Guías de Despliegue y OAuth](./docs/guides/)
 - 🎨 [Sistema de Diseño y Recursos](./docs/design/palettes.css)
-- 🖼️ [Recursos de Identidad Visual (Logo y Banner)](./docs/images/)
+- 🖼️ [Recursos de Identidad Visual (Logo oficial)](./docs/images/)
 - 📋 [Planes de Tareas y Verificación](./docs/tasks/)
 
 ---
