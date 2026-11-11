@@ -1,7 +1,7 @@
 # Plan de Implementación: Frontend (NEXT.g Web App & PWA)
 
 ## 1. Visión General
-Este documento detalla la construcción del Frontend de **NEXT.g** según la especificación técnica en [`docs/spec-frontend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/spec-frontend.md). El objetivo es crear una SPA / PWA de escritorio en **Vue 3 + Vite + Tailwind CSS v4 + Pinia**, con navegación deslizante fluida, Drag & Drop con cambio de pestañas al borde (Slide-on-Edge), 3 modos de ruleta interactiva y las 4 paletas de color de `palletes.css`.
+Este documento detalla la construcción del Frontend de **NEXT.g** según la especificación técnica en [`docs/architecture/spec-frontend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/architecture/spec-frontend.md). El objetivo es crear una SPA / PWA de escritorio en **Vue 3 + Vite + Tailwind CSS v4 + Pinia**, con navegación deslizante fluida, Drag & Drop con cambio de pestañas al borde (Slide-on-Edge), 3 modos de ruleta interactiva y las 4 paletas de color de `palletes.css`.
 
 ---
 

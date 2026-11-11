@@ -1,7 +1,7 @@
 # Plan de Implementación: Backend (NEXT.g API)
 
 ## 1. Visión General
-Este documento desglosa paso a paso la construcción del backend de **NEXT.g** según lo definido en [`docs/spec-backend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/spec-backend.md). El objetivo es crear una API modular, segura y de alto rendimiento utilizando **Bun + ElysiaJS + SQLite (`bun:sqlite`) + IGDB Proxy**, dividida en unidades de trabajo pequeñas y verificables.
+Este documento desglosa paso a paso la construcción del backend de **NEXT.g** según lo definido en [`docs/architecture/spec-backend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/architecture/spec-backend.md). El objetivo es crear una API modular, segura y de alto rendimiento utilizando **Bun + ElysiaJS + SQLite (`bun:sqlite`) + IGDB Proxy**, dividida en unidades de trabajo pequeñas y verificables.
 
 ---
 

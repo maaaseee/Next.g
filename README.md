@@ -33,11 +33,11 @@
 
 ### 🔍 Buscador Global de Juegos
 - **Búsqueda Global con Shortcut:** Accede desde la Navbar o con `Ctrl + K` desde cualquier pantalla.
-- **Integración con RAWG API:** Acceso a miles de títulos de videojuegos con metadatos completos y portadas.
+- **Integración con IGDB API (Twitch):** Acceso a cientos de miles de títulos de videojuegos con metadatos completos y portadas oficiales en alta resolución.
 - **Caché Multinivel y Optimización:**
   - **Debounce estricto:** 750 ms y umbral mínimo de 4 caracteres para evitar consumo innecesario de cuota.
   - **Caché en RAM de sesión (Pinia):** Búsquedas repetidas instantáneas sin peticiones a la red.
-  - **Caché persistente SQLite (Backend):** Guarda respuestas por 45 días protegiendo los límites de la API externa.
+  - **Caché persistente PostgreSQL (Backend):** Guarda respuestas por 45 días protegiendo los límites de la API externa.
   - **Catálogo Semilla Offline:** Búsqueda local de respaldo en caso de agotamiento de cuota o pérdida de conexión.
 
 ### 🎨 Personalización y Temas
@@ -58,9 +58,9 @@ Game Backlog/
 │   ├── src/
 │   │   ├── config/           # Carga y validación de variables de entorno
 │   │   ├── controllers/      # Controladores de búsqueda y biblioteca
-│   │   ├── db/               # SQLite (bun:sqlite), migraciones automáticas y seed local
-│   │   ├── providers/        # Patrón Adaptador para APIs externas (RAWG / IGDB)
-│   │   ├── services/         # Orquestador de búsqueda, caché de 45 días y CRUD
+│   │   ├── db/               # PostgreSQL, migraciones automáticas y seed local
+│   │   ├── providers/        # Patrón Adaptador para APIs externas (IGDB API v4)
+│   │   ├── services/         # Orquestador de búsqueda, autenticación Twitch OAuth2, caché y CRUD
 │   │   └── utils/            # Sistema de logging profesional (Winston)
 │   └── tests/                # Suite de pruebas unitarias y de integración
 │
@@ -77,10 +77,10 @@ Game Backlog/
 ```
 
 - **Frontend:** [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`), [Vite](https://vite.dev/), [Pinia](https://pinia.vuejs.org/), [Tailwind CSS v4](https://tailwindcss.com/), [Lucide Icons](https://lucide.dev/).
-- **Backend:** [Bun](https://bun.sh/) (Runtime de alto rendimiento), [Elysia.js](https://elysiajs.com/), [SQLite](https://bun.sh/docs/api/sqlite) integrado en Bun (`bun:sqlite`), [Winston](https://github.com/winstonjs/winston) (logs rotativos y en terminal).
+- **Backend:** [Bun](https://bun.sh/) (Runtime de alto rendimiento), [Elysia.js](https://elysiajs.com/), [PostgreSQL](https://github.com/porsager/postgres), [Winston](https://github.com/winstonjs/winston) (logs rotativos y en terminal).
 - **Patrones de Diseño:**
-  - **Adapter Pattern:** Interfaz común `GameProvider` que desacopla la API de RAWG de IGDB, permitiendo alternar proveedores sin tocar el frontend.
-  - **Multi-tier Cache:** Memoria RAM en cliente $\rightarrow$ SQLite en servidor $\rightarrow$ API Externa $\rightarrow$ Semilla Offline.
+  - **Adapter Pattern:** Interfaz `GameProvider` con `IgdbAdapter` que se conecta a IGDB API v4 vía Twitch OAuth2, normalizando los datos a `NormalizedGame`.
+  - **Multi-tier Cache:** Memoria RAM en cliente $\rightarrow$ PostgreSQL en servidor $\rightarrow$ IGDB API $\rightarrow$ Semilla Offline.
 
 ---
 
@@ -88,7 +88,7 @@ Game Backlog/
 
 ### Prerrequisitos
 - [Node.js](https://nodejs.org/) (v22 o superior) o [Bun](https://bun.sh/) (recomendado para el backend).
-- Una API Key gratuita de [RAWG.io](https://rawg.io/apidocs).
+- Una aplicación registrada en el [Twitch Developer Portal](https://dev.twitch.tv/console/apps) (`Client ID` y `Client Secret`).
 
 ---
 
@@ -111,7 +111,9 @@ cd game-backlog
 2. Crea tu archivo de variables de entorno `.env` en `backend/.env`:
    ```env
    PORT=3000
-   RAWG_API_KEY=tu_clave_de_rawg_aqui
+   DATABASE_URL=postgres://postgres:postgrespassword@localhost:5432/nextg_db
+   TWITCH_CLIENT_ID=tu_twitch_client_id
+   TWITCH_CLIENT_SECRET=tu_twitch_client_secret
    CORS_ORIGIN=http://localhost:5173
    NODE_ENV=development
    ```
@@ -177,8 +179,8 @@ cd game-backlog
   - [x] Modal de celebración de ganador con animaciones.
 
 - [x] **Fase 3: Búsqueda y Arquitectura de Proveedores**
-  - [x] Patrón Adapter para unificar RAWG e IGDB bajo el contrato `NormalizedGame`.
-  - [x] Caché de búsquedas en 3 capas (Pinia RAM, SQLite 45 días, Semilla Offline).
+  - [x] Patrón Adapter con `IgdbAdapter` normalizando datos al contrato `NormalizedGame`.
+  - [x] Caché de búsquedas en 3 capas (Pinia RAM, PostgreSQL 45 días, Semilla Offline).
   - [x] Barra de búsqueda global accesible con `Ctrl + K` en la Navbar.
   - [x] Sistema de logging profesional estructurado con Winston.
 
@@ -190,6 +192,17 @@ cd game-backlog
 - [ ] **Fase 5: Métricas & Social (Futuro)**
   - [ ] Gráficos de tiempo invertido y títulos completados por año.
   - [ ] Compartir perfil y ruletas personalizadas con amigos mediante enlace único.
+
+---
+
+## 📚 Documentación del Proyecto
+
+Toda la documentación técnica, guías de arquitectura y despliegue se encuentran organizadas en [`docs/`](./docs/README.md):
+- 🏛️ [Arquitectura y Especificaciones](./docs/architecture/)
+- 🚀 [Guías de Autenticación y Despliegue](./docs/guides/)
+- 🗺️ [Roadmap de Versiones Futuras](./docs/product/roadmap.md)
+- 🎨 [Tokens de Diseño y Paletas](./docs/design/palettes.css)
+- 📋 [Planes de Tareas](./docs/tasks/)
 
 ---
 

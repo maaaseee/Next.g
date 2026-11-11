@@ -1,7 +1,7 @@
 # Lista de Tareas: Frontend (NEXT.g Web App & PWA)
 
 Estado: **Completado y Verificado**  
-Referencia: [`docs/tasks/frontend-plan.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/tasks/frontend-plan.md) • [`docs/spec-frontend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/spec-frontend.md)
+Referencia: [`docs/tasks/frontend-plan.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/tasks/frontend-plan.md) • [`docs/architecture/spec-frontend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/architecture/spec-frontend.md)
 
 ---
 

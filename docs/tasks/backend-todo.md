@@ -1,7 +1,7 @@
 # Lista de Tareas: Backend (NEXT.g API)
 
 Estado: **Completado y Verificado**  
-Referencia: [`docs/tasks/backend-plan.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/tasks/backend-plan.md) • [`docs/spec-backend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/spec-backend.md)
+Referencia: [`docs/tasks/backend-plan.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/tasks/backend-plan.md) • [`docs/architecture/spec-backend.md`](file:///C:/Users/maxe1/Documents/Repos/Spring%20projects%20on%20Github/Game%20Backlog/docs/architecture/spec-backend.md)
 
 ---
 
