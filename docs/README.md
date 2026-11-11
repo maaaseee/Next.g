@@ -22,6 +22,9 @@ docs/
 │   └── roadmap.md             # Roadmap de versiones futuras (V1.1, V1.2, V2.0)
 ├── design/                # Tokens visuales y recursos de diseño
 │   └── palettes.css           # Paletas de colores (Midnight, Emerald, Cyberpunk, Rose)
+├── images/                # Recursos visuales e identidad gráfica oficial
+│   ├── logo.svg               # Logo vectorial adaptable (Light/Dark mode)
+│   └── banner.svg             # Banner panorámico gamer para README y headers
 └── tasks/                 # Tareas y planes de ejecución iniciales del MVP
     ├── backend-plan.md        # Plan de fases del backend
     ├── backend-todo.md        # Checklist de tareas del backend
@@ -58,6 +61,13 @@ docs/
 ## 🎨 Diseño & UI ([`design/`](./design/))
 
 * [**palettes.css**](./design/palettes.css): Definición de temas de color y variables CSS (`--app-primary`, `--app-surface`, `--app-bg`, etc.) para los 4 temas de la aplicación.
+
+---
+
+## 🖼️ Recursos Visuales & Marca ([`images/`](./images/))
+
+* [**logo.svg**](./images/logo.svg): Logo vectorial oficial adaptable a temas claro y oscuro (`NEXT.g`).
+* [**banner.svg**](./images/banner.svg): Banner panorámico cyberpunk oficial (1200x340) con iluminación de neón para READMEs y cabeceras.
 
 ---
 
