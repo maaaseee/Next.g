@@ -164,5 +164,13 @@ describe('Security & Hardening Suite', () => {
       })
     );
     expect(unauthorizedRes.headers.get('access-control-allow-origin')).not.toBe('https://malicious-website.com');
+
+    // 3. Unauthorized third-party Vercel app should be strictly rejected
+    const thirdPartyVercelRes = await app.handle(
+      new Request('http://localhost:3000/health', {
+        headers: { Origin: 'https://attacker-app.vercel.app' },
+      })
+    );
+    expect(thirdPartyVercelRes.headers.get('access-control-allow-origin')).not.toBe('https://attacker-app.vercel.app');
   }, 15000);
 });

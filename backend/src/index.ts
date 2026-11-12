@@ -44,11 +44,20 @@ export async function setupDatabase() {
 setupDatabase();
 
 // Parse CORS origins from environment variable (supports single origin or comma-separated list)
+// Automatically strips trailing slashes to prevent common configuration errors
 const configuredOrigins = (ENV.CORS_ORIGIN || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
+/**
+ * Strict, secure origin validation.
+ * Defends against CORS misconfiguration attacks (CWE-942):
+ * - Does NOT allow generic wildcards across all of vercel.app.
+ * - Allows exact matches configured in CORS_ORIGIN.
+ * - Allows preview deployments ONLY if they strictly match the user's specific project prefix.
+ * - Allows localhost only during local development/testing.
+ */
 export function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true;
   const clean = origin.trim().replace(/\/+$/, '');
@@ -56,11 +65,23 @@ export function isAllowedOrigin(origin: string | null): boolean {
   // 1. Matches explicitly configured origins
   if (configuredOrigins.includes(clean)) return true;
 
-  // 2. Matches local development ports (Vite, Preview, etc.)
-  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(clean)) return true;
+  // 2. Matches preview branches ONLY if they match your specific project prefix from CORS_ORIGIN
+  // e.g. If CORS_ORIGIN has https://nextg-backlog.vercel.app, only allow https://nextg-backlog-*.vercel.app
+  for (const conf of configuredOrigins) {
+    const vercelMatch = conf.match(/^https:\/\/([a-zA-Z0-9_-]+)\.vercel\.app$/);
+    if (vercelMatch) {
+      const projectName = vercelMatch[1];
+      // Must start with exact projectName followed by a dash for preview branches
+      if (clean.startsWith(`https://${projectName}-`) && clean.endsWith('.vercel.app')) {
+        return true;
+      }
+    }
+  }
 
-  // 3. Matches all Vercel deployments (*.vercel.app - production, previews and branch deploys)
-  if (/^https:\/\/[a-zA-Z0-9_\-\.]+\.vercel\.app$/.test(clean)) return true;
+  // 3. Local development ports allowed only in non-production or if explicitly listed
+  if (ENV.NODE_ENV !== 'production') {
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(clean)) return true;
+  }
 
   return false;
 }
