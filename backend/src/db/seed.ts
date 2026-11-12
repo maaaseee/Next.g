@@ -86,9 +86,12 @@ export async function runSeed(
       const defaultStatus = 'defaultStatus' in game ? (game as { defaultStatus?: string }).defaultStatus : undefined;
       if (populateUserLibrary && defaultStatus) {
         await tx`
-          INSERT INTO user_games (game_id, status, updated_at)
-          VALUES (${game.id}, ${defaultStatus}, CURRENT_TIMESTAMP)
-          ON CONFLICT(game_id) DO NOTHING;
+          INSERT INTO user_games (user_id, game_id, status, updated_at)
+          SELECT NULL, ${game.id}, ${defaultStatus}, CURRENT_TIMESTAMP
+          WHERE NOT EXISTS (
+            SELECT 1 FROM user_games 
+            WHERE user_id IS NULL AND game_id = ${game.id}
+          );
         `;
       }
     }
