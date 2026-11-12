@@ -50,7 +50,41 @@ El repositorio ya cuenta con el pipeline automatizado en `.github/workflows/depl
 
 ---
 
-## 5. Paso 4: Desplegar en Azure Container Apps ($0)
+## 5. Estrategia de Versionado Semántico & Rollback Confiable
+
+Para no depender exclusivamente del tag `:latest` y poder realizar retrocesos (rollbacks) inmediatos ante cualquier incidente sin necesidad de descifrar códigos SHA, el pipeline genera automáticamente versiones semánticas legibles:
+
+### Tags Publicados Automáticamente en GHCR:
+- **`ghcr.io/maaaseee/next.g-backend:v1.0.0`** (Versión SemVer fija)
+- **`ghcr.io/maaaseee/next.g-backend:1.0.0`** (SemVer sin prefijo)
+- **`ghcr.io/maaaseee/next.g-backend:latest`** (Última versión estable de `main`)
+- **`ghcr.io/maaaseee/next.g-backend:dev`** (Última versión de la rama `dev`)
+
+### Cómo Publicar una Nueva Versión:
+1. **Método Recomendado (Git Tag):**
+   ```bash
+   git tag v1.0.1
+   git push origin v1.0.1
+   ```
+   El pipeline compilará la imagen y publicará los tags `:v1.0.1`, `:1.0.1`, `:1.0` y actualizará `:latest`.
+2. **Método por `package.json`:**
+   Incrementa `"version": "1.0.1"` en `backend/package.json` y haz push a `main`. El pipeline publicará automáticamente `:v1.0.1`.
+3. **Método Manual (GitHub Actions):**
+   En la pestaña **Actions** > selecciona **Backend CI & CD Pipeline (GHCR)** > haz clic en **Run workflow** e ingresa la versión deseada (ej: `v1.0.1`).
+
+### Cómo Hacer un Rollback Inmediato en Azure Container Apps:
+Si una versión desplegada presenta algún fallo imprevisto:
+1. Entra a tu **Azure Portal** > navega a tu **Container App** (`nextg-backend`).
+2. En el menú lateral, ve a **Application > Containers** > haz clic en **Edit and deploy**.
+3. En la pestaña del contenedor, cambia la etiqueta de la imagen a la versión estable previa:
+   ```
+   ghcr.io/maaaseee/next.g-backend:v1.0.0
+   ```
+4. Haz clic en **Create**. Azure iniciará una nueva réplica con la versión anterior y redirigirá el tráfico sin tiempo de inactividad (Zero Downtime).
+
+---
+
+## 6. Paso 4: Desplegar en Azure Container Apps ($0)
 
 ### Mediante Azure Portal o Azure CLI:
 

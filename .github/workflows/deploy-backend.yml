@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - dev
+    tags:
+      - 'v*.*.*'
+      - 'v*'
     paths:
       - 'backend/**'
       - '.github/workflows/deploy-backend.yml'
@@ -15,6 +18,12 @@ on:
       - 'backend/**'
       - '.github/workflows/deploy-backend.yml'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag de versión manual (ej: v1.0.0 o 1.0.0)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -93,6 +102,12 @@ jobs:
         run: |
           echo "IMAGE_NAME_LOWER=$(echo '${{ github.repository }}-backend' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Read version from backend/package.json
+        id: pkg
+        run: |
+          VERSION=$(node -p "require('./backend/package.json').version")
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -109,8 +124,20 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}
           tags: |
-            type=raw,value=latest
+            # 1. Tags semánticos automáticos si se empuja un Git Tag (ej: git tag v1.0.0 -> 1.0.0, 1.0, 1)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            # 2. Versión declarada en backend/package.json (ej: v1.0.0 y 1.0.0)
+            type=raw,value=v${{ steps.pkg.outputs.version }}
+            type=raw,value=${{ steps.pkg.outputs.version }}
+            # 3. Tag manual si se ejecuta con input desde la interfaz de GitHub Actions
+            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }}
+            # 4. latest en main o git release tags
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+            # 5. Tag por nombre de rama (main o dev)
             type=ref,event=branch
+            # 6. SHA inmutable
             type=sha,format=short
 
       - name: Build and push Docker image
