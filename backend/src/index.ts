@@ -44,14 +44,26 @@ export async function setupDatabase() {
 setupDatabase();
 
 // Parse CORS origins from environment variable (supports single origin or comma-separated list)
-const parsedOrigins = ENV.CORS_ORIGIN
+const configuredOrigins = (ENV.CORS_ORIGIN || '')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
-const corsOriginSetting = parsedOrigins.length === 1
-  ? parsedOrigins[0]
-  : (parsedOrigins.length > 1 ? parsedOrigins : 'http://localhost:5173');
+export function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return true;
+  const clean = origin.trim().replace(/\/+$/, '');
+
+  // 1. Matches explicitly configured origins
+  if (configuredOrigins.includes(clean)) return true;
+
+  // 2. Matches local development ports (Vite, Preview, etc.)
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(clean)) return true;
+
+  // 3. Matches all Vercel deployments (*.vercel.app - production, previews and branch deploys)
+  if (/^https:\/\/[a-zA-Z0-9_\-\.]+\.vercel\.app$/.test(clean)) return true;
+
+  return false;
+}
 
 export const app = new Elysia()
   // 1. Injects OWASP defense-in-depth security headers
@@ -99,7 +111,10 @@ export const app = new Elysia()
   // 4. Global CORS configuration (strictly bounded by CORS_ORIGIN env parameter)
   .use(
     cors({
-      origin: corsOriginSetting,
+      origin: (request: Request) => {
+        const origin = request.headers.get('origin');
+        return isAllowedOrigin(origin);
+      },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
       exposeHeaders: ['Content-Type', 'X-Total-Count', 'X-Has-More', 'Retry-After'],
