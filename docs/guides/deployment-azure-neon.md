@@ -43,10 +43,10 @@ Esta guía detalla los pasos para desplegar el backend de **NEXT.g** con **gasto
 
 El repositorio ya cuenta con el pipeline automatizado en `.github/workflows/deploy-backend.yml`.
 
-1. Haz un `git push` a la rama `main`.
-2. En GitHub, ve a la pestaña **Actions** y verifica que el workflow `Build and Publish Backend to GHCR` termine en verde.
-3. Ve a tu perfil u organización de GitHub > **Packages** > selecciona `game-backlog-backend`.
-4. En **Package Settings**, puedes cambiar la visibilidad a **Public** para que Azure Container Apps pueda descargar la imagen sin necesidad de configurar secretos de autenticación.
+1. Haz un `git push` a la rama `main` (o ejecuta el workflow manualmente vía *Run workflow*).
+2. En GitHub, ve a la pestaña **Actions** y verifica que el workflow `Backend CI & CD Pipeline (GHCR)` termine en verde (aprobado).
+3. Ve a tu perfil u organización de GitHub > **Packages** (o directamente en `https://github.com/maaaseee?tab=packages`) > selecciona **`next.g-backend`**.
+4. En **Package Settings** (menú lateral derecho abajo), haz scroll hasta **Danger Zone** > **Change package visibility** y selecciona **Public**. Esto permite que Azure Container Apps descargue la imagen de forma gratuita sin necesidad de crear ni pagar por Azure Container Registry (ACR) ni configurar credenciales de registro.
 
 ---
 
@@ -59,9 +59,11 @@ El repositorio ya cuenta con el pipeline automatizado en `.github/workflows/depl
 - **Plan:** **Consumption (Serverless)** *(Obligatorio para que sea gratuito)*.
 
 #### 2. Crear la Container App:
-- **Nombre:** `gamebacklog-backend`
+- **Nombre:** `nextg-backend`
 - **Origen de la imagen:** Docker Hub u otros registros (`ghcr.io`).
-- **Imagen:** `ghcr.io/<tu-usuario-github>/<tu-repo>-backend:latest`
+- **Tipo de registro:** Otros (o Público si el paquete es público).
+- **Servidor del Registro:** `ghcr.io`
+- **Imagen y etiqueta:** `ghcr.io/maaaseee/next.g-backend:latest`
 - **Tamaño del contenedor:**
   - **vCPU:** `0.25`
   - **Memoria:** `0.5 GiB`
