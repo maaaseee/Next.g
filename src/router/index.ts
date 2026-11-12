@@ -1,13 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition;
+      return savedPosition
     }
-    return { top: 0, left: 0 };
+    return { top: 0, left: 0 }
   },
   routes: [
     {
@@ -99,17 +99,16 @@ const router = createRouter({
       component: () => import('@/views/NotFoundView.vue'),
     },
   ],
-});
+})
 
 router.beforeEach(async (to) => {
-  document.title = 'NEXT.g — Backlog & Videojuegos';
-  const authStore = useAuthStore();
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      const user = await authStore.fetchMe();
+      const user = await authStore.fetchMe()
       if (!user) {
-        return { path: '/login', query: { redirect: to.fullPath } };
+        return { path: '/login', query: { redirect: to.fullPath } }
       }
     }
   }
@@ -126,8 +125,8 @@ router.beforeEach(async (to) => {
     to.path !== '/privacy' &&
     to.path !== '/login'
   ) {
-    return { path: '/choose-nickname' };
+    return { path: '/choose-nickname' }
   }
-});
+})
 
-export default router;
+export default router
