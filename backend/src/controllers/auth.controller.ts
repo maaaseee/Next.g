@@ -42,7 +42,7 @@ function getAuthCookieOptions(rememberMe = true) {
  * Strips sensitive fields (such as email, password_hash, token_version) before sending to client.
  */
 function sanitizeUser<T extends { email?: string; password_hash?: unknown; token_version?: unknown }>(user: T) {
-  const { email, password_hash, token_version, ...rest } = user;
+  const { email: _email, password_hash: _password_hash, token_version: _token_version, ...rest } = user;
   return rest;
 }
 
