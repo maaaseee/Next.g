@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@elysiajs/bearer": "^1.4.4",
-    "@elysiajs/cors": "^1.4.2",
+    "@elysiajs/cors": "^1.4.3",
     "@elysiajs/cron": "^1.4.2",
     "@elysiajs/eden": "^1.4.9",
     "@elysiajs/jwt": "^1.4.2",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/pg": "^8.23.1",
     "bun-types": "latest",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "module": "src/index.ts"
 }

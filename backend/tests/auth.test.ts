@@ -4,17 +4,16 @@
 
 import { describe, it, expect, beforeEach } from 'bun:test';
 import { app } from '../src/index';
-import { initDatabase, type SqlClient } from '../src/db/index';
+import { initDatabase } from '../src/db/index';
 
 describe('Auth & Onboarding Endpoints', () => {
-  let sql: SqlClient;
   const testEmail = `test_${Date.now()}@nextg.test`;
   const testPassword = 'Password123!';
   const testName = 'Gamer Tester';
   let authToken = '';
 
   beforeEach(async () => {
-    sql = await initDatabase();
+    await initDatabase();
   });
 
   it('should register a new user successfully', async () => {
