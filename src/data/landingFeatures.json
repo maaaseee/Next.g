@@ -1,56 +1,56 @@
 [
   {
     "id": "library",
-    "label": "Mi Biblioteca",
+    "label": "Biblioteca",
     "badge": "DISPONIBLE",
-    "title": "Biblioteca Inteligente con Drag & Drop",
-    "subtitle": "Gestión ágil de partidas sin fricción",
-    "description": "Organiza tu colección completa de videojuegos en cuatro estados clave: Jugando, Backlog, Completados y Lista de Deseos. Mueve títulos arrastrándolos con el cursor y filtra por plataforma o género en milisegundos.",
-    "screenshotUrl": "/screenshots/library.svg",
+    "title": "Organización de Colección",
+    "subtitle": "Clasificación por estados y plataformas",
+    "description": "Gestioná tus partidas en cuatro listas: Jugando, Backlog, Completados y Deseos, con arrastre manual y filtros rápidos.",
+    "screenshotUrl": "/screenshots/library.webp",
     "highlights": [
-      "Arrastre fluido Drag & Drop entre estados y categorías",
-      "Filtros combinados de género, consola y estado de juego",
-      "Portadas en alta resolución sincronizadas directamente con IGDB"
+      "Arrastre Drag & Drop entre listas",
+      "Filtros por plataforma y género",
+      "Portadas oficiales sincronizadas con IGDB"
     ],
     "actionPath": "/",
     "actionLabel": "Ir a Mi Biblioteca",
     "guestActionPath": "/register",
-    "guestActionLabel": "Crear Cuenta y Probar"
+    "guestActionLabel": "Probar Biblioteca"
   },
   {
     "id": "roulette",
-    "label": "Ruleta Gamer",
+    "label": "Ruleta",
     "badge": "DISPONIBLE",
-    "title": "Ruleta de Decisión Anti-Parálisis",
-    "subtitle": "El fin de scrollear menús durante horas",
-    "description": "¿No sabes qué arrancar un viernes a la noche? Configura tus plataformas disponibles, elige si quieres un RPG o un juego corto de acción, y deja que el algoritmo elija tu siguiente partida con animación de rueda clásica o tragamonedas.",
-    "screenshotUrl": "/screenshots/roulette.svg",
+    "title": "Selección Aleatoria",
+    "subtitle": "Sorteo filtrado según tu biblioteca",
+    "description": "Elegí tu próxima partida al azar aplicando filtros por consola, género o tiempo de juego disponible.",
+    "screenshotUrl": "/screenshots/roulette.webp",
     "highlights": [
-      "3 modos interactivos: Ruleta Clásica, Slot Vertical y Modo Co-op",
-      "Filtros avanzados por plataforma disponible, género y tiempo de juego",
-      "Acción directa para agregar o empezar a jugar en el momento"
+      "Modos Ruleta Clásica y Slot Vertical",
+      "Filtros por plataforma y duración",
+      "Acceso directo a la ficha del título"
     ],
     "actionPath": "/roulette",
-    "actionLabel": "Girar la Ruleta Gamer",
+    "actionLabel": "Girar Ruleta",
     "guestActionPath": "/roulette",
-    "guestActionLabel": "Girar la Ruleta Gamer"
+    "guestActionLabel": "Probar Ruleta"
   },
   {
     "id": "game-detail",
     "label": "Fichas IGDB",
     "badge": "DISPONIBLE",
-    "title": "Ficha Técnica Completa con API de Twitch/IGDB",
-    "subtitle": "Información exhaustiva antes de invertir 60 horas",
-    "description": "Sinopsis oficial, capturas de pantalla en 1080p, desarrolladores, trailers de YouTube, plataformas de lanzamiento y valoración de la crítica internacional para cada título de la base de datos.",
-    "screenshotUrl": "/screenshots/game-detail.svg",
+    "title": "Ficha Técnica y Detalles",
+    "subtitle": "Datos y valoraciones vía Twitch / IGDB",
+    "description": "Consultá sinopsis oficial, capturas, trailers, plataformas de lanzamiento y puntajes de la crítica.",
+    "screenshotUrl": "/screenshots/game-detail.webp",
     "highlights": [
-      "Galería multimedia con capturas en 1080p y trailers de YouTube",
-      "Puntajes de crítica especializada y valoración comunitaria",
-      "Recomendaciones algorítmicas de juegos similares relevantes"
+      "Trailers de YouTube y capturas",
+      "Puntajes de crítica y comunidad",
+      "Títulos similares recomendados"
     ],
     "actionPath": "/explore",
-    "actionLabel": "Explorar Catálogo de Fichas",
+    "actionLabel": "Explorar Catálogo",
     "guestActionPath": "/explore",
-    "guestActionLabel": "Explorar Catálogo de Fichas"
+    "guestActionLabel": "Ver Catálogo"
   }
 ]

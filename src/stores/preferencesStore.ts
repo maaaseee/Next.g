@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { GameStatus } from '@/types/game';
 import type { ThemeId } from '@/types/theme';
-import { useTheme } from '@/composables/useTheme';
 import { useAuthStore } from './authStore';
 import { useToastStore } from './toastStore';
 import { getApiUrl } from '@/config/api.config';
@@ -39,7 +38,6 @@ function getStoredString<T extends string>(key: string, fallback: T): T {
 }
 
 export const usePreferencesStore = defineStore('preferences', () => {
-  const theme = useTheme();
   const authStore = useAuthStore();
   const toast = useToastStore();
 
