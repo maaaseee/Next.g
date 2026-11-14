@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NEXT.g — OpenGraph Card (Vivid Royal Theme - 1200x630)</title>
-  
+
   <!-- Google Fonts: Monofett (Logo oficial del AppIcon/Navbar), Space Grotesk & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Monofett&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Monofett&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800;900&display=swap"
+    rel="stylesheet">
 
   <style>
     /* ==========================================================================
@@ -29,23 +32,37 @@
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
       /* Paleta Vivid Royal de NEXT.g */
-      --app-bg: #0c0d1b;                 /* Space Indigo 950 */
-      --app-surface: #12152a;            /* Space Indigo 900 */
-      --app-surface-hover: #1c213f;      /* Space Indigo 800 */
-      --app-primary: #4c32e9;            /* Vivid Royal 500 */
-      --app-primary-hover: #3f25d4;      /* Vivid Royal 600 */
-      --app-primary-light: #9882f8;      /* Vivid Royal 300 */
-      --app-accent: #7a22e8;             /* Deep Twilight 500 */
-      --app-text: #f0fdf4;               /* Honeydew 100 */
-      --app-text-muted: #8ca1c2;         /* Glaucous 400 */
-      --app-border: #272d50;             /* Space Indigo 700 */
+      --app-bg: #0c0d1b;
+      /* Space Indigo 950 */
+      --app-surface: #12152a;
+      /* Space Indigo 900 */
+      --app-surface-hover: #1c213f;
+      /* Space Indigo 800 */
+      --app-primary: #4c32e9;
+      /* Vivid Royal 500 */
+      --app-primary-hover: #3f25d4;
+      /* Vivid Royal 600 */
+      --app-primary-light: #9882f8;
+      /* Vivid Royal 300 */
+      --app-accent: #7a22e8;
+      /* Deep Twilight 500 */
+      --app-text: #f0fdf4;
+      /* Honeydew 100 */
+      --app-text-muted: #8ca1c2;
+      /* Glaucous 400 */
+      --app-border: #272d50;
+      /* Space Indigo 700 */
       --app-glow: rgba(76, 50, 233, 0.4);
 
       /* Estados estándar de backlog */
-      --status-playing: #34d399;         /* Jugando (emerald-400) */
-      --status-completed: #38bdf8;       /* Completados (sky-400) */
-      --status-backlog: #fbbf24;         /* Backlog (amber-400) */
-      --status-wishlist: #c084fc;        /* Deseados (purple-400) */
+      --status-playing: #34d399;
+      /* Jugando (emerald-400) */
+      --status-completed: #38bdf8;
+      /* Completados (sky-400) */
+      --status-backlog: #fbbf24;
+      /* Backlog (amber-400) */
+      --status-wishlist: #c084fc;
+      /* Deseados (purple-400) */
     }
 
     * {
@@ -88,6 +105,7 @@
       overflow: hidden;
       pointer-events: none;
     }
+
     .hero-wallpaper img {
       width: 100%;
       height: 100%;
@@ -96,15 +114,14 @@
       opacity: 0.18;
       filter: grayscale(100%) brightness(70%);
     }
+
     .hero-wallpaper-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(12, 13, 27, 0.70) 0%,
-        rgba(12, 13, 27, 0.90) 55%,
-        rgba(12, 13, 27, 0.98) 100%
-      );
+      background: linear-gradient(180deg,
+          rgba(12, 13, 27, 0.70) 0%,
+          rgba(12, 13, 27, 0.90) 55%,
+          rgba(12, 13, 27, 0.98) 100%);
     }
 
     /* Resplandores dinámicos Vivid Royal */
@@ -115,6 +132,7 @@
       pointer-events: none;
       z-index: 1;
     }
+
     .glow-primary {
       width: 480px;
       height: 480px;
@@ -122,6 +140,7 @@
       left: -80px;
       background: rgba(76, 50, 233, 0.28);
     }
+
     .glow-accent {
       width: 420px;
       height: 420px;
@@ -161,24 +180,10 @@
       color: #ffffff;
       user-select: none;
       display: inline-block;
-      text-shadow: 0 0 24px rgba(152, 130, 248, 0.45);
-      margin-top: 2px;
-    }
-    .brand-logo-text span {
-      color: var(--app-primary-light);
     }
 
-    .brand-tag {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      background: rgba(76, 50, 233, 0.15);
+    .brand-logo-text span {
       color: var(--app-primary-light);
-      border: 1px solid rgba(76, 50, 233, 0.35);
-      padding: 4px 8px;
-      border-radius: 2px;
     }
 
     .nav-links {
@@ -192,12 +197,14 @@
       text-transform: uppercase;
       color: var(--app-text-muted);
     }
+
     .nav-link.active {
       color: #ffffff;
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .nav-link.active::after {
       content: '';
       display: inline-block;
@@ -206,26 +213,6 @@
       border-radius: 50%;
       background: var(--app-primary-light);
       box-shadow: 0 0 6px var(--app-primary-light);
-    }
-
-    .nav-user-chip {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--app-surface);
-      border: 1px solid var(--app-border);
-      padding: 5px 12px;
-      border-radius: 2px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--app-text);
-    }
-    .nav-user-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
     }
 
     /* ==========================================================================
@@ -249,24 +236,6 @@
       justify-content: center;
     }
 
-    .kicker-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--app-primary-light);
-      background: rgba(76, 50, 233, 0.12);
-      border: 1px solid rgba(76, 50, 233, 0.3);
-      padding: 5px 12px;
-      border-radius: 2px;
-      width: fit-content;
-      margin-bottom: 16px;
-    }
-
     /* Título con la tipografía y gradiente exacto de LandingHero.vue */
     .hero-title {
       font-family: var(--font-display);
@@ -278,15 +247,14 @@
       color: #ffffff;
       margin-bottom: 16px;
     }
+
     .flowing-gradient-title {
-      background: linear-gradient(
-        90deg,
-        #7a22e8 0%,
-        #4c32e9 25%,
-        #9882f8 50%,
-        #38bdf8 75%,
-        #34d399 100%
-      );
+      background: linear-gradient(90deg,
+          #7a22e8 0%,
+          #4c32e9 25%,
+          #9882f8 50%,
+          #38bdf8 75%,
+          #34d399 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       display: inline;
@@ -300,56 +268,25 @@
       margin-bottom: 22px;
       max-width: 500px;
     }
+
     .hero-subtitle strong {
       font-weight: 700;
     }
-    .hero-subtitle .state-play { color: var(--status-playing); }
-    .hero-subtitle .state-comp { color: var(--status-completed); }
-    .hero-subtitle .state-back { color: var(--status-backlog); }
-    .hero-subtitle .state-wish { color: var(--status-wishlist); }
 
-    /* Botones de acción (Estilo cuadrado Backloggd exacto de LandingHero.vue) */
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
+    .hero-subtitle .state-play {
+      color: var(--status-playing);
     }
-    .btn-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-sans);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      padding: 12px 20px;
-      border-radius: 2px;
-      text-decoration: none;
-      border: 1px solid transparent;
-      user-select: none;
+
+    .hero-subtitle .state-comp {
+      color: var(--status-completed);
     }
-    .btn-action-primary {
-      background-color: var(--app-primary);
-      color: #ffffff;
-      border-color: var(--app-border);
-      box-shadow: 0 4px 16px rgba(76, 50, 233, 0.45);
+
+    .hero-subtitle .state-back {
+      color: var(--status-backlog);
     }
-    .btn-action-primary svg {
-      width: 15px;
-      height: 15px;
-      stroke: #ffffff;
-    }
-    .btn-action-secondary {
-      background-color: var(--app-surface);
-      color: var(--app-text);
-      border-color: var(--app-border);
-    }
-    .btn-action-secondary svg {
-      width: 15px;
-      height: 15px;
-      stroke: var(--app-text-muted);
+
+    .hero-subtitle .state-wish {
+      color: var(--status-wishlist);
     }
 
     /* Franja de características inferiores */
@@ -359,15 +296,17 @@
       gap: 20px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #64748b;
+      color: #b2bfd0;
       padding-top: 16px;
       border-top: 1px solid rgba(39, 45, 80, 0.6);
     }
+
     .stats-item {
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .stats-item svg {
       width: 13px;
       height: 13px;
@@ -393,7 +332,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 
+      box-shadow:
         0 20px 50px rgba(0, 0, 0, 0.8),
         0 0 40px rgba(76, 50, 233, 0.25);
       position: relative;
@@ -408,19 +347,30 @@
       justify-content: space-between;
       border-bottom: 1px solid var(--app-border);
     }
+
     .card-dots {
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .card-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
-    .card-dot.red { background: #ef4444; }
-    .card-dot.yellow { background: #f59e0b; }
-    .card-dot.green { background: #10b981; }
+
+    .card-dot.red {
+      background: #ef4444;
+    }
+
+    .card-dot.yellow {
+      background: #f59e0b;
+    }
+
+    .card-dot.green {
+      background: #10b981;
+    }
 
     .card-badge {
       font-family: var(--font-mono);
@@ -430,6 +380,7 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
+
     .card-status {
       display: flex;
       align-items: center;
@@ -438,6 +389,7 @@
       font-family: var(--font-mono);
       color: #34d399;
     }
+
     .card-status-dot {
       width: 6px;
       height: 6px;
@@ -453,6 +405,7 @@
       overflow: hidden;
       background: #080912;
     }
+
     .card-media img {
       width: 100%;
       height: 100%;
@@ -467,62 +420,11 @@
       left: 0;
       right: 0;
       height: 90px;
-      background: linear-gradient(
-        to top,
-        rgba(18, 21, 42, 0.95) 0%,
-        rgba(76, 50, 233, 0.25) 50%,
-        transparent 100%
-      );
+      background: linear-gradient(to top,
+          rgba(18, 21, 42, 0.95) 0%,
+          rgba(76, 50, 233, 0.25) 50%,
+          transparent 100%);
       pointer-events: none;
-    }
-
-    /* Píldoras flotantes con estados reales sobre la captura */
-    .floating-overlay-bar {
-      position: absolute;
-      bottom: 14px;
-      left: 14px;
-      right: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(12, 13, 27, 0.88);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--app-border);
-      padding: 8px 12px;
-      border-radius: 2px;
-    }
-
-    .library-stat {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .rating-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 800;
-      background: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      padding: 2px 7px;
-      border-radius: 2px;
-    }
-    .roulette-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--app-primary-light);
-      background: rgba(76, 50, 233, 0.2);
-      border: 1px solid rgba(76, 50, 233, 0.4);
-      padding: 3px 8px;
-      border-radius: 2px;
-      text-transform: uppercase;
     }
 
     /* ==========================================================================
@@ -534,26 +436,23 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(
-        90deg,
-        var(--app-primary) 0%,
-        var(--app-accent) 50%,
-        var(--app-primary-light) 100%
-      );
+      background: linear-gradient(90deg,
+          var(--app-primary) 0%,
+          var(--app-accent) 50%,
+          var(--app-primary-light) 100%);
     }
   </style>
 </head>
+
 <body>
 
   <!-- CONTENEDOR 1200x630 OPEN GRAPH -->
   <div class="og-container">
-    
+
     <!-- WALLPAPER REAL DEL HERO -->
     <div class="hero-wallpaper">
-      <img
-        src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=2000&q=80"
-        alt="Gaming Setup Wallpaper"
-      />
+      <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=2000&q=80"
+        alt="Gaming Setup Wallpaper" />
       <div class="hero-wallpaper-overlay"></div>
     </div>
 
@@ -567,7 +466,6 @@
         <div class="brand-logo-text">
           NEXT<span>.g</span>
         </div>
-        <div class="brand-tag">Game Hub</div>
       </div>
 
       <nav class="nav-links">
@@ -576,25 +474,16 @@
         <div class="nav-link">Ruleta</div>
         <div class="nav-link">Explorar</div>
       </nav>
-
-      <div class="nav-user-chip">
-        <span class="nav-user-dot"></span>
-        <span>Online</span>
-      </div>
     </header>
 
     <!-- CONTENIDO HERO DE LA LANDING -->
     <main class="og-content">
       <!-- Columna Izquierda: Mensaje y Call to Actions reales -->
       <section class="left-hero">
-        <div class="kicker-badge">
-          <span>●</span>
-          <span>Game Backlog &amp; Roulette Hub</span>
-        </div>
 
         <h1 class="hero-title">
-          Lleva el registro de cada <br />
-          <span class="flowing-gradient-title">videojuego que juegas.</span>
+          Llevá el registro de cada <br />
+          <span class="flowing-gradient-title">videojuego que jugás.</span>
         </h1>
 
         <p class="hero-subtitle">
@@ -605,33 +494,25 @@
           <strong class="state-wish">Deseados</strong>.
         </p>
 
-        <!-- Botones con diseño Backloggd de LandingHero.vue -->
-        <div class="hero-actions">
-          <div class="btn-action btn-action-primary">
-            <!-- LogIn Icon -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-            <span>Comenzar Ahora — Es Gratis</span>
-          </div>
-
-          <div class="btn-action btn-action-secondary">
-            <!-- Dices Icon -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="3"></rect><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>
-            <span>Girar Ruleta</span>
-          </div>
-        </div>
-
         <!-- Estadísticas en el pie -->
         <div class="stats-footer">
           <div class="stats-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>+300.000 Títulos IGDB</span>
           </div>
           <div class="stats-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
             <span>Filtro por Tiempo</span>
           </div>
           <div class="stats-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
             <span>Sin Carga Manual</span>
           </div>
         </div>
@@ -661,15 +542,6 @@
           </div>
 
           <!-- Píldoras flotantes auténticas de la interfaz -->
-          <div class="floating-overlay-bar">
-            <div class="library-stat">
-              <span class="rating-badge">★ 95</span>
-              <span style="font-size: 11px; font-weight: 700; color: #f8fafc;">Chrono Trigger</span>
-            </div>
-            <div class="roulette-pill">
-              <span>🎲 Ruleta Lista</span>
-            </div>
-          </div>
         </div>
       </aside>
     </main>
@@ -679,4 +551,5 @@
   </div>
 
 </body>
+
 </html>
