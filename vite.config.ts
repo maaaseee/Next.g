@@ -5,15 +5,29 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import packageJson from './package.json' with { type: 'json' }
 
+const siteUrl = (
+  process.env.VITE_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '') ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+  ''
+).replace(/\/+$/, '')
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
     tailwindcss(),
+    {
+      name: 'html-transform-og',
+      transformIndexHtml(html) {
+        const ogImageUrl = siteUrl ? `${siteUrl}/og-image.png` : '/og-image.png'
+        return html.replace(/__OG_IMAGE_URL__/g, ogImageUrl)
+      },
+    },
   ],
   define: {
-    '__APP_VERSION__': JSON.stringify(packageJson.version)
+    '__APP_VERSION__': JSON.stringify(packageJson.version),
   },
   resolve: {
     alias: {

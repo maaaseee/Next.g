@@ -19,7 +19,7 @@ export function useOpenGraph() {
     const appDesc =
       meta.description ||
       'Organiza tu backlog de videojuegos pendientes y elige tu próxima aventura al azar con la ruleta gamer comunitaria.';
-    const appImage = meta.image || '/og-image.svg';
+    const appImage = meta.image || '/og-image.png';
     const appUrl = meta.url || (typeof window !== 'undefined' ? window.location.href : '');
 
     // 1. Primary Page Title
@@ -56,7 +56,7 @@ export function useOpenGraph() {
     setMeta({
       title: 'NEXT.g — Backlog & Ruleta Gamer',
       description: 'Organiza tu backlog de videojuegos pendientes y elige tu próxima aventura al azar con la ruleta gamer comunitaria.',
-      image: '/og-image.svg',
+      image: '/og-image.png',
     });
   }
 
